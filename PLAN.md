@@ -55,6 +55,9 @@ Validation gate G1:
 - Reference, verifier, metric, randomized, and formal checks are integrated into
   the existing CI gate.
 
+Phase 1 implementation does not include baseline generation or any optimization
+algorithm; those remain gated by G1 and begin in later phases.
+
 ## Phase 2 — Comparable Baselines
 
 Scope:

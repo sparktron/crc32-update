@@ -1,0 +1,19 @@
+# Build one combined equivalence miter with an assertion. Berkeley ABC must
+# successfully synthesize a saved copy; the original bit-vector miter is then
+# emitted for the companion Yosys SMTBMC/Z3 proof.
+
+read_verilog reference/crc32_reference.v
+read_verilog verifier/fixtures/valid_crc32_network.v
+proc
+miter -equiv -flatten -make_assert crc32_reference crc32_network crc32_miter
+hierarchy -check -top crc32_miter
+opt
+design -save proof_design
+techmap
+opt
+abc -exe yosys-abc -g simple
+opt
+check
+design -load proof_design
+prep -top crc32_miter
+write_smt2 -wires /tmp/crc32_equivalence_miter.smt2
