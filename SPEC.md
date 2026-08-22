@@ -4,6 +4,8 @@ Status: frozen for implementation
 
 Frozen on: 2026-08-22
 
+Revision: 1 — preserve explicit XOR2 instances for physical fanout accounting
+
 ## 1. Objective and Scope
 
 Design and verify combinational circuits for one 64-bit parallel update of a
@@ -112,8 +114,14 @@ vector.
 ### 3.4 Structural-network rules
 
 Every XOR node must have exactly two previously defined inputs. XOR input order
-is canonicalized for structural comparison. The graph must be combinational and
-acyclic.
+is canonicalized within each instance for deterministic representation. The
+graph must be combinational and acyclic.
+
+Each separately defined XOR node represents a distinct physical XOR2 instance.
+Two instances remain distinct even when they have the same canonical input
+pair. This makes intentional logic duplication representable when it is used to
+split fanout. Common-subexpression merging is an optimizer transformation that
+produces a different circuit; it is not parser or metric normalization.
 
 Accepted structural forms must be equivalent to either:
 
@@ -176,13 +184,17 @@ of the 32 outputs.
 Metrics are computed only after:
 
 1. Direct aliases are propagated.
-2. XOR input order is canonicalized.
-3. Structurally identical XOR nodes are merged.
-4. Nodes unreachable from primary outputs are removed.
+2. XOR input order is canonicalized independently within each XOR instance.
+3. Nodes unreachable from primary outputs are removed.
+
+Separately instantiated XOR nodes are never merged by metric normalization,
+even if their canonical input pairs are identical. Merging those nodes would
+change both physical gate count and fanout, so it is measured only when an
+optimizer explicitly emits the merged circuit as a new candidate.
 
 The independent verifier must report:
 
-- XOR2 count: number of remaining unique two-input XOR nodes
+- XOR2 count: number of retained physical two-input XOR instances
 - Maximum depth: maximum of all output depths
 - Output depths: an ordered 32-element list for `next_crc[0]` through
   `next_crc[31]`
@@ -192,9 +204,11 @@ The independent verifier must report:
 - Intermediate-node count
 - Direct-output-alias count
 
-Fanout of a signal is its number of consumers after canonicalization, including
-primary outputs as consumers. Each XOR input pin is one consumer occurrence;
-each direct primary-output connection is one consumer occurrence.
+Fanout of a signal is its number of consumers after alias propagation,
+per-instance input canonicalization, and unreachable-node removal, including
+primary outputs as consumers. Each retained XOR instance contributes its input
+pin consumers independently, including when another instance has the same input
+pair. Each direct primary-output connection is one consumer occurrence.
 
 For signal set `S`, with fanout `fo(s)`:
 
@@ -207,9 +221,9 @@ total_excess_fanout_above_4 = sum(max(0, fo(s) - 4) for s in S)
 not counted or inferred unless a separate explicit physical-library model is
 introduced; such a model is outside the default experiment.
 
-An intermediate node is a retained XOR node. A direct-output alias is an output
-whose final driver is a primary input or XOR node without a dedicated XOR node
-created solely for the output connection.
+An intermediate node is a retained physical XOR instance. A direct-output alias
+is an output whose final driver is a primary input or XOR node without a
+dedicated XOR node created solely for the output connection.
 
 ## 6. Independent Verification Requirements
 
@@ -248,6 +262,10 @@ Verifier tests must include deliberately broken circuits covering, at minimum:
 - Combinational cycle
 - Missing or undriven output
 - Unreachable-node reporting and removal
+
+Metric tests must also include two structurally identical XOR instances feeding
+different consumers. Both instances must survive normalization, count as two
+gates, and split fanout according to their actual consumers.
 
 ## 7. Required Baselines
 

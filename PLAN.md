@@ -12,6 +12,7 @@ Scope:
 - Define phased work and validation gates.
 - Establish a status record and append-only optimization search log.
 - Point the repository README at the experiment control documents.
+- Establish a least-privilege GitHub Actions workflow for structure checks.
 
 Validation gate G0:
 
@@ -19,6 +20,8 @@ Validation gate G0:
 - The search log is valid as an empty JSONL stream and contains no fabricated
   attempts.
 - Status reports no candidate metrics or validation claims.
+- GitHub Actions checks required files, trailing whitespace, and JSONL search-log
+  structure on pull requests and pushes to `master`.
 - No reference, verifier, generator, optimizer, or candidate implementation has
   begun.
 
@@ -32,6 +35,8 @@ Scope:
 - Define and parse the restricted structural XOR2 network format.
 - Independently evaluate networks, canonicalize them, and recompute all frozen
   metrics.
+- Preserve separately instantiated XOR2 nodes so fanout-aware physical
+  duplication remains measurable.
 - Check all-zero and 96 basis-vector exact equivalence.
 - Add seeded testing over at least 100,000 random pairs.
 - Add SAT/equivalence checking with Yosys or ABC.
@@ -43,9 +48,12 @@ Validation gate G1:
 - Matrix reconstruction agrees with the normative bit-serial reference.
 - Every required malformed-network fixture is rejected with a nonzero exit.
 - A known-correct structural fixture passes exact, random, and formal checks.
-- Metric unit tests cover alias propagation, duplicate merging, dead-node
-  removal/reporting, depth, fanout, and excess fanout.
+- Metric unit tests cover alias propagation, preservation of intentional
+  duplicate instances, dead-node removal/reporting, depth, fanout, and excess
+  fanout.
 - Clean-checkout commands are documented in the README.
+- Reference, verifier, metric, randomized, and formal checks are integrated into
+  the existing CI gate.
 
 ## Phase 2 — Comparable Baselines
 
@@ -73,6 +81,8 @@ Scope:
 - Implement GF(2)-vector-aware two-term and multi-term extraction.
 - Implement Boyar–Peralta-style straight-line-program heuristics.
 - Add depth-aware common-subexpression elimination.
+- Treat common-subexpression merging as an explicit candidate transformation,
+  never as metric normalization.
 - Explore sharing versus depth and selected output-subset re-synthesis.
 - Preserve the best verified candidate after every stage.
 
