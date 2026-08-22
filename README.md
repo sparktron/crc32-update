@@ -28,8 +28,9 @@ exist and have been validated.
 GitHub Actions runs the `CI` workflow for pull requests, pushes to `master`, and
 manual dispatches. It checks the control files and search log, regenerates the
 Phase 1 fixture, runs the unit and rejection suite, checks 97 exact plus 100,000
-seeded random vectors, runs formal equivalence, and validates the deterministic
-Phase 2 baselines.
+seeded random vectors, runs formal equivalence, and regenerates then validates
+the deterministic Phase 2 baselines. The generation timings and measurement
+results in that CI check always refer to the same generated artifacts.
 
 Phase 1 reference, matrix, parser, metric, equivalence, rejection, and formal
 tests run in the same CI gate. Baseline checks do not run any stochastic or

@@ -188,12 +188,12 @@ jobs:
           cmp results/baselines/greedy_cse.v \
             /tmp/generated_baselines/greedy_cse.v
 
-      - name: Verify and measure committed baselines
+      - name: Verify and measure generated baselines
         shell: bash
         run: |
           set -euo pipefail
           python3 -m verifier.verify_baselines \
-            --baselines-dir results/baselines \
+            --baselines-dir /tmp/generated_baselines \
             --generation-timings /tmp/baseline_generation_timings.json \
             --metrics-output /tmp/baseline_metrics.csv \
             --random-tests 100000 \

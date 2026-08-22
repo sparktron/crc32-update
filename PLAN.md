@@ -74,7 +74,8 @@ Validation gate G2:
 
 - Every baseline passes the structural parser, 97 exact checks, at least 100,000
   seeded random tests, and formal equivalence.
-- Metrics are produced only by the independent verifier.
+- Metrics are produced only by the independent verifier from the generated
+  artifacts whose timings they report.
 - Reproduction commands and tool versions are recorded.
 - External baseline metadata captures convention, width, gate model, metric
   definitions, and comparability.
