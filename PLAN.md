@@ -1,0 +1,174 @@
+# CRC32 Superoptimization Development Plan
+
+This document is the repository development roadmap. Work proceeds in order;
+later phases do not begin until the preceding validation gate passes. The
+current phase is tracked in `STATUS.md`.
+
+## Phase 0 — Experiment Structure
+
+Scope:
+
+- Freeze CRC semantics, circuit restrictions, metrics, and acceptance criteria.
+- Define phased work and validation gates.
+- Establish a status record and append-only optimization search log.
+- Point the repository README at the experiment control documents.
+
+Validation gate G0:
+
+- `SPEC.md`, `PLAN.md`, `STATUS.md`, and `results/search_log.jsonl` exist.
+- The search log is valid as an empty JSONL stream and contains no fabricated
+  attempts.
+- Status reports no candidate metrics or validation claims.
+- No reference, verifier, generator, optimizer, or candidate implementation has
+  begun.
+
+## Phase 1 — Reference, Matrix, Format, and Independent Verifier
+
+Scope:
+
+- Implement the normative Python bit-serial reference.
+- Implement an independent reference RTL model.
+- Generate the 32-by-96 GF(2) transformation matrix from the normative model.
+- Define and parse the restricted structural XOR2 network format.
+- Independently evaluate networks, canonicalize them, and recompute all frozen
+  metrics.
+- Check all-zero and 96 basis-vector exact equivalence.
+- Add seeded testing over at least 100,000 random pairs.
+- Add SAT/equivalence checking with Yosys or ABC.
+- Test the verifier against deliberately broken circuits before optimization.
+
+Validation gate G1:
+
+- Python and RTL references agree on basis vectors and the seeded random corpus.
+- Matrix reconstruction agrees with the normative bit-serial reference.
+- Every required malformed-network fixture is rejected with a nonzero exit.
+- A known-correct structural fixture passes exact, random, and formal checks.
+- Metric unit tests cover alias propagation, duplicate merging, dead-node
+  removal/reporting, depth, fanout, and excess fanout.
+- Clean-checkout commands are documented in the README.
+
+## Phase 2 — Comparable Baselines
+
+Scope:
+
+- Generate independently expanded per-output equations.
+- Generate balanced per-output XOR2 trees with no sharing.
+- Normalize conventional Yosys/ABC synthesis output to the frozen XOR2 model.
+- Implement greedy common-subexpression elimination.
+- Verify and measure every baseline identically.
+
+Validation gate G2:
+
+- Every baseline passes the structural parser, 97 exact checks, at least 100,000
+  seeded random tests, and formal equivalence.
+- Metrics are produced only by the independent verifier.
+- Reproduction commands and tool versions are recorded.
+- External baseline metadata captures convention, width, gate model, metric
+  definitions, and comparability.
+
+## Phase 3 — Deterministic Optimization
+
+Scope:
+
+- Implement GF(2)-vector-aware two-term and multi-term extraction.
+- Implement Boyar–Peralta-style straight-line-program heuristics.
+- Add depth-aware common-subexpression elimination.
+- Explore sharing versus depth and selected output-subset re-synthesis.
+- Preserve the best verified candidate after every stage.
+
+Validation gate G3:
+
+- Each attempt is appended to `results/search_log.jsonl` with parameters,
+  runtime, starting/final metrics, verification outcome, and disposition.
+- All retained candidates pass periodic independent verification.
+- Candidate A and initial depth-bounded/frontier candidates are reproducible.
+- No invalid or unverified candidate appears on the valid frontier.
+
+## Phase 4 — Stochastic and Local Search
+
+Scope:
+
+- Run simulated annealing or other stochastic local search.
+- Run iterated local improvement from multiple recorded seeds.
+- Re-synthesize selected output subsets.
+- Investigate fanout-aware duplication and sharing/depth tradeoffs.
+- Search depth bounds 8, and bounds 9 and 10 when required by the specification.
+
+Validation gate G4:
+
+- Random seeds and compute budgets are recorded and reproducible.
+- Candidate A, Candidate B, and Candidate C classes have verified best-found
+  representatives or an explicit documented failure to find one.
+- Depth-bounded candidates satisfy their claimed bounds under independent
+  recomputation.
+- The nondominated frontier is regenerated from verified metrics only.
+
+## Phase 5 — Exact Small-Subcircuit Improvement
+
+Scope:
+
+- Select bounded, high-value subcircuits from verified candidates.
+- Apply SAT/SMT search for gate removal, depth reduction, or constrained
+  replacement.
+- Integrate only exact, independently verified replacements.
+- Record timeouts and negative results without treating them as certificates.
+
+Validation gate G5:
+
+- Every replacement has exact local-function evidence and full-network
+  verification.
+- Solver versions, constraints, limits, and outcomes are recorded.
+- Any optimality claim is limited to the exact encoded problem and accompanied
+  by a checkable certificate or unsatisfiability result.
+
+## Phase 6 — Final Verification, Comparison, and Reporting
+
+Scope:
+
+- Rebuild all artifacts from a clean checkout.
+- Re-run structural, exact-basis, randomized, metric, and formal checks for all
+  submitted candidates.
+- Generate the Pareto frontier and metrics table.
+- Research relevant published approaches and open-source generators.
+- Document failed or misleading approaches and comparison limitations.
+- Assess publishability without overstating novelty or optimality.
+
+Validation gate G6:
+
+- All required deliverables exist and are generated by documented commands.
+- Every submitted candidate satisfies all acceptance criteria in `SPEC.md`.
+- Candidate files, frontier JSON, metrics CSV, search log, and report agree.
+- README commands work from a clean checkout.
+- The report includes all required methodology, results, limitations, and
+  reproduction sections.
+
+## Planned Deliverable Layout
+
+Implementation phases will populate the following structure; Phase 0 creates
+only the experiment control files requested for setup:
+
+```text
+crc32-superopt/
+├── README.md
+├── reference/
+│   ├── crc32_reference.py
+│   └── crc32_reference.v
+├── verifier/
+│   ├── verify_network.py
+│   ├── formal_equivalence.ys
+│   └── test_verifier.py
+├── generator/
+│   ├── build_matrix.py
+│   └── baseline_generator.py
+├── optimizer/
+│   ├── optimize.py
+│   └── search_config.yaml
+├── results/
+│   ├── candidate_a_min_area.v
+│   ├── candidate_b_depth8.v
+│   ├── candidate_c_min_depth.v
+│   ├── pareto_frontier.json
+│   ├── metrics.csv
+│   └── search_log.jsonl
+└── report.md
+```
