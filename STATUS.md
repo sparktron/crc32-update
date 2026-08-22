@@ -110,7 +110,7 @@ Tool versions used locally:
 - Random network equivalence: 100,000 pairs passed with seed `0xC32A5EED`
   (`3274333933`).
 - Formal equivalence: Yosys built the combined 96-input miter, Berkeley ABC
-  synthesized an independent saved copy, and Yosys SMTBMC/Z3 proved every
+  synthesized the structural network, and Yosys SMTBMC/Z3 proved every
   output comparison for all inputs.
 - Invalid-circuit CLI checks: all eight fixtures exited nonzero; seven failed
   structural parsing and `wrong_function.v` failed exact equivalence.
@@ -149,7 +149,7 @@ Tool versions used locally:
   identical XOR gates remain distinct.
 - Direct ABC CEC and Yosys 0.9's gate-level SAT proof did not finish promptly
   after XOR logic was flattened to AIG/CNF form. The passing flow instead uses
-  ABC as an independent synthesis check and Yosys SMTBMC with Z3 for the
+  ABC as a structural-network synthesis check and Yosys SMTBMC with Z3 for the
   exhaustive bit-vector equivalence proof. This is consistent with the
   specification's SAT/SMT equivalence requirement; the unsuccessful trials are
   not reported as passes.

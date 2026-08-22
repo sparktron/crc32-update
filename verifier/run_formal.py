@@ -50,7 +50,7 @@ def run() -> None:
     if proof.returncode != 0 or "Status: PASSED" not in output:
         raise RuntimeError("Yosys SMTBMC/Z3 did not prove equivalence:\n" + output)
     print("Yosys generated a combined 96-input equivalence miter.")
-    print("Berkeley ABC synthesis completed on an independent miter copy.")
+    print("Berkeley ABC synthesis completed on the structural network.")
     print("Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.")
 
 
