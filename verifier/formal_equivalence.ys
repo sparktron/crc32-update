@@ -1,0 +1,21 @@
+# Template rendered by run_formal.py for one explicitly submitted network.
+# Berkeley ABC must successfully synthesize that network. Then reload both
+# untouched designs, build a combined assertion miter, and emit it for the
+# companion Yosys SMTBMC/Z3 proof.
+
+read_verilog reference/crc32_reference.v
+read_verilog @CANDIDATE_FILE@
+proc
+design -save source_design
+hierarchy -check -top @CANDIDATE_MODULE@
+flatten
+opt
+techmap
+opt
+abc -exe yosys-abc -g simple
+opt
+check
+design -load source_design
+miter -equiv -flatten -make_assert crc32_reference @CANDIDATE_MODULE@ crc32_miter
+prep -top crc32_miter
+write_smt2 -wires @SMT2_OUTPUT@

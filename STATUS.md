@@ -2,14 +2,15 @@
 
 Last updated: 2026-08-22
 
-Current phase: Phase 0 — Experiment Structure
+Current phase: Phase 1 — Reference, Matrix, Format, and Independent Verifier
 
-Current gate: G0
+Current gate: G1 passed locally; CI integration added
 
 ## Current Best Results
 
-No circuits have been generated, measured, optimized, or accepted. There is no
-current Pareto frontier and no best-found result.
+No optimization candidate has been generated or accepted. There is no current
+Pareto frontier and no best-found result. The generated 1,390-XOR structural
+network is a Phase 1 validation fixture only, not a candidate or baseline.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |
@@ -17,7 +18,7 @@ current Pareto frontier and no best-found result.
 | B — depth at most 8 | — | — | Not run | Not started |
 | C — minimum-depth search | — | — | Not run | Not started |
 
-No baseline metrics exist yet.
+No Phase 2 baseline metrics exist yet.
 
 ## Completed Work
 
@@ -31,32 +32,142 @@ No baseline metrics exist yet.
   machine-readable search-log structure with read-only repository permissions.
 - The metric model preserves separately instantiated XOR2 gates, resolving the
   conflict between structural merging and required fanout-aware duplication.
+- The normative Python and independently written Verilog reference models use
+  the frozen reflected IEEE CRC-32 semantics.
+- The GF(2) generator builds the 32-by-96 transformation matrix in the frozen
+  basis order and reproducibly emits an unoptimized structural validation
+  fixture.
+- The independent verifier parses the restricted XOR2 subset, propagates
+  aliases, removes and reports unreachable nodes, preserves physical duplicate
+  instances, evaluates networks, and recomputes every required metric.
+- Exact all-zero plus 96 basis-vector checks, seeded bit-parallel randomized
+  checks, and Yosys/ABC/Z3 formal equivalence are implemented.
+- Deliberately malformed and functionally incorrect fixtures demonstrate
+  nonzero verifier exits.
+- GitHub Actions runs every Phase 1 acceptance command.
+
+## Files Created for Phase 1
+
+- `.gitignore`
+- `reference/__init__.py`
+- `reference/crc32_reference.py`
+- `reference/crc32_reference.v`
+- `generator/__init__.py`
+- `generator/build_matrix.py`
+- `verifier/__init__.py`
+- `verifier/verify_network.py`
+- `verifier/run_formal.py`
+- `verifier/formal_equivalence.ys`
+- `verifier/test_verifier.py`
+- `verifier/fixtures/valid_crc32_network.v`
+- `verifier/fixtures/duplicate_instances.v`
+- `verifier/fixtures/unreachable_node.v`
+- `verifier/fixtures/invalid/chained_xor.v`
+- `verifier/fixtures/invalid/cycle.v`
+- `verifier/fixtures/invalid/forbidden_gate.v`
+- `verifier/fixtures/invalid/forward_reference.v`
+- `verifier/fixtures/invalid/missing_output.v`
+- `verifier/fixtures/invalid/multiply_defined.v`
+- `verifier/fixtures/invalid/undefined_signal.v`
+- `verifier/fixtures/invalid/wrong_function.v`
+
+## Commands Executed
+
+Required formal tools were installed with:
+
+```bash
+sudo apt-get install -y yosys berkeley-abc
+sudo apt-get install -y z3
+```
+
+The final Phase 1 acceptance commands were:
+
+```bash
+python3 -m generator.build_matrix \
+  --matrix-output /tmp/crc32_matrix.json \
+  --network-output verifier/fixtures/valid_crc32_network.v
+python3 -m unittest -v verifier.test_verifier
+python3 -m verifier.verify_network \
+  verifier/fixtures/valid_crc32_network.v \
+  --random-tests 100000 \
+  --seed 0xC32A5EED \
+  --output /tmp/phase1_verification.json
+python3 -m verifier.run_formal \
+  verifier/fixtures/valid_crc32_network.v \
+  --module crc32_network
+```
+
+Tool versions used locally:
+
+- Python 3.10.12
+- Yosys 0.9 (`git sha1 1979e0b`)
+- Berkeley ABC 1.01 (compiled 2022-01-29)
+- Z3 4.8.12
+
+## Test Results
+
+- Unit/rejection suite: 19 tests passed, 0 failed, 0 skipped.
+- Matrix reconstruction: 1,000 seeded random pairs matched the Python reference.
+- Exact network equivalence: all-zero plus 96 basis vectors passed (97 total).
+- Random network equivalence: 100,000 pairs passed with seed `0xC32A5EED`
+  (`3274333933`).
+- Formal equivalence: Yosys built the combined 96-input miter, Berkeley ABC
+  synthesized the explicitly submitted structural network, and Yosys
+  SMTBMC/Z3 proved every output comparison for all inputs. A negative formal
+  regression confirmed that `wrong_function.v` fails.
+- Invalid-circuit CLI checks: all eight fixtures exited nonzero; seven failed
+  structural parsing and `wrong_function.v` failed exact equivalence.
+- Unreachable-node fixture: accepted structurally, reported `assign:dead`, and
+  removed it before metrics.
+- Duplicate-instance fixture: both identical physical gates were retained.
+- Validation-fixture metrics: 1,390 XOR2 instances, maximum depth 51, maximum
+  fanout 20, total fanout 2,812, and total excess fanout above four 1,038. These
+  are not optimization or baseline results.
 
 ## Not Started
 
-- Normative reference implementation
-- Independent RTL reference
-- GF(2) transformation-matrix generator
-- Structural-network parser and evaluator
-- Independent metric calculator
-- Deliberately broken verifier fixtures and verifier tests
-- Randomized and formal equivalence infrastructure
 - Baseline generation and measurement
 - Deterministic, stochastic, depth-bounded, and exact-subcircuit searches
 - Candidate netlists, Pareto frontier, metrics table, and final report
 - Literature and open-source comparison research
 
+## Semantic Ambiguities or Discrepancies
+
+- The permitted structural representation is intentionally a strict,
+  non-ANSI Verilog subset: exact vector port declarations, scalar internal
+  wires, direct aliases, one-XOR assignments, and named-port `xor2` instances.
+  Equivalent behavioral Verilog is not accepted as a submitted network.
+- Because every node must use previously defined inputs, any cycle necessarily
+  contains a forward reference. Cycle detection runs first so the deliberate
+  cycle fixture is diagnosed as a cycle; acyclic later-defined dependencies are
+  diagnosed as forward references.
+- “Dead output” is implemented as a missing or undriven `next_crc` bit.
+  Unreachable internal XOR nodes are not malformed; they are reported and
+  removed before metrics, as required by SPEC.md Section 6.
+- `direct_output_alias_count` counts output bits whose submitted driver is an
+  alias rather than an XOR instance. Internal alias chains are propagated before
+  depth and fanout accounting.
+- Under the physical-instance clarification in SPEC.md Revision 1,
+  `intermediate_node_count` and `xor2_count` are equal. Separately instantiated
+  identical XOR gates remain distinct.
+- Direct ABC CEC and Yosys 0.9's gate-level SAT proof did not finish promptly
+  after XOR logic was flattened to AIG/CNF form. The passing flow instead uses
+  ABC as a structural-network synthesis check and Yosys SMTBMC with Z3 for the
+  exhaustive bit-vector equivalence proof. This is consistent with the
+  specification's SAT/SMT equivalence requirement; the unsuccessful trials are
+  not reported as passes.
+- The Verilog reference expresses the normative conditional polynomial update
+  as the algebraically identical masked-feedback XOR recurrence. This avoids
+  introducing mux layers while preserving the frozen bit-serial semantics; the
+  exhaustive proof checks it against the Python-derived structural fixture.
+
 ## Unresolved Issues
 
-- Confirm the available versions and capabilities of Yosys, ABC, and any SAT/SMT
-  solver before choosing the formal-equivalence and exact-search command lines.
 - Set and record concrete compute budgets for deterministic, stochastic, and
   solver-backed searches before those phases begin.
-- Select reproducible random seeds and record the random generator/version before
-  creating randomized verification corpora or search attempts.
-- Confirm final artifact naming conventions before Phase 1. The
-  `crc32-superopt/` label in the requested deliverable tree is treated as the
-  repository root, not as a nested directory.
+- Batch orchestration for formally checking multiple future candidates belongs
+  to later phases; the Phase 1 runner already requires one explicit network per
+  invocation and validates its module name.
 
 ## Gate G0 Checklist
 
@@ -66,4 +177,18 @@ No baseline metrics exist yet.
 - [x] `results/search_log.jsonl` exists and contains no fabricated attempt.
 - [x] README reflects the structure-only setup state.
 - [x] GitHub Actions CI enforces the Phase 0 structure checks.
-- [x] No implementation or optimization work has begun.
+- [x] Phase 0 introduced no implementation or optimization work.
+
+## Gate G1 Checklist
+
+- [x] Python and Verilog semantics agree exhaustively through the generated
+  structural network and formal miter.
+- [x] Matrix reconstruction matches the normative bit-serial reference.
+- [x] Every deliberately invalid fixture exits nonzero through the verifier CLI.
+- [x] The known-correct structural fixture passes exact and randomized checks.
+- [x] Metrics cover aliases, duplicate instances, unreachable nodes, depth,
+  fanout, and excess fanout.
+- [x] Formal equivalence passes with Yosys, Berkeley ABC, and Z3.
+- [x] Clean-checkout Phase 1 commands are documented in `README.md`.
+- [x] CI contains every Phase 1 acceptance gate.
+- [x] No Phase 2 baseline or optimization algorithm has been implemented.

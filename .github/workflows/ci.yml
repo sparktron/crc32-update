@@ -129,3 +129,45 @@ jobs:
 
           print(f"Validated {len(attempt_ids)} optimization attempt record(s).")
           PY
+
+      - name: Install formal verification tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends yosys z3
+
+      - name: Check generated Phase 1 structural reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m generator.build_matrix \
+            --matrix-output /tmp/crc32_matrix.json \
+            --network-output /tmp/valid_crc32_network.v
+          cmp verifier/fixtures/valid_crc32_network.v \
+            /tmp/valid_crc32_network.v
+
+      - name: Run Phase 1 unit and rejection tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v verifier.test_verifier
+
+      - name: Run Phase 1 acceptance verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m verifier.verify_network \
+            verifier/fixtures/valid_crc32_network.v \
+            --random-tests 100000 \
+            --seed 0xC32A5EED \
+            --output /tmp/phase1_verification.json
+          python3 -m json.tool /tmp/phase1_verification.json
+
+      - name: Run formal equivalence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m verifier.run_formal \
+            verifier/fixtures/valid_crc32_network.v \
+            --module crc32_network
