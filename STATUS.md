@@ -29,6 +29,8 @@ No baseline metrics exist yet.
 - The repository README identifies the setup state and control documents.
 - GitHub Actions CI validates required scaffolding, trailing whitespace, and the
   machine-readable search-log structure with read-only repository permissions.
+- The metric model preserves separately instantiated XOR2 gates, resolving the
+  conflict between structural merging and required fanout-aware duplication.
 
 ## Not Started
 

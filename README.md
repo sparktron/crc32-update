@@ -31,3 +31,11 @@ record in `results/search_log.jsonl` against the required log fields.
 
 Circuit verification and optimization tests will be added to the same CI gate
 when their implementations pass the corresponding phases in `PLAN.md`.
+
+## Circuit Metric Model
+
+Each separately instantiated XOR2 node is a distinct physical gate, even when
+another node has the same inputs. Metric normalization preserves those instances
+so fanout-aware duplication can trade additional gates for reduced fanout.
+Common-subexpression merging is measured as an explicit optimization that emits
+a different circuit, not as an automatic verifier rewrite.
