@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scaffolding:
+    name: Validate experiment scaffolding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check required files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required_files=(
+            README.md
+            SPEC.md
+            PLAN.md
+            STATUS.md
+            results/search_log.jsonl
+          )
+
+          for required_file in "${required_files[@]}"; do
+            test -f "${required_file}" || {
+              echo "Missing required file: ${required_file}" >&2
+              exit 1
+            }
+          done
+
+      - name: Reject trailing whitespace
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git grep -nI -E '[[:blank:]]+$' -- .; then
+            echo "Trailing whitespace found." >&2
+            exit 1
+          fi
+
+      - name: Validate optimization search log
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("results/search_log.jsonl")
+          required_fields = {
+              "timestamp_utc",
+              "attempt_id",
+              "algorithm",
+              "parameters",
+              "seed",
+              "runtime_seconds",
+              "starting_metrics",
+              "final_metrics",
+              "verification_passed",
+              "accepted",
+              "rejection_reason",
+              "artifact",
+          }
+          attempt_ids = set()
+
+          for line_number, raw_line in enumerate(path.read_text().splitlines(), 1):
+              if not raw_line.strip():
+                  raise SystemExit(f"{path}:{line_number}: blank JSONL record")
+
+              try:
+                  record = json.loads(raw_line)
+              except json.JSONDecodeError as error:
+                  raise SystemExit(f"{path}:{line_number}: {error}") from error
+
+              if not isinstance(record, dict):
+                  raise SystemExit(f"{path}:{line_number}: record must be an object")
+
+              missing_fields = sorted(required_fields - record.keys())
+              if missing_fields:
+                  missing = ", ".join(missing_fields)
+                  raise SystemExit(
+                      f"{path}:{line_number}: missing required fields: {missing}"
+                  )
+
+              attempt_id = record["attempt_id"]
+              if not isinstance(attempt_id, str) or not attempt_id:
+                  raise SystemExit(
+                      f"{path}:{line_number}: attempt_id must be a nonempty string"
+                  )
+              if attempt_id in attempt_ids:
+                  raise SystemExit(
+                      f"{path}:{line_number}: duplicate attempt_id: {attempt_id}"
+                  )
+              attempt_ids.add(attempt_id)
+
+              if not isinstance(record["parameters"], dict):
+                  raise SystemExit(
+                      f"{path}:{line_number}: parameters must be an object"
+                  )
+              if type(record["verification_passed"]) is not bool:
+                  raise SystemExit(
+                      f"{path}:{line_number}: verification_passed must be boolean"
+                  )
+              if type(record["accepted"]) is not bool:
+                  raise SystemExit(
+                      f"{path}:{line_number}: accepted must be boolean"
+                  )
+              if not record["accepted"] and not record["rejection_reason"]:
+                  raise SystemExit(
+                      f"{path}:{line_number}: rejected attempt needs a reason"
+                  )
+
+          print(f"Validated {len(attempt_ids)} optimization attempt record(s).")
+          PY

@@ -21,3 +21,13 @@ Experiment control documents:
 
 Regeneration, optimization, verification, and measurement commands will be
 added only after the corresponding tools exist and have been validated.
+
+## Continuous Integration
+
+GitHub Actions runs the `CI` workflow for pull requests, pushes to `master`, and
+manual dispatches. During the structure-only phase it checks that the required
+control files exist, rejects trailing whitespace, and validates every nonempty
+record in `results/search_log.jsonl` against the required log fields.
+
+Circuit verification and optimization tests will be added to the same CI gate
+when their implementations pass the corresponding phases in `PLAN.md`.

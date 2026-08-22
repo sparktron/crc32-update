@@ -12,6 +12,7 @@ Scope:
 - Define phased work and validation gates.
 - Establish a status record and append-only optimization search log.
 - Point the repository README at the experiment control documents.
+- Establish a least-privilege GitHub Actions workflow for structure checks.
 
 Validation gate G0:
 
@@ -19,6 +20,8 @@ Validation gate G0:
 - The search log is valid as an empty JSONL stream and contains no fabricated
   attempts.
 - Status reports no candidate metrics or validation claims.
+- GitHub Actions checks required files, trailing whitespace, and JSONL search-log
+  structure on pull requests and pushes to `master`.
 - No reference, verifier, generator, optimizer, or candidate implementation has
   begun.
 
@@ -46,6 +49,8 @@ Validation gate G1:
 - Metric unit tests cover alias propagation, duplicate merging, dead-node
   removal/reporting, depth, fanout, and excess fanout.
 - Clean-checkout commands are documented in the README.
+- Reference, verifier, metric, randomized, and formal checks are integrated into
+  the existing CI gate.
 
 ## Phase 2 — Comparable Baselines
 

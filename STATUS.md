@@ -27,6 +27,8 @@ No baseline metrics exist yet.
 - `results/search_log.jsonl` has been initialized as an empty append-only log;
   there have been no optimization attempts to record.
 - The repository README identifies the setup state and control documents.
+- GitHub Actions CI validates required scaffolding, trailing whitespace, and the
+  machine-readable search-log structure with read-only repository permissions.
 
 ## Not Started
 
@@ -61,4 +63,5 @@ No baseline metrics exist yet.
 - [x] `STATUS.md` reports no unearned results or validation claims.
 - [x] `results/search_log.jsonl` exists and contains no fabricated attempt.
 - [x] README reflects the structure-only setup state.
+- [x] GitHub Actions CI enforces the Phase 0 structure checks.
 - [x] No implementation or optimization work has begun.
