@@ -89,8 +89,15 @@ Run exhaustive formal equivalence between the independently generated
 structural fixture and the Verilog reference:
 
 ```bash
-python3 -m verifier.run_formal
+python3 -m verifier.run_formal \
+  verifier/fixtures/valid_crc32_network.v \
+  --module crc32_network
 ```
+
+The network path is mandatory. The runner parses that submitted file, derives
+its module name, copies it to an isolated temporary directory, and renders the
+formal script for that exact file. `--module` is optional but, when supplied,
+must match the parsed module declaration.
 
 `verifier/fixtures/valid_crc32_network.v` is an unoptimized Phase 1 validation
 fixture, not a candidate, Pareto result, or measured Phase 2 baseline. There is

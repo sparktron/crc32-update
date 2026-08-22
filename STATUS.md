@@ -92,7 +92,9 @@ python3 -m verifier.verify_network \
   --random-tests 100000 \
   --seed 0xC32A5EED \
   --output /tmp/phase1_verification.json
-python3 -m verifier.run_formal
+python3 -m verifier.run_formal \
+  verifier/fixtures/valid_crc32_network.v \
+  --module crc32_network
 ```
 
 Tool versions used locally:
@@ -104,14 +106,15 @@ Tool versions used locally:
 
 ## Test Results
 
-- Unit/rejection suite: 17 tests passed, 0 failed, 0 skipped.
+- Unit/rejection suite: 19 tests passed, 0 failed, 0 skipped.
 - Matrix reconstruction: 1,000 seeded random pairs matched the Python reference.
 - Exact network equivalence: all-zero plus 96 basis vectors passed (97 total).
 - Random network equivalence: 100,000 pairs passed with seed `0xC32A5EED`
   (`3274333933`).
 - Formal equivalence: Yosys built the combined 96-input miter, Berkeley ABC
-  synthesized the structural network, and Yosys SMTBMC/Z3 proved every
-  output comparison for all inputs.
+  synthesized the explicitly submitted structural network, and Yosys
+  SMTBMC/Z3 proved every output comparison for all inputs. A negative formal
+  regression confirmed that `wrong_function.v` fails.
 - Invalid-circuit CLI checks: all eight fixtures exited nonzero; seven failed
   structural parsing and `wrong_function.v` failed exact equivalence.
 - Unreachable-node fixture: accepted structurally, reported `assign:dead`, and
@@ -162,8 +165,9 @@ Tool versions used locally:
 
 - Set and record concrete compute budgets for deterministic, stochastic, and
   solver-backed searches before those phases begin.
-- The formal script currently targets the Phase 1 structural fixture by design.
-  Candidate selection and batch formal verification belong to later phases.
+- Batch orchestration for formally checking multiple future candidates belongs
+  to later phases; the Phase 1 runner already requires one explicit network per
+  invocation and validates its module name.
 
 ## Gate G0 Checklist
 

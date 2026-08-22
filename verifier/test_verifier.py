@@ -29,6 +29,12 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "verifier" / "fixtures"
 VALID_NETWORK = FIXTURES / "valid_crc32_network.v"
 INVALID_FIXTURES = FIXTURES / "invalid"
+FORMAL_TOOLS_AVAILABLE = bool(
+    shutil.which("yosys")
+    and shutil.which("yosys-smtbmc")
+    and shutil.which("z3")
+    and shutil.which("yosys-abc")
+)
 
 
 class ReferenceModelTests(unittest.TestCase):
@@ -234,22 +240,66 @@ class EquivalenceTests(unittest.TestCase):
 
 
 class FormalEquivalenceTests(unittest.TestCase):
+    def test_rejects_requested_module_mismatch(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "verifier.run_formal",
+                str(VALID_NETWORK),
+                "--module",
+                "not_the_submitted_module",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("does not match submitted module", result.stderr)
+
     @unittest.skipUnless(
-        shutil.which("yosys")
-        and shutil.which("yosys-smtbmc")
-        and shutil.which("z3")
-        and shutil.which("yosys-abc"),
+        FORMAL_TOOLS_AVAILABLE,
         "Yosys, Berkeley ABC, and Z3 are not installed",
     )
     def test_yosys_abc_equivalence(self) -> None:
         result = subprocess.run(
-            [sys.executable, "-m", "verifier.run_formal"],
+            [
+                sys.executable,
+                "-m",
+                "verifier.run_formal",
+                str(VALID_NETWORK),
+                "--module",
+                "crc32_network",
+            ],
             cwd=ROOT,
             capture_output=True,
             text=True,
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(str(VALID_NETWORK.resolve()), result.stdout)
+
+    @unittest.skipUnless(
+        FORMAL_TOOLS_AVAILABLE,
+        "Yosys, Berkeley ABC, and Z3 are not installed",
+    )
+    def test_yosys_rejects_wrong_submitted_function(self) -> None:
+        wrong_network = INVALID_FIXTURES / "wrong_function.v"
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "verifier.run_formal",
+                str(wrong_network),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("did not prove equivalence", result.stderr)
 
 
 if __name__ == "__main__":

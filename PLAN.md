@@ -54,6 +54,8 @@ Validation gate G1:
 - Clean-checkout commands are documented in the README.
 - Reference, verifier, metric, randomized, and formal checks are integrated into
   the existing CI gate.
+- Formal verification requires an explicit submitted-network path and validates
+  the requested module against that parsed file.
 
 Phase 1 implementation does not include baseline generation or any optimization
 algorithm; those remain gated by G1 and begin in later phases.

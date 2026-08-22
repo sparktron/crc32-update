@@ -168,4 +168,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m verifier.run_formal
+          python3 -m verifier.run_formal \
+            verifier/fixtures/valid_crc32_network.v \
+            --module crc32_network
