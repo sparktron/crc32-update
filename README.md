@@ -6,8 +6,9 @@ CRC-32 state update.
 
 Phase 1 reference, matrix-generation, structural verification, metric, random,
 and formal-equivalence infrastructure is implemented. Phase 2 deterministic
-baselines are generated and verified. No optimizer, stochastic search,
-candidate, or Pareto frontier has been produced.
+baselines are generated and verified. Phase 3 has produced and verified
+Candidate A with a reproducible multi-seed minimum-area search. Candidates B
+and C have not begun.
 
 Experiment control documents:
 
@@ -17,11 +18,8 @@ Experiment control documents:
   gates.
 - [`STATUS.md`](STATUS.md) records completed work, current best results, and
   unresolved issues.
-- [`results/search_log.jsonl`](results/search_log.jsonl) will contain one
+- [`results/search_log.jsonl`](results/search_log.jsonl) contains one
   machine-readable record for every optimization attempt.
-
-Optimization commands will be added only after the corresponding Phase 3 tools
-exist and have been validated.
 
 ## Continuous Integration
 
@@ -33,8 +31,9 @@ the deterministic Phase 2 baselines. The generation timings and measurement
 results in that CI check always refer to the same generated artifacts.
 
 Phase 1 reference, matrix, parser, metric, equivalence, rejection, and formal
-tests run in the same CI gate. Baseline checks do not run any stochastic or
-candidate optimization.
+tests run in the same CI gate. CI also replays Candidate A from its recorded
+seed, compares it byte-for-byte, and repeats its structural, exact, random,
+metric-record, and formal checks. CI does not rerun the 10,000-seed search.
 
 ## Circuit Metric Model
 
@@ -134,3 +133,46 @@ phases are propagated algebraically and must cancel at every primary output;
 the resulting committed circuit contains only permitted XOR2 gates and aliases.
 Observed runtimes are machine-dependent. No command in Phase 2 performs
 stochastic optimization or creates an optimization candidate.
+
+## Candidate A Commands
+
+Run the recorded 10,000-seed, unrestricted-depth Candidate A search. The search
+uses GF(2) signal vectors, common-subexpression extraction, Boyar–Peralta-style
+distance reduction, depth-aware rewrites, and seeded stochastic tie-breaking.
+It appends one JSONL record per seed and atomically updates a resumable
+checkpoint every 25 seeds:
+
+```bash
+python3 -m optimizer.optimize \
+  --seed-start 0 \
+  --seed-count 10000 \
+  --workers 8
+```
+
+Replay only the verified winning seed recorded in the frontier and compare the
+result byte-for-byte:
+
+```bash
+python3 -m optimizer.optimize \
+  --replay-frontier results/pareto_frontier.json \
+  --artifact /tmp/candidate_a_min_area.v
+cmp results/candidate_a_min_area.v /tmp/candidate_a_min_area.v
+```
+
+Re-run the complete Candidate A acceptance flow and cross-check
+`results/metrics.csv` and `results/pareto_frontier.json` against the independent
+measurement:
+
+```bash
+python3 -m verifier.verify_candidate \
+  --candidate results/candidate_a_min_area.v \
+  --frontier results/pareto_frontier.json \
+  --metrics results/metrics.csv \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
+```
+
+Every improving incumbent is independently parsed, checked on all 97 exact
+vectors and 100,000 recorded random vectors, and formally proved before it is
+accepted. Candidate A has no hard depth cap. This work does not run or create
+Candidates B or C.

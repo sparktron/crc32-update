@@ -153,7 +153,8 @@ jobs:
           set -euo pipefail
           python3 -m unittest -v \
             verifier.test_verifier \
-            generator.test_baseline_generator
+            generator.test_baseline_generator \
+            optimizer.test_optimize
 
       - name: Run Phase 1 acceptance verifier
         shell: bash
@@ -196,5 +197,26 @@ jobs:
             --baselines-dir /tmp/generated_baselines \
             --generation-timings /tmp/baseline_generation_timings.json \
             --metrics-output /tmp/baseline_metrics.csv \
+            --random-tests 100000 \
+            --seed 0xC32A5EED
+
+      - name: Reproduce Candidate A from its recorded seed
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m optimizer.optimize \
+            --replay-frontier results/pareto_frontier.json \
+            --artifact /tmp/candidate_a_min_area.v
+          cmp results/candidate_a_min_area.v \
+            /tmp/candidate_a_min_area.v
+
+      - name: Verify Candidate A and result records
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m verifier.verify_candidate \
+            --candidate results/candidate_a_min_area.v \
+            --frontier results/pareto_frontier.json \
+            --metrics results/metrics.csv \
             --random-tests 100000 \
             --seed 0xC32A5EED
