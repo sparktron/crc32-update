@@ -96,20 +96,28 @@ Scope:
   never as metric normalization.
 - Explore sharing versus depth and selected output-subset re-synthesis.
 - Preserve the best verified candidate after every stage.
+- Complete Candidate A with a bounded multi-seed stochastic tie-breaking pass
+  over the deterministic GF(2)/CSE/Boyar–Peralta engine. This explicit
+  Candidate A work package does not begin Candidates B or C.
 
 Validation gate G3:
 
 - Each attempt is appended to `results/search_log.jsonl` with parameters,
   runtime, starting/final metrics, verification outcome, and disposition.
 - All retained candidates pass periodic independent verification.
-- Candidate A and initial depth-bounded/frontier candidates are reproducible.
+- Candidate A, its checkpoint, and its one-candidate frontier are reproducible.
+- A completed checkpoint can recover every requested result artifact and
+  rejects conflicting append-only search logs.
+- Resume reconciles an append-only log prefix that is ahead of its checkpoint
+  without duplicating completed attempts.
 - No invalid or unverified candidate appears on the valid frontier.
 
 ## Phase 4 — Stochastic and Local Search
 
 Scope:
 
-- Run simulated annealing or other stochastic local search.
+- Run broader simulated annealing or other stochastic local search beyond the
+  bounded Candidate A tie-breaking pass completed in Phase 3.
 - Run iterated local improvement from multiple recorded seeds.
 - Re-synthesize selected output subsets.
 - Investigate fanout-aware duplication and sharing/depth tradeoffs.
