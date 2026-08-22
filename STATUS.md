@@ -2,15 +2,15 @@
 
 Last updated: 2026-08-22
 
-Current phase: Phase 1 — Reference, Matrix, Format, and Independent Verifier
+Current phase: Phase 2 — Comparable Baselines
 
-Current gate: G1 passed locally; CI integration added
+Current gate: G2 passed locally; CI integration added
 
 ## Current Best Results
 
 No optimization candidate has been generated or accepted. There is no current
 Pareto frontier and no best-found result. The generated 1,390-XOR structural
-network is a Phase 1 validation fixture only, not a candidate or baseline.
+network remains a Phase 1 validation fixture only, not a candidate or baseline.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |
@@ -18,7 +18,19 @@ network is a Phase 1 validation fixture only, not a candidate or baseline.
 | B — depth at most 8 | — | — | Not run | Not started |
 | C — minimum-depth search | — | — | Not run | Not started |
 
-No Phase 2 baseline metrics exist yet.
+Deterministic baseline metrics below were recomputed by the independent Phase 1
+verifier. Runtime is the observed sum of generation, 100,000-vector
+verification, and formal-equivalence time on the local toolchain.
+
+| Baseline | XOR2 | Depth | Max fanout | Total fanout | Excess fanout >4 | Runtime (s) | Verification |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Independent per-output expansion | 1,390 | 51 | 20 | 2,812 | 1,038 | 4.805134 | Passed |
+| Balanced per-output tree | 1,390 | 6 | 20 | 2,812 | 1,038 | 4.745530 | Passed |
+| Greedy common-subexpression elimination | 454 | 9 | 6 | 940 | 11 | 3.868081 | Passed |
+| Yosys/ABC normalized synthesis | 1,123 | 7 | 15 | 2,278 | 536 | 6.297098 | Passed |
+
+`results/baseline_metrics.csv` contains every output-bit depth, intermediate and
+alias counts, runtime components, exact/random vector counts, and formal status.
 
 ## Completed Work
 
@@ -45,6 +57,13 @@ No Phase 2 baseline metrics exist yet.
 - Deliberately malformed and functionally incorrect fixtures demonstrate
   nonzero verifier exits.
 - GitHub Actions runs every Phase 1 acceptance command.
+- Four deterministic baseline generators are implemented: serial independent
+  equations, balanced no-sharing trees, greedy two-term CSE, and conventional
+  Yosys/ABC synthesis normalized back to XOR2.
+- Every committed baseline passes the Phase 1 structural, exact-basis,
+  100,000-vector randomized, metric, and formal-equivalence checks.
+- The baseline metrics table is produced exclusively from the independent
+  verifier; no optimization attempt or candidate was created.
 
 ## Files Created for Phase 1
 
@@ -71,6 +90,17 @@ No Phase 2 baseline metrics exist yet.
 - `verifier/fixtures/invalid/undefined_signal.v`
 - `verifier/fixtures/invalid/wrong_function.v`
 
+## Files Created for Phase 2
+
+- `generator/baseline_generator.py`
+- `generator/test_baseline_generator.py`
+- `verifier/verify_baselines.py`
+- `results/baselines/independent_per_output.v`
+- `results/baselines/balanced_per_output.v`
+- `results/baselines/greedy_cse.v`
+- `results/baselines/yosys_abc.v`
+- `results/baseline_metrics.csv`
+
 ## Commands Executed
 
 Required formal tools were installed with:
@@ -84,17 +114,37 @@ The final Phase 1 acceptance commands were:
 
 ```bash
 python3 -m generator.build_matrix \
-  --matrix-output /tmp/crc32_matrix.json \
-  --network-output verifier/fixtures/valid_crc32_network.v
-python3 -m unittest -v verifier.test_verifier
+  --matrix-output /tmp/phase1_matrix_final.json \
+  --network-output /tmp/phase1_network_final.v
+cmp verifier/fixtures/valid_crc32_network.v /tmp/phase1_network_final.v
+python3 -m unittest -v \
+  verifier.test_verifier \
+  generator.test_baseline_generator
 python3 -m verifier.verify_network \
   verifier/fixtures/valid_crc32_network.v \
   --random-tests 100000 \
   --seed 0xC32A5EED \
-  --output /tmp/phase1_verification.json
+  --output /tmp/phase1_verification_final.json
 python3 -m verifier.run_formal \
   verifier/fixtures/valid_crc32_network.v \
   --module crc32_network
+```
+
+The Phase 2 baseline commands were:
+
+```bash
+python3 -m generator.baseline_generator \
+  --output-dir results/baselines \
+  --timings-output /tmp/baseline_generation_timings.json
+python3 -m unittest -v \
+  verifier.test_verifier \
+  generator.test_baseline_generator
+python3 -m verifier.verify_baselines \
+  --baselines-dir results/baselines \
+  --generation-timings /tmp/baseline_generation_timings.json \
+  --metrics-output results/baseline_metrics.csv \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
 ```
 
 Tool versions used locally:
@@ -123,12 +173,15 @@ Tool versions used locally:
 - Validation-fixture metrics: 1,390 XOR2 instances, maximum depth 51, maximum
   fanout 20, total fanout 2,812, and total excess fanout above four 1,038. These
   are not optimization or baseline results.
+- Combined Phase 1 and baseline unit suite: 24 tests passed, 0 failed, 0
+  skipped. The original Phase 1 suite remains 19 tests passed.
+- All four baselines passed 97 exact vectors, 100,000 random vectors with seed
+  `0xC32A5EED`, and Yosys SMTBMC/Z3 formal equivalence.
 
 ## Not Started
 
-- Baseline generation and measurement
 - Deterministic, stochastic, depth-bounded, and exact-subcircuit searches
-- Candidate netlists, Pareto frontier, metrics table, and final report
+- Candidate netlists, Pareto frontier, candidate metrics table, and final report
 - Literature and open-source comparison research
 
 ## Semantic Ambiguities or Discrepancies
@@ -160,6 +213,17 @@ Tool versions used locally:
   as the algebraically identical masked-feedback XOR recurrence. This avoids
   introducing mux layers while preserving the frozen bit-serial semantics; the
   exhaustive proof checks it against the Python-derived structural fixture.
+- The local Yosys 0.9 `abc -g XOR` flow aborts because the mapper has no
+  fallback cell. The baseline uses `-g XOR,AND`; ABC emitted 1,123 XOR cells,
+  eight NOT cells, and no AND cells. Normalization propagates the NOT phases,
+  rejects any non-XOR/non-NOT mapped cell, and requires all output phases to
+  cancel before emitting the restricted XOR2 circuit.
+- Yosys/ABC structure and all runtime columns are toolchain- and
+  machine-dependent. The recorded result is directly comparable under the
+  frozen XOR2 metric only after normalization and independent verification.
+- These are local baselines using the frozen reflected IEEE CRC-32 semantics,
+  64-bit parallel width, physical XOR2 gate model, and SPEC.md metrics. No
+  external or arbitrary-width-XOR result is compared here.
 
 ## Unresolved Issues
 
@@ -168,6 +232,8 @@ Tool versions used locally:
 - Batch orchestration for formally checking multiple future candidates belongs
   to later phases; the Phase 1 runner already requires one explicit network per
   invocation and validates its module name.
+- Pinning or containerizing the Yosys/ABC toolchain is deferred; a different
+  release may produce a different valid conventional-synthesis baseline.
 
 ## Gate G0 Checklist
 
@@ -191,4 +257,17 @@ Tool versions used locally:
 - [x] Formal equivalence passes with Yosys, Berkeley ABC, and Z3.
 - [x] Clean-checkout Phase 1 commands are documented in `README.md`.
 - [x] CI contains every Phase 1 acceptance gate.
-- [x] No Phase 2 baseline or optimization algorithm has been implemented.
+- [x] Phase 1 still passes unchanged after adding Phase 2 baseline tooling.
+
+## Gate G2 Checklist
+
+- [x] Independent serial expansion, balanced no-sharing trees, greedy CSE, and
+  normalized Yosys/ABC baselines are reproducibly generated.
+- [x] Every baseline passes the restricted structural parser and independent
+  metric calculator.
+- [x] Every baseline passes all 97 exact vectors and 100,000 seeded random
+  vectors.
+- [x] Every baseline passes Yosys SMTBMC/Z3 formal equivalence after Berkeley
+  ABC synthesis.
+- [x] Reproduction commands and local tool versions are recorded.
+- [x] No deterministic candidate optimization or stochastic search has begun.

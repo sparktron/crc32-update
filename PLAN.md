@@ -74,10 +74,16 @@ Validation gate G2:
 
 - Every baseline passes the structural parser, 97 exact checks, at least 100,000
   seeded random tests, and formal equivalence.
-- Metrics are produced only by the independent verifier.
+- Metrics are produced only by the independent verifier from the generated
+  artifacts whose timings they report.
 - Reproduction commands and tool versions are recorded.
 - External baseline metadata captures convention, width, gate model, metric
   definitions, and comparability.
+
+The four local baselines are implemented as deterministic Phase 2 artifacts.
+The Yosys/ABC flow rejects non-linear mapped cells and propagates paired NOT
+phases while normalizing its output to the restricted XOR2 model. Phase 2 stops
+after identical independent verification and does not begin Phase 3 search.
 
 ## Phase 3 — Deterministic Optimization
 

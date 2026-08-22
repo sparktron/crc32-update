@@ -5,8 +5,9 @@ combinational XOR2 networks implementing a 64-bit parallel reflected IEEE
 CRC-32 state update.
 
 Phase 1 reference, matrix-generation, structural verification, metric, random,
-and formal-equivalence infrastructure is implemented. No optimizer, candidate,
-Pareto frontier, or Phase 2 baseline result has been produced.
+and formal-equivalence infrastructure is implemented. Phase 2 deterministic
+baselines are generated and verified. No optimizer, stochastic search,
+candidate, or Pareto frontier has been produced.
 
 Experiment control documents:
 
@@ -19,18 +20,21 @@ Experiment control documents:
 - [`results/search_log.jsonl`](results/search_log.jsonl) will contain one
   machine-readable record for every optimization attempt.
 
-Regeneration, optimization, verification, and measurement commands will be
-added only after the corresponding tools exist and have been validated.
+Optimization commands will be added only after the corresponding Phase 3 tools
+exist and have been validated.
 
 ## Continuous Integration
 
 GitHub Actions runs the `CI` workflow for pull requests, pushes to `master`, and
 manual dispatches. It checks the control files and search log, regenerates the
 Phase 1 fixture, runs the unit and rejection suite, checks 97 exact plus 100,000
-seeded random vectors, and runs formal equivalence.
+seeded random vectors, runs formal equivalence, and regenerates then validates
+the deterministic Phase 2 baselines. The generation timings and measurement
+results in that CI check always refer to the same generated artifacts.
 
 Phase 1 reference, matrix, parser, metric, equivalence, rejection, and formal
-tests run in the same CI gate. Optimization remains intentionally unavailable.
+tests run in the same CI gate. Baseline checks do not run any stochastic or
+candidate optimization.
 
 ## Circuit Metric Model
 
@@ -100,5 +104,33 @@ formal script for that exact file. `--module` is optional but, when supplied,
 must match the parsed module declaration.
 
 `verifier/fixtures/valid_crc32_network.v` is an unoptimized Phase 1 validation
-fixture, not a candidate, Pareto result, or measured Phase 2 baseline. There is
-no optimization command in Phase 1.
+fixture, not a candidate, Pareto result, or measured Phase 2 baseline.
+
+## Phase 2 Baseline Commands
+
+Generate the four baseline circuits and record generation timings:
+
+```bash
+python3 -m generator.baseline_generator \
+  --output-dir results/baselines \
+  --timings-output /tmp/baseline_generation_timings.json
+```
+
+Run the complete Phase 1 verifier and formal flow for every baseline, then
+write the independently measured table:
+
+```bash
+python3 -m verifier.verify_baselines \
+  --baselines-dir results/baselines \
+  --generation-timings /tmp/baseline_generation_timings.json \
+  --metrics-output results/baseline_metrics.csv \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
+```
+
+The Yosys/ABC baseline starts from the independent expansion, runs conventional
+Yosys optimization and ABC mapping, and accepts only XOR/NOT output cells. NOT
+phases are propagated algebraically and must cancel at every primary output;
+the resulting committed circuit contains only permitted XOR2 gates and aliases.
+Observed runtimes are machine-dependent. No command in Phase 2 performs
+stochastic optimization or creates an optimization candidate.

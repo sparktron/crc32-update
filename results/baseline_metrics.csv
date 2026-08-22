@@ -1,0 +1,5 @@
+baseline,xor2_count,maximum_depth,output_depths,maximum_fanout,total_fanout,total_excess_fanout_above_4,intermediate_node_count,direct_output_alias_count,generation_runtime_seconds,verifier_runtime_seconds,formal_runtime_seconds,total_runtime_seconds,exact_vectors_checked,random_vectors_checked,formal_equivalence,verification_status
+independent_per_output,1390,51,"[40,42,43,45,47,46,44,46,45,49,35,35,35,34,33,33,44,46,45,46,50,44,49,50,51,44,46,46,44,43,48,42]",20,2812,1038,1390,32,0.004194,1.974594,2.826346,4.805134,97,100000,passed,passed
+balanced_per_output,1390,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",20,2812,1038,1390,32,0.003049,2.082043,2.660439,4.745530,97,100000,passed,passed
+greedy_cse,454,9,"[7,7,7,8,9,8,8,7,8,7,8,7,8,8,8,8,8,8,8,8,9,8,8,7,8,8,8,9,8,8,8,9]",6,940,11,454,32,0.224845,2.126230,1.517006,3.868081,97,100000,passed,passed
+yosys_abc,1123,7,"[7,6,7,7,7,7,6,7,6,7,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,6,7,6,6]",15,2278,536,1123,32,1.424137,2.029359,2.843601,6.297098,97,100000,passed,passed

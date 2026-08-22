@@ -151,7 +151,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m unittest -v verifier.test_verifier
+          python3 -m unittest -v \
+            verifier.test_verifier \
+            generator.test_baseline_generator
 
       - name: Run Phase 1 acceptance verifier
         shell: bash
@@ -171,3 +173,28 @@ jobs:
           python3 -m verifier.run_formal \
             verifier/fixtures/valid_crc32_network.v \
             --module crc32_network
+
+      - name: Regenerate deterministic baselines
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m generator.baseline_generator \
+            --output-dir /tmp/generated_baselines \
+            --timings-output /tmp/baseline_generation_timings.json
+          cmp results/baselines/independent_per_output.v \
+            /tmp/generated_baselines/independent_per_output.v
+          cmp results/baselines/balanced_per_output.v \
+            /tmp/generated_baselines/balanced_per_output.v
+          cmp results/baselines/greedy_cse.v \
+            /tmp/generated_baselines/greedy_cse.v
+
+      - name: Verify and measure generated baselines
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m verifier.verify_baselines \
+            --baselines-dir /tmp/generated_baselines \
+            --generation-timings /tmp/baseline_generation_timings.json \
+            --metrics-output /tmp/baseline_metrics.csv \
+            --random-tests 100000 \
+            --seed 0xC32A5EED
