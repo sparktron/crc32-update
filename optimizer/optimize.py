@@ -345,15 +345,79 @@ def _full_verify(candidate: Candidate, random_tests: int, random_seed: int) -> d
     return report
 
 
-def _restore_search_log(
-    checkpoint: dict[str, object], checkpoint_path: Path, requested_path: Path
-) -> None:
+def _checkpoint_search_log_path(
+    checkpoint: dict[str, object], checkpoint_path: Path
+) -> Path:
     recorded_value = checkpoint.get("search_log_path")
     if not isinstance(recorded_value, str) or not recorded_value:
-        raise ValueError("completed checkpoint does not record its search log path")
+        raise ValueError("checkpoint does not record its search log path")
     recorded_path = Path(recorded_value)
     if not recorded_path.is_absolute():
         recorded_path = checkpoint_path.parent / recorded_path
+    return recorded_path
+
+
+def _candidate_a_attempts(
+    log_path: Path, seed_start: int, seed_count: int
+) -> list[dict[str, object]]:
+    if not log_path.exists():
+        return []
+    attempts: list[dict[str, object]] = []
+    for line_number, raw_line in enumerate(log_path.read_text().splitlines(), 1):
+        try:
+            record = json.loads(raw_line)
+        except json.JSONDecodeError as error:
+            raise ValueError(
+                f"malformed search log record at line {line_number}: {error}"
+            ) from error
+        if not isinstance(record, dict):
+            raise ValueError(f"search log line {line_number} is not an object")
+        seed = record.get("seed")
+        if (
+            record.get("algorithm") == ALGORITHM
+            and isinstance(seed, int)
+            and seed_start <= seed < seed_start + seed_count
+        ):
+            attempts.append(record)
+    expected_seeds = list(range(seed_start, seed_start + len(attempts)))
+    if [attempt.get("seed") for attempt in attempts] != expected_seeds:
+        raise ValueError("Candidate A search log is not a contiguous seed prefix")
+    expected_ids = [
+        f"candidate-a-{ALGORITHM}-seed-{seed}" for seed in expected_seeds
+    ]
+    if [attempt.get("attempt_id") for attempt in attempts] != expected_ids:
+        raise ValueError("Candidate A search log has invalid or duplicate attempt IDs")
+    return attempts
+
+
+def _reconcile_checkpoint(
+    checkpoint: dict[str, object], log_path: Path, seed_start: int, seed_count: int
+) -> tuple[int, int | None, dict[str, object] | None]:
+    completed = int(checkpoint.get("completed_seeds", 0))
+    attempts = _candidate_a_attempts(log_path, seed_start, seed_count)
+    if len(attempts) < completed:
+        raise ValueError("search log is behind the recorded checkpoint")
+    accepted = [attempt for attempt in attempts if attempt.get("accepted") is True]
+    if accepted:
+        incumbent = accepted[-1]
+        incumbent_seed = incumbent.get("seed")
+        incumbent_metrics = incumbent.get("final_metrics")
+        if not isinstance(incumbent_seed, int) or not isinstance(
+            incumbent_metrics, dict
+        ):
+            raise ValueError("accepted search-log incumbent is malformed")
+    else:
+        incumbent_seed = checkpoint.get("incumbent_seed")
+        incumbent_metrics = checkpoint.get("incumbent_metrics")
+        if incumbent_seed is not None or incumbent_metrics is not None:
+            raise ValueError("checkpoint incumbent is absent from the search log")
+    return len(attempts), incumbent_seed, incumbent_metrics
+
+
+def _restore_search_log(
+    checkpoint: dict[str, object], checkpoint_path: Path, requested_path: Path
+) -> None:
+    recorded_path = _checkpoint_search_log_path(checkpoint, checkpoint_path)
     if not recorded_path.is_file():
         raise FileNotFoundError(
             f"completed checkpoint search log is missing: {recorded_path}"
@@ -457,15 +521,35 @@ def run_search(
             raise ValueError(
                 "checkpoint configuration does not match requested search"
             )
-        completed_before = int(loaded.get("completed_seeds", 0))
+        recorded_log_path = _checkpoint_search_log_path(loaded, checkpoint_path)
+        if (
+            loaded.get("status") != "completed"
+            and recorded_log_path.resolve() != log_path.resolve()
+        ):
+            raise ValueError("running checkpoint must resume with its recorded log")
+        completed_before, incumbent_seed, logged_metrics = _reconcile_checkpoint(
+            loaded, recorded_log_path, seed_start, seed_count
+        )
         if not 0 <= completed_before <= seed_count:
             raise ValueError("checkpoint completed-seed count is outside the budget")
-        incumbent_seed = loaded.get("incumbent_seed")
         if incumbent_seed is not None:
             best = search_seed(int(incumbent_seed))
             best_metrics = independently_check(best).to_dict()
-            if best_metrics != loaded.get("incumbent_metrics"):
-                raise RuntimeError("replayed checkpoint incumbent metrics do not match")
+            if _metrics_for_log(best_metrics) != logged_metrics:
+                raise RuntimeError("replayed search-log incumbent metrics do not match")
+        if (
+            completed_before != loaded.get("completed_seeds")
+            or loaded.get("incumbent_seed") != incumbent_seed
+            or loaded.get("incumbent_metrics") != best_metrics
+        ):
+            loaded.update(
+                {
+                    "completed_seeds": completed_before,
+                    "incumbent_seed": None if best is None else best.seed,
+                    "incumbent_metrics": best_metrics,
+                }
+            )
+            _write_json(checkpoint_path, loaded)
         if loaded.get("status") == "completed":
             if best is None or best_metrics is None:
                 raise RuntimeError("completed checkpoint has no incumbent")
@@ -480,6 +564,8 @@ def run_search(
                 random_seed,
             )
             return best
+    elif log_path.exists() and log_path.stat().st_size:
+        raise ValueError("nonempty search log has no checkpoint to resume")
 
     checkpoint = {
         "algorithm": ALGORITHM,

@@ -81,6 +81,8 @@ alias counts, runtime components, exact/random vector counts, and formal status.
   only and match the independent verifier. Candidates B and C were not run.
 - Completed-checkpoint replay recreates requested candidate, frontier, metrics,
   and search-log outputs while refusing conflicting append-only logs.
+- Resume reconciles complete log records written immediately before an
+  interrupted checkpoint update, avoiding duplicate attempt IDs.
 - Candidate result verification checks the frontier's recorded structural,
   exact-vector, randomized-vector, seed, and formal-equivalence evidence against
   the acceptance checks actually performed.
@@ -224,7 +226,7 @@ Tool versions used locally:
 - Validation-fixture metrics: 1,390 XOR2 instances, maximum depth 51, maximum
   fanout 20, total fanout 2,812, and total excess fanout above four 1,038. These
   are not optimization or baseline results.
-- Combined Phase 1, baseline, optimizer, and result-verifier suite: 29 tests
+- Combined Phase 1, baseline, optimizer, and result-verifier suite: 30 tests
   passed, 0 failed, 0 skipped. The original Phase 1 suite remains 19 tests
   passed.
 - All four baselines passed 97 exact vectors, 100,000 random vectors with seed
@@ -237,7 +239,8 @@ Tool versions used locally:
   independent recomputation, and the search log contains 10,000 unique attempt
   IDs with 12 retained-incumbent records.
 - Regression tests cover completed-checkpoint output recovery and rejection of
-  stale frontier verification evidence.
+  stale frontier verification evidence, plus recovery when the log is ahead of
+  its checkpoint.
 
 ## Not Started
 

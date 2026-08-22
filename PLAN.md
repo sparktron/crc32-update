@@ -108,6 +108,8 @@ Validation gate G3:
 - Candidate A, its checkpoint, and its one-candidate frontier are reproducible.
 - A completed checkpoint can recover every requested result artifact and
   rejects conflicting append-only search logs.
+- Resume reconciles an append-only log prefix that is ahead of its checkpoint
+  without duplicating completed attempts.
 - No invalid or unverified candidate appears on the valid frontier.
 
 ## Phase 4 — Stochastic and Local Search

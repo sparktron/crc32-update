@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -66,6 +67,53 @@ class OptimizeTests(unittest.TestCase):
                 search_log.read_bytes(),
                 (ROOT / "results/search_log.jsonl").read_bytes(),
             )
+
+    def test_log_ahead_of_checkpoint_resumes_without_duplicates(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            temporary = Path(directory)
+            log_path = temporary / "search.jsonl"
+            records = (
+                ROOT / "results/search_log.jsonl"
+            ).read_text().splitlines()[:2]
+            log_path.write_text("\n".join(records) + "\n")
+            incumbent = search_seed(0, self.rows)
+            checkpoint_path = temporary / "checkpoint.json"
+            checkpoint_path.write_text(
+                json.dumps(
+                    {
+                        "algorithm": "gf2-bp-cse-depth-stochastic-v1",
+                        "seed_start": 0,
+                        "seed_count": 2,
+                        "random_tests": DEFAULT_RANDOM_TESTS,
+                        "random_seed": DEFAULT_RANDOM_SEED,
+                        "search_log_path": "search.jsonl",
+                        "completed_seeds": 1,
+                        "incumbent_seed": 0,
+                        "incumbent_metrics": independently_check(
+                            incumbent
+                        ).to_dict(),
+                        "status": "running",
+                    }
+                )
+                + "\n"
+            )
+            candidate = run_search(
+                seed_start=0,
+                seed_count=2,
+                workers=1,
+                checkpoint_path=checkpoint_path,
+                artifact_path=temporary / "candidate.v",
+                frontier_path=temporary / "frontier.json",
+                metrics_path=temporary / "metrics.csv",
+                log_path=log_path,
+                random_tests=DEFAULT_RANDOM_TESTS,
+                random_seed=DEFAULT_RANDOM_SEED,
+            )
+            self.assertEqual(candidate.seed, 0)
+            self.assertEqual(log_path.read_text().splitlines(), records)
+            checkpoint = json.loads(checkpoint_path.read_text())
+            self.assertEqual(checkpoint["completed_seeds"], 2)
+            self.assertEqual(checkpoint["status"], "completed")
 
 
 if __name__ == "__main__":

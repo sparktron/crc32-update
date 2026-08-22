@@ -153,6 +153,9 @@ Re-running against a completed checkpoint validates the recorded search
 configuration, recreates the requested candidate, frontier, and metrics files,
 and restores the append-only search log from the checkpoint's recorded log.
 It refuses to overwrite a conflicting log.
+On resume, a complete logged seed prefix takes precedence over a stale
+checkpoint counter, preventing duplicate attempts after interruption between a
+log append and checkpoint update.
 
 Replay only the verified winning seed recorded in the frontier and compare the
 result byte-for-byte:
