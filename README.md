@@ -45,8 +45,12 @@ a different circuit, not as an automatic verifier rewrite.
 Install the formal tools on Ubuntu/Debian:
 
 ```bash
-sudo apt-get install -y berkeley-abc yosys z3
+sudo apt-get install -y yosys z3
 ```
+
+The distribution's `yosys` package must provide or depend on the `yosys-abc`
+executable. Ubuntu 24.04 packages it as `yosys-abc`; Ubuntu 22.04 uses the
+`berkeley-abc` dependency name.
 
 Evaluate the normative Python reference:
 

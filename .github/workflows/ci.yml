@@ -135,7 +135,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends berkeley-abc yosys z3
+          sudo apt-get install -y --no-install-recommends yosys z3
 
       - name: Check generated Phase 1 structural reference
         shell: bash
