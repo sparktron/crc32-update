@@ -79,6 +79,11 @@ Validation gate G2:
 - External baseline metadata captures convention, width, gate model, metric
   definitions, and comparability.
 
+The four local baselines are implemented as deterministic Phase 2 artifacts.
+The Yosys/ABC flow rejects non-linear mapped cells and propagates paired NOT
+phases while normalizing its output to the restricted XOR2 model. Phase 2 stops
+after identical independent verification and does not begin Phase 3 search.
+
 ## Phase 3 — Deterministic Optimization
 
 Scope:
