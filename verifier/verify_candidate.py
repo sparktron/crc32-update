@@ -23,6 +23,25 @@ def _integer(row: dict[str, str], field: str) -> int:
         raise ValueError(f"metrics CSV has invalid {field}") from error
 
 
+def _validate_frontier_verification(
+    entry: dict[str, object],
+    report: dict[str, object],
+    random_tests: int,
+    random_seed: int,
+) -> None:
+    expected = {
+        "structural": "passed",
+        "exact_vectors": report.get("exact_vectors_checked"),
+        "random_vectors": random_tests,
+        "random_seed": random_seed,
+        "formal_equivalence": "passed",
+    }
+    if entry.get("verification") != expected:
+        raise ValueError(
+            "frontier verification record does not match performed checks"
+        )
+
+
 def verify_candidate_records(
     candidate_path: Path,
     frontier_path: Path,
@@ -51,6 +70,7 @@ def verify_candidate_records(
         key: value for key, value in measured.items() if key != "unreachable_nodes"
     }:
         raise ValueError("frontier metrics do not match independent measurement")
+    _validate_frontier_verification(entry, report, random_tests, random_seed)
 
     with metrics_path.open(newline="") as source:
         rows = list(csv.DictReader(source))

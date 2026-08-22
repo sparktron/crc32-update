@@ -106,6 +106,8 @@ Validation gate G3:
   runtime, starting/final metrics, verification outcome, and disposition.
 - All retained candidates pass periodic independent verification.
 - Candidate A, its checkpoint, and its one-candidate frontier are reproducible.
+- A completed checkpoint can recover every requested result artifact and
+  rejects conflicting append-only search logs.
 - No invalid or unverified candidate appears on the valid frontier.
 
 ## Phase 4 — Stochastic and Local Search

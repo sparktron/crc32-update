@@ -47,6 +47,9 @@
     "xor2_count": 439
   },
   "incumbent_seed": 3195,
+  "random_seed": 3274333933,
+  "random_tests": 100000,
+  "search_log_path": "../search_log.jsonl",
   "seed_count": 10000,
   "seed_start": 0,
   "status": "completed"

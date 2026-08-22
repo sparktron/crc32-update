@@ -79,6 +79,11 @@ alias counts, runtime components, exact/random vector counts, and formal status.
   artifact reproduces byte-for-byte from that seed.
 - `results/metrics.csv` and `results/pareto_frontier.json` contain Candidate A
   only and match the independent verifier. Candidates B and C were not run.
+- Completed-checkpoint replay recreates requested candidate, frontier, metrics,
+  and search-log outputs while refusing conflicting append-only logs.
+- Candidate result verification checks the frontier's recorded structural,
+  exact-vector, randomized-vector, seed, and formal-equivalence evidence against
+  the acceptance checks actually performed.
 
 ## Files Created for Phase 1
 
@@ -219,8 +224,9 @@ Tool versions used locally:
 - Validation-fixture metrics: 1,390 XOR2 instances, maximum depth 51, maximum
   fanout 20, total fanout 2,812, and total excess fanout above four 1,038. These
   are not optimization or baseline results.
-- Combined Phase 1, baseline, and optimizer unit suite: 26 tests passed, 0
-  failed, 0 skipped. The original Phase 1 suite remains 19 tests passed.
+- Combined Phase 1, baseline, optimizer, and result-verifier suite: 29 tests
+  passed, 0 failed, 0 skipped. The original Phase 1 suite remains 19 tests
+  passed.
 - All four baselines passed 97 exact vectors, 100,000 random vectors with seed
   `0xC32A5EED`, and Yosys SMTBMC/Z3 formal equivalence.
 - Candidate A passed the restricted parser, 97 exact vectors, 100,000 random
@@ -230,6 +236,8 @@ Tool versions used locally:
 - The winning seed replayed byte-for-byte, the frontier and metrics CSV matched
   independent recomputation, and the search log contains 10,000 unique attempt
   IDs with 12 retained-incumbent records.
+- Regression tests cover completed-checkpoint output recovery and rejection of
+  stale frontier verification evidence.
 
 ## Not Started
 

@@ -12,6 +12,7 @@ from itertools import combinations
 import os
 from pathlib import Path
 import random
+import shutil
 import tempfile
 import time
 from typing import Iterable, Sequence
@@ -344,6 +345,83 @@ def _full_verify(candidate: Candidate, random_tests: int, random_seed: int) -> d
     return report
 
 
+def _restore_search_log(
+    checkpoint: dict[str, object], checkpoint_path: Path, requested_path: Path
+) -> None:
+    recorded_value = checkpoint.get("search_log_path")
+    if not isinstance(recorded_value, str) or not recorded_value:
+        raise ValueError("completed checkpoint does not record its search log path")
+    recorded_path = Path(recorded_value)
+    if not recorded_path.is_absolute():
+        recorded_path = checkpoint_path.parent / recorded_path
+    if not recorded_path.is_file():
+        raise FileNotFoundError(
+            f"completed checkpoint search log is missing: {recorded_path}"
+        )
+    if recorded_path.resolve() == requested_path.resolve():
+        return
+    if requested_path.exists():
+        if requested_path.read_bytes() != recorded_path.read_bytes():
+            raise ValueError("requested search log conflicts with checkpoint search log")
+        return
+    requested_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(recorded_path, requested_path)
+
+
+def _write_result_artifacts(
+    best: Candidate,
+    best_metrics: dict[str, object],
+    artifact_path: Path,
+    frontier_path: Path,
+    metrics_path: Path,
+    random_tests: int,
+    random_seed: int,
+) -> None:
+    artifact_path.parent.mkdir(parents=True, exist_ok=True)
+    artifact_path.write_text(best.render())
+    frontier = {
+        "schema_version": 1,
+        "generated_by": ALGORITHM,
+        "candidate_scope": ["A"],
+        "entries": [
+            {
+                "candidate_class": "A",
+                "artifact": str(artifact_path),
+                "seed": best.seed,
+                "metrics": _metrics_for_log(best_metrics),
+                "verification": {
+                    "structural": "passed",
+                    "exact_vectors": 97,
+                    "random_vectors": random_tests,
+                    "random_seed": random_seed,
+                    "formal_equivalence": "passed",
+                },
+            }
+        ],
+    }
+    _write_json(frontier_path, frontier)
+    header = (
+        "candidate_class,artifact,seed,xor2_count,maximum_depth,output_depths,"
+        "maximum_fanout,total_fanout,total_excess_fanout_above_4,"
+        "intermediate_node_count,direct_output_alias_count,exact_vectors_checked,"
+        "random_vectors_checked,random_seed,formal_equivalence,verification_status\n"
+    )
+    output_depths = json.dumps(
+        best_metrics["output_depths"], separators=(",", ":")
+    )
+    row = (
+        f"A,{artifact_path},{best.seed},{best_metrics['xor2_count']},"
+        f"{best_metrics['maximum_depth']},\"{output_depths}\","
+        f"{best_metrics['maximum_fanout']},{best_metrics['total_fanout']},"
+        f"{best_metrics['total_excess_fanout_above_4']},"
+        f"{best_metrics['intermediate_node_count']},"
+        f"{best_metrics['direct_output_alias_count']},97,{random_tests},"
+        f"{random_seed},passed,passed\n"
+    )
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+    metrics_path.write_text(header + row)
+
+
 def run_search(
     seed_start: int,
     seed_count: int,
@@ -367,15 +445,17 @@ def run_search(
     completed_before = 0
     if checkpoint_path.exists():
         loaded = json.loads(checkpoint_path.read_text())
-        expected = (ALGORITHM, seed_start, seed_count)
+        expected = (ALGORITHM, seed_start, seed_count, random_tests, random_seed)
         actual = (
             loaded.get("algorithm"),
             loaded.get("seed_start"),
             loaded.get("seed_count"),
+            loaded.get("random_tests"),
+            loaded.get("random_seed"),
         )
         if actual != expected:
             raise ValueError(
-                "checkpoint configuration does not match algorithm/seed range"
+                "checkpoint configuration does not match requested search"
             )
         completed_before = int(loaded.get("completed_seeds", 0))
         if not 0 <= completed_before <= seed_count:
@@ -387,14 +467,29 @@ def run_search(
             if best_metrics != loaded.get("incumbent_metrics"):
                 raise RuntimeError("replayed checkpoint incumbent metrics do not match")
         if loaded.get("status") == "completed":
-            if best is None:
+            if best is None or best_metrics is None:
                 raise RuntimeError("completed checkpoint has no incumbent")
+            _restore_search_log(loaded, checkpoint_path, log_path)
+            _write_result_artifacts(
+                best,
+                best_metrics,
+                artifact_path,
+                frontier_path,
+                metrics_path,
+                random_tests,
+                random_seed,
+            )
             return best
 
     checkpoint = {
         "algorithm": ALGORITHM,
         "seed_start": seed_start,
         "seed_count": seed_count,
+        "random_tests": random_tests,
+        "random_seed": random_seed,
+        "search_log_path": os.path.relpath(
+            log_path.resolve(), checkpoint_path.parent.resolve()
+        ),
         "completed_seeds": completed_before,
         "incumbent_seed": None if best is None else best.seed,
         "incumbent_metrics": best_metrics,
@@ -481,47 +576,15 @@ def run_search(
     if best is None or best_metrics is None:
         raise RuntimeError("search completed without a verified incumbent")
 
-    frontier = {
-        "schema_version": 1,
-        "generated_by": ALGORITHM,
-        "candidate_scope": ["A"],
-        "entries": [
-            {
-                "candidate_class": "A",
-                "artifact": str(artifact_path),
-                "seed": best.seed,
-                "metrics": _metrics_for_log(best_metrics),
-                "verification": {
-                    "structural": "passed",
-                    "exact_vectors": 97,
-                    "random_vectors": random_tests,
-                    "random_seed": random_seed,
-                    "formal_equivalence": "passed",
-                },
-            }
-        ],
-    }
-    _write_json(frontier_path, frontier)
-    header = (
-        "candidate_class,artifact,seed,xor2_count,maximum_depth,output_depths,"
-        "maximum_fanout,total_fanout,total_excess_fanout_above_4,"
-        "intermediate_node_count,direct_output_alias_count,exact_vectors_checked,"
-        "random_vectors_checked,random_seed,formal_equivalence,verification_status\n"
+    _write_result_artifacts(
+        best,
+        best_metrics,
+        artifact_path,
+        frontier_path,
+        metrics_path,
+        random_tests,
+        random_seed,
     )
-    output_depths = json.dumps(
-        best_metrics["output_depths"], separators=(",", ":")
-    )
-    row = (
-        f"A,{artifact_path},{best.seed},{best_metrics['xor2_count']},"
-        f"{best_metrics['maximum_depth']},\"{output_depths}\","
-        f"{best_metrics['maximum_fanout']},{best_metrics['total_fanout']},"
-        f"{best_metrics['total_excess_fanout_above_4']},"
-        f"{best_metrics['intermediate_node_count']},"
-        f"{best_metrics['direct_output_alias_count']},97,{random_tests},"
-        f"{random_seed},passed,passed\n"
-    )
-    metrics_path.parent.mkdir(parents=True, exist_ok=True)
-    metrics_path.write_text(header + row)
     checkpoint["status"] = "completed"
     _write_json(checkpoint_path, checkpoint)
     return best

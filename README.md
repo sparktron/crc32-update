@@ -149,6 +149,11 @@ python3 -m optimizer.optimize \
   --workers 8
 ```
 
+Re-running against a completed checkpoint validates the recorded search
+configuration, recreates the requested candidate, frontier, and metrics files,
+and restores the append-only search log from the checkpoint's recorded log.
+It refuses to overwrite a conflicting log.
+
 Replay only the verified winning seed recorded in the frontier and compare the
 result byte-for-byte:
 

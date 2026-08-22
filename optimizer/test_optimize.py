@@ -2,10 +2,16 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+import tempfile
 import unittest
 
 from generator.build_matrix import build_transformation_matrix
-from optimizer.optimize import independently_check, search_seed
+from optimizer.optimize import independently_check, run_search, search_seed
+from verifier.verify_network import DEFAULT_RANDOM_SEED, DEFAULT_RANDOM_TESTS
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class OptimizeTests(unittest.TestCase):
@@ -27,6 +33,39 @@ class OptimizeTests(unittest.TestCase):
             metrics = independently_check(candidate)
             self.assertGreater(metrics.xor2_count, 0)
             self.assertEqual(len(metrics.output_depths), 32)
+
+    def test_completed_checkpoint_restores_requested_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            temporary = Path(directory)
+            artifact = temporary / "candidate.v"
+            frontier = temporary / "frontier.json"
+            metrics = temporary / "metrics.csv"
+            search_log = temporary / "search.jsonl"
+            candidate = run_search(
+                seed_start=0,
+                seed_count=10_000,
+                workers=1,
+                checkpoint_path=(
+                    ROOT / "results/checkpoints/candidate_a_checkpoint.json"
+                ),
+                artifact_path=artifact,
+                frontier_path=frontier,
+                metrics_path=metrics,
+                log_path=search_log,
+                random_tests=DEFAULT_RANDOM_TESTS,
+                random_seed=DEFAULT_RANDOM_SEED,
+            )
+            self.assertEqual(candidate.seed, 3195)
+            self.assertEqual(
+                artifact.read_text(),
+                (ROOT / "results/candidate_a_min_area.v").read_text(),
+            )
+            self.assertTrue(frontier.is_file())
+            self.assertTrue(metrics.is_file())
+            self.assertEqual(
+                search_log.read_bytes(),
+                (ROOT / "results/search_log.jsonl").read_bytes(),
+            )
 
 
 if __name__ == "__main__":

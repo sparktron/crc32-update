@@ -153,6 +153,7 @@ jobs:
           set -euo pipefail
           python3 -m unittest -v \
             verifier.test_verifier \
+            verifier.test_verify_candidate \
             generator.test_baseline_generator \
             optimizer.test_optimize
 
