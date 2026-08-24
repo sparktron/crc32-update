@@ -1,0 +1,64 @@
+{
+  "candidate_scope": [
+    "A"
+  ],
+  "entries": [
+    {
+      "artifact": "results/phase4/candidate_a_extended.v",
+      "candidate_class": "A",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 439,
+        "maximum_depth": 8,
+        "maximum_fanout": 5,
+        "output_depths": [
+          8,
+          8,
+          8,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8,
+          7,
+          7,
+          6,
+          7,
+          8,
+          7,
+          8,
+          7,
+          7,
+          7,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8
+        ],
+        "total_excess_fanout_above_4": 5,
+        "total_fanout": 910,
+        "xor2_count": 439
+      },
+      "seed": 16564,
+      "verification": {
+        "exact_vectors": 97,
+        "formal_equivalence": "passed",
+        "random_seed": 3274333933,
+        "random_vectors": 100000,
+        "structural": "passed"
+      }
+    }
+  ],
+  "generated_by": "gf2-bp-cse-depth-stochastic-v1",
+  "schema_version": 1
+}

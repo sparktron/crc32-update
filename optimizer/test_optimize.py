@@ -9,7 +9,15 @@ import unittest
 
 from generator.build_matrix import build_transformation_matrix
 from optimizer.optimize import independently_check, run_search, search_seed
-from verifier.verify_network import DEFAULT_RANDOM_SEED, DEFAULT_RANDOM_TESTS
+from optimizer.phase4_candidates import _render_candidate_c
+from optimizer.refine_candidates import _config
+from optimizer.repair_search_log import deduplicate
+from verifier.verify_network import (
+    DEFAULT_RANDOM_SEED,
+    DEFAULT_RANDOM_TESTS,
+    parse_network,
+    verify_exact_equivalence,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -114,6 +122,30 @@ class OptimizeTests(unittest.TestCase):
             checkpoint = json.loads(checkpoint_path.read_text())
             self.assertEqual(checkpoint["completed_seeds"], 2)
             self.assertEqual(checkpoint["status"], "completed")
+
+    def test_log_repair_rejects_conflicting_duplicate_attempts(self) -> None:
+        record = {"attempt_id": "trial", "algorithm": "test", "seed": 1}
+        self.assertEqual(deduplicate([record, dict(record)]), [record])
+        conflicting = dict(record)
+        conflicting["seed"] = 2
+        with self.assertRaisesRegex(ValueError, "conflicting duplicate"):
+            deduplicate([record, conflicting])
+
+    def test_candidate_c_starting_point_is_depth_six(self) -> None:
+        candidate = parse_network(_render_candidate_c()).normalize()
+        metrics = candidate.metrics()
+        self.assertEqual(metrics.maximum_depth, 6)
+        self.assertEqual(verify_exact_equivalence(candidate), 97)
+
+    def test_refinement_objectives_match_candidate_classes(self) -> None:
+        output_dir = ROOT / "results/phase4"
+        candidate_b = _config("B", output_dir)
+        candidate_c = _config("C", output_dir)
+        self.assertEqual(candidate_b.depth_cap, 8)
+        self.assertIsNone(candidate_c.depth_cap)
+        metrics = {"xor2_count": 439, "maximum_depth": 8, "maximum_fanout": 5}
+        self.assertLess(candidate_b.score(metrics, 1), candidate_b.score(metrics, 2))
+        self.assertLess(candidate_c.score(metrics, 1), candidate_c.score(metrics, 2))
 
 
 if __name__ == "__main__":

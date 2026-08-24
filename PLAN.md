@@ -123,6 +123,23 @@ Scope:
 - Investigate fanout-aware duplication and sharing/depth tradeoffs.
 - Search depth bounds 8, and bounds 9 and 10 when required by the specification.
 
+Phase 4 begins with a separate 10,000-seed Candidate A continuation over seeds
+10,000 through 19,999. Its checkpoint and generated artifacts are kept under
+`results/checkpoints/phase4_candidate_a_checkpoint.json` and `results/phase4/`
+so the completed Phase 3 Candidate A result remains reproducible unchanged.
+Long-running configured searches are executed manually when they may exceed
+Codex's command-execution time limit; their checkpoint and append-only log
+remain the source of resumable progress.
+Each checkpoint accepts only one active optimizer process. A repair operation
+may remove duplicate records only after checking that their functional outcomes
+match and saving an explicit recovery copy.
+Candidate B begins from a verified depth-8 point found in the continuation;
+Candidate C begins from a verified depth-6 balanced-tree point. Their later
+depth-bounded and minimum-depth refinement budgets remain required for G4.
+The recorded initial manual budgets are 10,000 seeds each: B uses seeds
+20,000 through 29,999, then C uses seeds 30,000 through 39,999. They share the
+canonical log and therefore run sequentially.
+
 Validation gate G4:
 
 - Random seeds and compute budgets are recorded and reproducible.

@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 import json
+import fcntl
 from itertools import combinations
 import os
 from pathlib import Path
@@ -52,13 +54,13 @@ class Candidate:
     vectors: tuple[int, ...]
     depths: tuple[int, ...]
 
-    def render(self) -> str:
+    def render(self, module_name: str = "candidate_a_min_area") -> str:
         names = list(basis_signal_names()) + [
             f"n{index}" for index in range(len(self.vectors) - INPUT_COUNT)
         ]
         retained = {operation.output for operation in self.operations}
         lines = [
-            "module candidate_a_min_area(crc, data, next_crc);",
+            f"module {module_name}(crc, data, next_crc);",
             "input [31:0] crc;",
             "input [63:0] data;",
             "output [31:0] next_crc;",
@@ -336,6 +338,25 @@ def _append_log(path: Path, records: Sequence[dict[str, object]]) -> None:
             output.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
 
 
+@contextmanager
+def _exclusive_search_lock(checkpoint_path: Path) -> Iterable[None]:
+    """Prevent two CLI invocations from sharing one checkpoint and search log."""
+
+    lock_path = checkpoint_path.with_suffix(checkpoint_path.suffix + ".lock")
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("w") as lock_file:
+        try:
+            fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise RuntimeError(
+                f"search checkpoint is already active: {checkpoint_path}"
+            ) from error
+        try:
+            yield
+        finally:
+            fcntl.flock(lock_file, fcntl.LOCK_UN)
+
+
 def _full_verify(candidate: Candidate, random_tests: int, random_seed: int) -> dict[str, object]:
     with tempfile.TemporaryDirectory(prefix="candidate-a-incumbent-") as directory:
         path = Path(directory) / "candidate_a_min_area.v"
@@ -564,8 +585,8 @@ def run_search(
                 random_seed,
             )
             return best
-    elif log_path.exists() and log_path.stat().st_size:
-        raise ValueError("nonempty search log has no checkpoint to resume")
+    elif _candidate_a_attempts(log_path, seed_start, seed_count):
+        raise ValueError("search log has Candidate A attempts without a checkpoint")
 
     checkpoint = {
         "algorithm": ALGORITHM,
@@ -735,18 +756,19 @@ def main() -> int:
     if args.random_tests < DEFAULT_RANDOM_TESTS:
         parser.error(f"--random-tests must be at least {DEFAULT_RANDOM_TESTS}")
     try:
-        candidate = run_search(
-            args.seed_start,
-            args.seed_count,
-            args.workers,
-            args.checkpoint,
-            args.artifact,
-            args.frontier,
-            args.metrics,
-            args.search_log,
-            args.random_tests,
-            args.random_seed,
-        )
+        with _exclusive_search_lock(args.checkpoint):
+            candidate = run_search(
+                args.seed_start,
+                args.seed_count,
+                args.workers,
+                args.checkpoint,
+                args.artifact,
+                args.frontier,
+                args.metrics,
+                args.search_log,
+                args.random_tests,
+                args.random_seed,
+            )
     except (OSError, RuntimeError, ValueError) as error:
         parser.exit(1, f"Candidate A search failed: {error}\n")
     metrics = independently_check(candidate)

@@ -184,3 +184,85 @@ Every improving incumbent is independently parsed, checked on all 97 exact
 vectors and 100,000 recorded random vectors, and formally proved before it is
 accepted. Candidate A has no hard depth cap. This work does not run or create
 Candidates B or C.
+
+## Phase 4 Continuation
+
+Phase 4 broadens the seeded local search without changing the completed Phase 3
+Candidate A checkpoint. It uses seeds 10,000 through 19,999, appends records to
+the same canonical search log, and can safely resume after interruption:
+
+```bash
+python3 -m optimizer.optimize \
+  --seed-start 10000 \
+  --seed-count 10000 \
+  --workers 8 \
+  --checkpoint results/checkpoints/phase4_candidate_a_checkpoint.json \
+  --artifact results/phase4/candidate_a_extended.v \
+  --frontier results/phase4/candidate_a_frontier.json \
+  --metrics results/phase4/candidate_a_metrics.csv \
+  --search-log results/search_log.jsonl
+```
+
+This is an in-progress Phase 4 work package. It does not yet claim to complete
+Candidate B, Candidate C, or Gate G4.
+
+## Candidate B and C Starting Points
+
+Phase 4 records a depth-8 Candidate B starting point from the completed seeded
+continuation and a depth-6 Candidate C balanced-tree starting point. Both are
+independently checked on 97 exact vectors, 100,000 seeded random vectors, and
+formal equivalence before being accepted into the search log:
+
+```bash
+python3 -m optimizer.phase4_candidates \
+  --output-dir results/phase4 \
+  --search-log results/search_log.jsonl \
+  --random-tests 100000 \
+  --random-seed 0xC32A5EED
+```
+
+The command records each starting point once; it intentionally refuses to
+append a duplicate attempt. Longer depth-bounded and minimum-depth refinement
+budgets remain a separate manual Phase 4 step.
+
+Run the following budgets manually, one at a time, after committing the
+refinement implementation and starting-point artifacts. Both commands resume
+from their checkpoints after interruption and reject concurrent access to the
+canonical search log:
+
+```bash
+python3 -m optimizer.refine_candidates B \
+  --seed-start 20000 \
+  --seed-count 10000 \
+  --workers 8 \
+  --output-dir results/phase4 \
+  --search-log results/search_log.jsonl \
+  --checkpoint results/checkpoints/candidate_b_refinement.json
+
+python3 -m optimizer.refine_candidates C \
+  --seed-start 30000 \
+  --seed-count 10000 \
+  --workers 8 \
+  --output-dir results/phase4 \
+  --search-log results/search_log.jsonl \
+  --checkpoint results/checkpoints/candidate_c_refinement.json
+```
+
+Run Candidate B first, then Candidate C. Candidate B retains only trials at
+depth 8 or less and minimizes XOR2 count; Candidate C minimizes depth first,
+then XOR2 count.
+
+Because this search can exceed Codex's command-execution time limit, run the
+continuation manually rather than asking Codex to start it. The checkpoint and
+append-only log make that manual command safe to resume.
+
+Run only one invocation for a checkpoint at a time; the optimizer now rejects a
+second active invocation. If an older interrupted concurrent run left duplicate
+records, repair only after preserving a recovery copy and confirming that every
+duplicate has the same outcome:
+
+```bash
+python3 -m optimizer.repair_search_log \
+  --log results/search_log.jsonl \
+  --backup results/checkpoints/phase4_search_log_pre_dedup.jsonl
+```

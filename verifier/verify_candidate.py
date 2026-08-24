@@ -115,13 +115,21 @@ def verify_candidate_records(
     if checkpoint.get("incumbent_metrics") != measured:
         raise ValueError("checkpoint incumbent metrics do not match measurement")
 
-    attempts = [
-        json.loads(line) for line in search_log_path.read_text().splitlines()
-    ]
     expected_count = checkpoint.get("seed_count")
     seed_start = checkpoint.get("seed_start")
     if not isinstance(expected_count, int) or not isinstance(seed_start, int):
         raise ValueError("checkpoint seed range is malformed")
+    algorithm = checkpoint.get("algorithm")
+    if not isinstance(algorithm, str) or not algorithm:
+        raise ValueError("checkpoint algorithm is malformed")
+    attempts = [
+        record
+        for line in search_log_path.read_text().splitlines()
+        for record in [json.loads(line)]
+        if record.get("algorithm") == algorithm
+        and isinstance(record.get("seed"), int)
+        and seed_start <= record["seed"] < seed_start + expected_count
+    ]
     if len(attempts) != expected_count:
         raise ValueError("search log attempt count does not match checkpoint budget")
     attempt_ids = [attempt.get("attempt_id") for attempt in attempts]
