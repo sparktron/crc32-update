@@ -154,6 +154,15 @@ not a global-optimality claim.
 
 ## Phase 5 — Exact Small-Subcircuit Improvement
 
+The bounded single-cone SMT study over the verified Candidate B artifact is
+complete. It selected 20 small high-fanout cones and searched only for strict
+gate-count reductions. Seventeen cones were proven UNSAT for every smaller
+implementation; three six-gate cones reached the one-second per-query limit
+and remain inconclusive rather than negative certificates. No replacement was
+found or integrated. The Z3 version, timeout, selected roots, candidate
+verification evidence, and outcomes are recorded in the checkpoint, output
+JSON, and append-only search log.
+
 Scope:
 
 - Select bounded, high-value subcircuits from verified candidates.
@@ -169,6 +178,10 @@ Validation gate G5:
 - Solver versions, constraints, limits, and outcomes are recorded.
 - Any optimality claim is limited to the exact encoded problem and accompanied
   by a checkable certificate or unsatisfiability result.
+
+G5 passed locally for this bounded study. Its negative results apply only to
+the stated single-output cone encodings and timeout; they do not establish
+global or whole-network optimality.
 
 ## Phase 6 — Final Verification, Comparison, and Reporting
 
