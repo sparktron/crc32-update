@@ -203,8 +203,11 @@ python3 -m optimizer.optimize \
   --search-log results/search_log.jsonl
 ```
 
-This is an in-progress Phase 4 work package. It does not yet claim to complete
-Candidate B, Candidate C, or Gate G4.
+The configured Candidate A continuation and Candidate B/C refinement budgets
+have completed. Candidate B (seeds 20,000–29,999) and Candidate C (seeds
+30,000–39,999) found no accepted improvement over their verified starting
+incumbents. Gate G4 passed locally for those recorded budgets; this is not a
+global-optimality claim.
 
 ## Candidate B and C Starting Points
 
@@ -222,11 +225,10 @@ python3 -m optimizer.phase4_candidates \
 ```
 
 The command records each starting point once; it intentionally refuses to
-append a duplicate attempt. Longer depth-bounded and minimum-depth refinement
-budgets remain a separate manual Phase 4 step.
+append a duplicate attempt. The documented depth-bounded and minimum-depth
+refinement budgets below have completed without an accepted improvement.
 
-Run the following budgets manually, one at a time, after committing the
-refinement implementation and starting-point artifacts. Both commands resume
+The following completed budgets were run manually, one at a time. Both commands resume
 from their checkpoints after interruption and reject concurrent access to the
 canonical search log:
 

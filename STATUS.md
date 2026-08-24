@@ -1,11 +1,10 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-08-24
+Last updated: 2026-08-25
 
-Current phase: Phase 4 — Stochastic and local-search continuation in progress
+Current phase: Phase 4 — Stochastic and local-search continuation complete
 
-Current gate: G3 passed locally for the Candidate A-only scope; G4 is in
-progress and has not passed.
+Current gate: G4 passed locally
 
 ## Current Best Results
 
@@ -13,10 +12,9 @@ Candidate A is the best network found by the recorded 20,000-seed search. It is
 not a claim of global optimality. The generated 1,390-XOR structural network
 remains a Phase 1 validation fixture only, not a candidate or baseline.
 
-Phase 4 has begun a separate recorded continuation over seeds 10,000 through
-19,999. The current checkpoint records completed work only; it is not a Phase 4
-result or Gate G4 claim until its configured budget and later candidate classes
-are complete.
+Phase 4 completed its separate recorded Candidate A continuation over seeds
+10,000 through 19,999 and its recorded Candidate B and Candidate C refinement
+budgets.
 
 The completed continuation logged 10,000 unique attempts. A prior overlapping
 manual invocation created 7,125 duplicate records; they had identical outcomes
@@ -27,16 +25,15 @@ holds an exclusive checkpoint lock to reject overlapping invocations.
 Candidate B and Candidate C starting points are recorded in
 `results/phase4/candidate_starting_points.json` and the append-only search log.
 Both passed structural, exact, 100,000-vector randomized, and formal checks.
-Their refinement searches have not yet run, so G4 remains in progress.
-The configured manual refinement budgets are 10,000 seeds for B (20,000–29,999)
-followed by 10,000 seeds for C (30,000–39,999); they share the canonical log
-and must run one at a time.
+Their refinements completed the configured 10,000-seed budgets for B
+(20,000–29,999) and C (30,000–39,999), with no accepted improvement over the
+verified starting incumbent in either class.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |
 | A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
-| B — depth at most 8 | 439 | 8 | Passed | Starting point; seed 16,564 |
-| C — minimum-depth search | 1,390 | 6 | Passed | Balanced-tree starting point |
+| B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
+| C — minimum-depth search | 1,390 | 6 | Passed | Best found; no refinement improvement |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector

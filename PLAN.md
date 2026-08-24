@@ -133,12 +133,11 @@ remain the source of resumable progress.
 Each checkpoint accepts only one active optimizer process. A repair operation
 may remove duplicate records only after checking that their functional outcomes
 match and saving an explicit recovery copy.
-Candidate B begins from a verified depth-8 point found in the continuation;
-Candidate C begins from a verified depth-6 balanced-tree point. Their later
-depth-bounded and minimum-depth refinement budgets remain required for G4.
-The recorded initial manual budgets are 10,000 seeds each: B uses seeds
-20,000 through 29,999, then C uses seeds 30,000 through 39,999. They share the
-canonical log and therefore run sequentially.
+Candidate B began from a verified depth-8 point found in the continuation;
+Candidate C began from a verified depth-6 balanced-tree point. The recorded
+manual refinement budgets completed sequentially: B used seeds 20,000 through
+29,999 and C used seeds 30,000 through 39,999. Neither search found an
+accepted improvement, so each class retains its verified starting incumbent.
 
 Validation gate G4:
 
@@ -148,6 +147,10 @@ Validation gate G4:
 - Depth-bounded candidates satisfy their claimed bounds under independent
   recomputation.
 - The nondominated frontier is regenerated from verified metrics only.
+
+G4 passed locally after the configured Candidate A continuation and Candidate
+B/C budgets completed. This is a best-found result for the recorded searches,
+not a global-optimality claim.
 
 ## Phase 5 — Exact Small-Subcircuit Improvement
 
