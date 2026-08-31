@@ -154,6 +154,20 @@ not a global-optimality claim.
 
 ## Phase 5 — Exact Small-Subcircuit Improvement
 
+Phase 5 uses a bounded single-cone SMT study over the verified Candidate B
+artifact. It cuts at internally shared nodes and counts only exclusively
+removable XOR2 instances, so a future witness can be compared honestly with the
+part of the submitted network it can replace. Each append-only log record
+contains its complete solver outcome, allowing a resumed run to reconstruct
+the combined study output after interruption. The Z3 version, timeout,
+selected roots, candidate verification evidence, and outcomes are recorded in
+the checkpoint, output JSON, and append-only search log.
+
+The earlier v1 non-exclusive 20-cone study remains an exploratory historical
+record only. Its counts included shared fan-in nodes and it is not used as G5
+evidence. The corrected exclusive-cone v2 budget must complete before G5 can
+pass.
+
 Scope:
 
 - Select bounded, high-value subcircuits from verified candidates.
@@ -169,6 +183,10 @@ Validation gate G5:
 - Solver versions, constraints, limits, and outcomes are recorded.
 - Any optimality claim is limited to the exact encoded problem and accompanied
   by a checkable certificate or unsatisfiability result.
+
+Any completed v2 negative results apply only to the stated single-output cone
+encodings and timeout; they do not establish global or whole-network
+optimality.
 
 ## Phase 6 — Final Verification, Comparison, and Reporting
 

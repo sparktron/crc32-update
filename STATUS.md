@@ -1,10 +1,10 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-08-25
+Last updated: 2026-08-31
 
-Current phase: Phase 4 — Stochastic and local-search continuation complete
+Current phase: Phase 5 — Exact small-subcircuit improvement in progress
 
-Current gate: G4 passed locally
+Current gate: G4 passed locally; G5 pending the exclusive-cone study
 
 ## Current Best Results
 
@@ -28,6 +28,13 @@ Both passed structural, exact, 100,000-vector randomized, and formal checks.
 Their refinements completed the configured 10,000-seed budgets for B
 (20,000–29,999) and C (30,000–39,999), with no accepted improvement over the
 verified starting incumbent in either class.
+
+Phase 5's first 20-cone study is retained as an exploratory historical record,
+but it counted shared fan-in nodes that cannot be removed during integration.
+It is therefore not G5 evidence. The replacement v2 study cuts at shared
+signals, counts only exclusively removable gates, and stores complete outcomes
+in each append-only log record so resumed runs cannot discard prior results.
+No Phase 5 replacement has been accepted or integrated.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |

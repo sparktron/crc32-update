@@ -1,0 +1,453 @@
+"""Run bounded exact SMT studies on small XOR cones from a verified candidate.
+
+The search represents every cut signal as a GF(2) coefficient bit-vector.  A
+Z3 query therefore proves equality for all assignments to the cut leaves, not
+just a sampled set of input vectors.  This tool records study outcomes only;
+an improvement remains unaccepted until it is integrated and the complete
+network passes the normal independent verification flow.
+"""
+
+from __future__ import annotations
+
+import argparse
+from collections import Counter
+from dataclasses import dataclass
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+import time
+
+from optimizer.optimize import _exclusive_search_lock
+from verifier.run_formal import run as run_formal
+from verifier.verify_network import (
+    DEFAULT_RANDOM_SEED,
+    DEFAULT_RANDOM_TESTS,
+    NormalizedNetwork,
+    parse_network_file,
+    verification_report,
+)
+
+ALGORITHM = "phase5-exact-exclusive-cone-v2"
+
+
+@dataclass(frozen=True)
+class Cone:
+    root: str
+    nodes: tuple[str, ...]
+    leaves: tuple[str, ...]
+    target_vector: int
+
+
+@dataclass(frozen=True)
+class SolverResult:
+    status: str
+    gate_count: int | None
+    witness: dict[str, int] | None
+
+
+def _timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _z3_version() -> str:
+    completed = subprocess.run(
+        ["z3", "--version"], check=True, capture_output=True, text=True
+    )
+    return completed.stdout.strip()
+
+
+def _cone(network: NormalizedNetwork, root: str) -> Cone:
+    """Return the removable fan-in cone rooted at ``root``.
+
+    A non-root node is retained only when every one of its consumers is also
+    retained. Nodes shared with the rest of the submitted network therefore
+    become cut leaves and are not counted as removable gates.
+    """
+
+    node_names = {node.output for node in network.nodes}
+    if root not in node_names:
+        raise ValueError(f"root is not a retained XOR node: {root}")
+
+    transitive_inputs: set[str] = set()
+
+    def visit(signal: str) -> None:
+        if signal not in node_names or signal in transitive_inputs:
+            return
+        transitive_inputs.add(signal)
+        input_a, input_b = network.canonical_inputs[signal]
+        visit(input_a)
+        visit(input_b)
+
+    visit(root)
+    consumers: dict[str, set[str]] = {name: set() for name in node_names}
+    for output, inputs in network.canonical_inputs.items():
+        for source in inputs:
+            if source in consumers:
+                consumers[source].add(output)
+    for source in network.output_sources:
+        if source in consumers:
+            consumers[source].add("next_crc")
+
+    retained = {root}
+    while True:
+        additions = {
+            node.output
+            for node in network.nodes
+            if node.output in transitive_inputs
+            and node.output not in retained
+            and consumers[node.output] <= retained
+        }
+        if not additions:
+            break
+        retained.update(additions)
+
+    nodes = tuple(node.output for node in network.nodes if node.output in retained)
+    leaves = tuple(
+        sorted(
+            {
+                source
+                for node in nodes
+                for source in network.canonical_inputs[node]
+                if source not in retained
+            }
+        )
+    )
+    values = {leaf: 1 << index for index, leaf in enumerate(leaves)}
+    for node in nodes:
+        input_a, input_b = network.canonical_inputs[node]
+        values[node] = values[input_a] ^ values[input_b]
+    return Cone(root, nodes, leaves, values[root])
+
+
+def select_cones(
+    network: NormalizedNetwork, max_cone_nodes: int, limit: int
+) -> list[Cone]:
+    """Choose deterministic, high-fanout small cones for an exact study."""
+
+    if max_cone_nodes <= 0 or limit <= 0:
+        raise ValueError("max_cone_nodes and limit must be positive")
+    fanout = Counter(source for inputs in network.canonical_inputs.values() for source in inputs)
+    fanout.update(network.output_sources)
+    candidates = [
+        _cone(network, node.output)
+        for node in network.nodes
+    ]
+    candidates = [cone for cone in candidates if 2 <= len(cone.nodes) <= max_cone_nodes]
+    candidates.sort(key=lambda cone: (-fanout[cone.root], -len(cone.nodes), cone.root))
+    return candidates[:limit]
+
+
+def _bit_vector(value: int, width: int) -> str:
+    return f"(_ bv{value} {width})"
+
+
+def _selection_expression(selector: str, values: list[str]) -> str:
+    expression = values[-1]
+    for index in range(len(values) - 2, -1, -1):
+        expression = f"(ite (= {selector} {index}) {values[index]} {expression})"
+    return expression
+
+
+def build_smt2(cone: Cone, gate_count: int, timeout_ms: int) -> str:
+    """Build an exact bounded-XOR synthesis query for one cone output."""
+
+    if gate_count < 0 or timeout_ms <= 0:
+        raise ValueError("gate_count and timeout_ms must be non-negative/positive")
+    width = len(cone.leaves)
+    if width == 0:
+        raise ValueError("cone has no cut leaves")
+    lines = [
+        "; Exact GF(2) cone synthesis generated by optimizer.phase5_exact",
+        f"(set-option :timeout {timeout_ms})",
+        "(set-logic ALL)",
+    ]
+    values = [_bit_vector(1 << index, width) for index in range(width)]
+    selectors: list[str] = []
+    for index in range(gate_count):
+        input_count = width + index
+        first = f"a{index}"
+        second = f"b{index}"
+        selectors.extend((first, second))
+        lines.extend(
+            (
+                f"(declare-fun {first} () Int)",
+                f"(declare-fun {second} () Int)",
+                f"(assert (and (<= 0 {first}) (< {first} {input_count})))",
+                f"(assert (and (<= 0 {second}) (< {second} {input_count})))",
+                f"(assert (< {first} {second}))",
+            )
+        )
+        input_a = _selection_expression(first, values)
+        input_b = _selection_expression(second, values)
+        value_name = f"g{index}"
+        lines.append(f"(define-fun {value_name} () (_ BitVec {width}) (bvxor {input_a} {input_b}))")
+        values.append(value_name)
+    lines.extend(
+        (
+            "(declare-fun out () Int)",
+            f"(assert (and (<= 0 out) (< out {len(values)})))",
+            f"(assert (= {_selection_expression('out', values)} {_bit_vector(cone.target_vector, width)}))",
+            "(check-sat)",
+            f"(get-value ({' '.join([*selectors, 'out'])}))",
+        )
+    )
+    return "\n".join(lines) + "\n"
+
+
+def _run_query(smt2: str, timeout_ms: int) -> SolverResult:
+    with tempfile.NamedTemporaryFile("w", suffix=".smt2", delete=False) as output:
+        path = Path(output.name)
+        output.write(smt2)
+    try:
+        completed = subprocess.run(
+            ["z3", "-smt2", str(path)],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=(timeout_ms / 1000) + 2,
+        )
+    finally:
+        path.unlink(missing_ok=True)
+    lines = completed.stdout.splitlines()
+    if not lines:
+        return SolverResult("error", None, None)
+    status = lines[0].strip()
+    if status != "sat":
+        return SolverResult(status if status in {"unsat", "unknown"} else "error", None, None)
+    if completed.returncode != 0:
+        return SolverResult("error", None, None)
+    witness = {
+        name: int(value)
+        for name, value in re.findall(r"\((a\d+|b\d+|out)\s+(-?\d+)\)", completed.stdout)
+    }
+    return SolverResult("sat", None, witness)
+
+
+def solve_strict_improvement(cone: Cone, timeout_ms: int) -> SolverResult:
+    """Return a proven smaller implementation, or a completed negative result."""
+
+    for gate_count in range(len(cone.nodes)):
+        result = _run_query(build_smt2(cone, gate_count, timeout_ms), timeout_ms)
+        if result.status == "sat":
+            return SolverResult("sat", gate_count, result.witness)
+        if result.status != "unsat":
+            return result
+    return SolverResult("unsat", None, None)
+
+
+def _append_log(path: Path, record: dict[str, object]) -> None:
+    with path.open("a") as output:
+        output.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
+
+
+def _write_json(path: Path, document: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
+    temporary.replace(path)
+
+
+def _stored_outcomes(
+    output_path: Path, configuration: dict[str, object], roots: set[str]
+) -> dict[str, dict[str, object]]:
+    if not output_path.exists():
+        return {}
+    document = json.loads(output_path.read_text())
+    if document.get("configuration") != configuration:
+        raise ValueError("study output configuration does not match requested study")
+    raw_outcomes = document.get("outcomes")
+    if not isinstance(raw_outcomes, list):
+        raise ValueError("study output outcomes are malformed")
+    outcomes: dict[str, dict[str, object]] = {}
+    for outcome in raw_outcomes:
+        if not isinstance(outcome, dict) or not isinstance(outcome.get("root"), str):
+            raise ValueError("study output contains a malformed outcome")
+        root = outcome["root"]
+        if root not in roots or root in outcomes:
+            raise ValueError("study output contains an unexpected or duplicate root")
+        outcomes[root] = outcome
+    return outcomes
+
+
+def _completed_outcomes(
+    log_path: Path,
+    roots: set[str],
+    stored: dict[str, dict[str, object]],
+) -> dict[str, dict[str, object]]:
+    """Restore outcomes from the log, falling back to an older study output.
+
+    New records carry the full outcome. The output fallback preserves a record
+    already written by an older runner that did not embed that field in the log.
+    """
+
+    if not log_path.exists():
+        return {}
+    completed: dict[str, dict[str, object]] = {}
+    for line_number, line in enumerate(log_path.read_text().splitlines(), 1):
+        record = json.loads(line)
+        if not isinstance(record, dict):
+            raise ValueError(f"{log_path}:{line_number}: record is not an object")
+        if record.get("algorithm") != ALGORITHM:
+            continue
+        root = record.get("parameters", {}).get("root")
+        if root in roots:
+            outcome = record.get("study_outcome")
+            if outcome is None:
+                outcome = stored.get(root)
+            if not isinstance(outcome, dict) or outcome.get("root") != root:
+                raise ValueError(f"{log_path}:{line_number}: completed root has no stored outcome")
+            if root in completed and completed[root] != outcome:
+                raise ValueError(f"{log_path}:{line_number}: conflicting outcome for root {root}")
+            completed[root] = outcome
+    return completed
+
+
+def run_study(
+    candidate_path: Path,
+    checkpoint_path: Path,
+    log_path: Path,
+    output_path: Path,
+    max_cone_nodes: int,
+    limit: int,
+    timeout_ms: int,
+    random_tests: int,
+    random_seed: int,
+) -> dict[str, object]:
+    """Run or resume a bounded, logged negative-or-witness exact study."""
+
+    if random_tests < DEFAULT_RANDOM_TESTS:
+        raise ValueError(f"random_tests must be at least {DEFAULT_RANDOM_TESTS}")
+    report = verification_report(candidate_path, random_tests, random_seed)
+    run_formal(candidate_path)
+    solver_version = _z3_version()
+    network = parse_network_file(candidate_path).normalize()
+    cones = select_cones(network, max_cone_nodes, limit)
+    roots = [cone.root for cone in cones]
+    configuration = {
+        "algorithm": ALGORITHM,
+        "candidate": str(candidate_path),
+        "roots": roots,
+        "max_cone_nodes": max_cone_nodes,
+        "timeout_ms": timeout_ms,
+        "random_tests": random_tests,
+        "random_seed": random_seed,
+    }
+    if checkpoint_path.exists():
+        checkpoint = json.loads(checkpoint_path.read_text())
+        if checkpoint.get("configuration") != configuration:
+            raise ValueError("checkpoint configuration does not match requested study")
+    root_set = set(roots)
+    stored = _stored_outcomes(output_path, configuration, root_set)
+    outcomes_by_root = _completed_outcomes(log_path, root_set, stored)
+    for cone in cones:
+        if cone.root in outcomes_by_root:
+            continue
+        started = time.perf_counter()
+        result = solve_strict_improvement(cone, timeout_ms)
+        runtime = time.perf_counter() - started
+        outcome = {
+            "root": cone.root,
+            "original_gate_count": len(cone.nodes),
+            "cut_leaf_count": len(cone.leaves),
+            "solver_status": result.status,
+            "replacement_gate_count": result.gate_count,
+            "witness": result.witness,
+        }
+        outcomes_by_root[cone.root] = outcome
+        accepted = False
+        verification_passed = result.status in {"sat", "unsat"}
+        reason = (
+            "replacement requires integration and full-network verification"
+            if result.status == "sat"
+            else "no strict gate reduction" if result.status == "unsat" else f"solver {result.status}"
+        )
+        _append_log(
+            log_path,
+            {
+                "timestamp_utc": _timestamp(),
+                "attempt_id": f"phase5-exact-cone-{cone.root}",
+                "algorithm": ALGORITHM,
+                "parameters": {
+                    "root": cone.root,
+                    "max_cone_nodes": max_cone_nodes,
+                    "timeout_ms": timeout_ms,
+                    "solver_version": solver_version,
+                },
+                "seed": None,
+                "runtime_seconds": round(runtime, 6),
+                "starting_metrics": report["metrics"],
+                "final_metrics": report["metrics"],
+                "verification_passed": verification_passed,
+                "accepted": accepted,
+                "rejection_reason": reason,
+                "artifact": None,
+                "study_outcome": outcome,
+            },
+        )
+        _write_json(
+            checkpoint_path,
+            {
+                "configuration": configuration,
+                "completed_roots": sorted(outcomes_by_root),
+                "outcomes": [outcomes_by_root[root] for root in roots if root in outcomes_by_root],
+                "solver_version": solver_version,
+                "status": "running",
+            },
+        )
+    outcomes = [outcomes_by_root[root] for root in roots if root in outcomes_by_root]
+    document = {
+        "configuration": configuration,
+        "outcomes": outcomes,
+        "solver_version": solver_version,
+        "status": "completed",
+    }
+    _write_json(output_path, document)
+    _write_json(
+        checkpoint_path,
+        {
+            "configuration": configuration,
+            "completed_roots": roots,
+            "outcomes": outcomes,
+            "solver_version": solver_version,
+            "status": "completed",
+        },
+    )
+    return document
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--candidate", type=Path, default=Path("results/phase4/candidate_b_refined.v"))
+    parser.add_argument("--checkpoint", type=Path, default=Path("results/checkpoints/phase5_exact_exclusive_cones.json"))
+    parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
+    parser.add_argument("--output", type=Path, default=Path("results/phase5/exact_exclusive_cone_study.json"))
+    parser.add_argument("--max-cone-nodes", type=int, default=6)
+    parser.add_argument("--limit", type=int, default=20)
+    parser.add_argument("--timeout-ms", type=int, default=1000)
+    parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
+    parser.add_argument("--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED)
+    args = parser.parse_args()
+    try:
+        with _exclusive_search_lock(args.search_log):
+            document = run_study(
+                args.candidate,
+                args.checkpoint,
+                args.search_log,
+                args.output,
+                args.max_cone_nodes,
+                args.limit,
+                args.timeout_ms,
+                args.random_tests,
+                args.random_seed,
+            )
+    except (OSError, RuntimeError, ValueError, json.JSONDecodeError, subprocess.SubprocessError) as error:
+        parser.exit(1, f"Phase 5 exact study failed: {error}\n")
+    print(json.dumps(document, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
