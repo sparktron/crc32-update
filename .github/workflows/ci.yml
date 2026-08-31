@@ -154,8 +154,10 @@ jobs:
           python3 -m unittest -v \
             verifier.test_verifier \
             verifier.test_verify_candidate \
+            verifier.test_verify_final \
             generator.test_baseline_generator \
-            optimizer.test_optimize
+            optimizer.test_optimize \
+            optimizer.test_phase5_exact
 
       - name: Run Phase 1 acceptance verifier
         shell: bash
@@ -221,3 +223,29 @@ jobs:
             --metrics results/metrics.csv \
             --random-tests 100000 \
             --seed 0xC32A5EED
+
+      - name: Reconstruct the completed Phase 5 study
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m optimizer.phase5_exact \
+            --candidate results/phase4/candidate_b_refined.v \
+            --checkpoint results/checkpoints/phase5_exact_exclusive_cones.json \
+            --search-log results/search_log.jsonl \
+            --output /tmp/exact_exclusive_cone_study.json \
+            --max-cone-nodes 6 \
+            --limit 20 \
+            --timeout-ms 1000
+          cmp results/phase5/exact_exclusive_cone_study.json \
+            /tmp/exact_exclusive_cone_study.json
+
+      - name: Verify the Phase 6 candidate frontier
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m verifier.verify_final \
+            --frontier /tmp/final_pareto_frontier.json \
+            --metrics /tmp/final_metrics.csv
+          cmp results/phase6/pareto_frontier.json \
+            /tmp/final_pareto_frontier.json
+          cmp results/phase6/metrics.csv /tmp/final_metrics.csv

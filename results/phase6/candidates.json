@@ -1,0 +1,31 @@
+{
+  "candidates": [
+    {
+      "artifact": "results/phase4/candidate_a_extended.v",
+      "candidate_classes": [
+        "A",
+        "B"
+      ],
+      "candidate_id": "candidate_ab_min_area_depth8",
+      "provenance": "Phase 4 Candidate A continuation seed 16564; the same verified structure is the Candidate B depth-8 representative",
+      "role": "minimum-area and depth-at-most-8"
+    },
+    {
+      "artifact": "results/baselines/yosys_abc.v",
+      "candidate_classes": [],
+      "candidate_id": "candidate_yosys_abc_tradeoff",
+      "provenance": "Phase 2 conventional Yosys/ABC synthesis normalized to the frozen XOR2 model",
+      "role": "intermediate area-depth tradeoff"
+    },
+    {
+      "artifact": "results/phase4/candidate_c_refined.v",
+      "candidate_classes": [
+        "C"
+      ],
+      "candidate_id": "candidate_c_min_depth",
+      "provenance": "Phase 4 balanced-tree Candidate C; refinement seeds 30000 through 39999 found no improvement",
+      "role": "minimum-depth search"
+    }
+  ],
+  "schema_version": 1
+}

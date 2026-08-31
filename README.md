@@ -4,11 +4,10 @@ This repository is the workspace for a reproducible search for optimized
 combinational XOR2 networks implementing a 64-bit parallel reflected IEEE
 CRC-32 state update.
 
-Phase 1 reference, matrix-generation, structural verification, metric, random,
-and formal-equivalence infrastructure is implemented. Phase 2 deterministic
-baselines are generated and verified. Phase 3 has produced and verified
-Candidate A with a reproducible multi-seed minimum-area search. Candidates B
-and C have not begun.
+Phases 1 through 5 are complete. The repository contains independently verified
+baselines, deterministic and stochastic candidate searches, depth-bounded
+Candidate B and minimum-depth Candidate C results, and a completed bounded
+exact-cone study. Phase 6 final verification and reporting is in progress.
 
 Experiment control documents:
 
@@ -33,7 +32,9 @@ results in that CI check always refer to the same generated artifacts.
 Phase 1 reference, matrix, parser, metric, equivalence, rejection, and formal
 tests run in the same CI gate. CI also replays Candidate A from its recorded
 seed, compares it byte-for-byte, and repeats its structural, exact, random,
-metric-record, and formal checks. CI does not rerun the 10,000-seed search.
+metric-record, and formal checks. It reconstructs the completed Phase 5 study
+from the append-only log and independently regenerates the Phase 6 frontier and
+metrics. CI does not rerun the seeded optimization budgets.
 
 ## Circuit Metric Model
 
@@ -288,6 +289,11 @@ fan-in gates. The corrected command above records each complete outcome in the
 canonical log and preserves all outcomes when resumed after interruption. Run
 it alone because it locks the shared canonical search log.
 
+The corrected 20-root budget completed with 13 UNSAT lower-bound results and
+seven solver timeouts. It found no replacement witness, so no candidate was
+modified. These are local results for the recorded cone encodings and timeout,
+not whole-network optimality claims.
+
 Run only one invocation for a checkpoint at a time; the optimizer now rejects a
 second active invocation. If an older interrupted concurrent run left duplicate
 records, repair only after preserving a recovery copy and confirming that every
@@ -298,3 +304,26 @@ python3 -m optimizer.repair_search_log \
   --log results/search_log.jsonl \
   --backup results/checkpoints/phase4_search_log_pre_dedup.jsonl
 ```
+
+## Phase 6 Final Candidate Verification
+
+The Phase 6 manifest selects three distinct nondominated structures: the shared
+Candidate A/B depth-8 implementation, the normalized depth-7 Yosys/ABC
+tradeoff, and the depth-6 Candidate C implementation. The verifier rejects a
+missing candidate class, duplicate topology, dominated entry, or stale metric
+record before writing the generated frontier and CSV.
+
+Regenerate both records while repeating the complete acceptance flow for every
+selected artifact:
+
+```bash
+python3 -m verifier.verify_final \
+  --manifest results/phase6/candidates.json \
+  --frontier results/phase6/pareto_frontier.json \
+  --metrics results/phase6/metrics.csv \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
+```
+
+The initial Phase 6 report is in [`report.md`](report.md). External literature
+comparison and a clean-checkout reproduction run remain before G6 can pass.

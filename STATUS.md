@@ -2,9 +2,9 @@
 
 Last updated: 2026-08-31
 
-Current phase: Phase 5 — Exact small-subcircuit improvement in progress
+Current phase: Phase 6 — Final verification, comparison, and reporting in progress
 
-Current gate: G4 passed locally; G5 pending the exclusive-cone study
+Current gate: G5 passed locally; G6 in progress
 
 ## Current Best Results
 
@@ -34,12 +34,19 @@ but it counted shared fan-in nodes that cannot be removed during integration.
 It is therefore not G5 evidence. The replacement v2 study cuts at shared
 signals, counts only exclusively removable gates, and stores complete outcomes
 in each append-only log record so resumed runs cannot discard prior results.
-No Phase 5 replacement has been accepted or integrated.
+The 20-root v2 budget completed with 13 UNSAT results, seven timeouts, and no
+replacement witness. No Phase 5 replacement was accepted or integrated.
+
+Phase 6 currently selects three distinct nondominated structures. Candidate A
+and Candidate B intentionally share the same verified seed-16,564 structure;
+the normalized Yosys/ABC baseline is retained as the distinct depth-7 tradeoff
+between that structure and Candidate C.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |
 | A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
 | B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
+| Additional frontier tradeoff — Yosys/ABC | 1,123 | 7 | Passed | Conventional normalized synthesis |
 | C — minimum-depth search | 1,390 | 6 | Passed | Best found; no refinement improvement |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
@@ -109,6 +116,15 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 - Candidate result verification checks the frontier's recorded structural,
   exact-vector, randomized-vector, seed, and formal-equivalence evidence against
   the acceptance checks actually performed.
+- Phase 4 completed 10,000 additional Candidate A seeds and 10,000 refinement
+  seeds for each of Candidates B and C. Candidate A/B retain the verified
+  439-XOR, depth-8 seed-16,564 structure; Candidate C retains the verified
+  1,390-XOR, depth-6 balanced structure.
+- The corrected Phase 5 exclusive-cone study completed all 20 roots and is
+  reconstructible from the canonical log. It found no replacement witness.
+- Phase 6 independently verified three distinct nondominated structures and
+  generated `results/phase6/pareto_frontier.json` and
+  `results/phase6/metrics.csv` from a checked manifest.
 
 ## Files Created for Phase 1
 
@@ -157,6 +173,21 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 - `results/metrics.csv`
 - `results/checkpoints/candidate_a_checkpoint.json`
 - `results/checkpoints/candidate_a_incumbents/*.v`
+
+## Files Created for Phases 4–6
+
+- `optimizer/phase4_candidates.py`
+- `optimizer/refine_candidates.py`
+- `optimizer/phase5_exact.py`
+- `optimizer/test_phase5_exact.py`
+- `verifier/verify_final.py`
+- `verifier/test_verify_final.py`
+- `results/checkpoints/phase5_exact_exclusive_cones.json`
+- `results/phase5/exact_exclusive_cone_study.json`
+- `results/phase6/candidates.json`
+- `results/phase6/pareto_frontier.json`
+- `results/phase6/metrics.csv`
+- `report.md`
 
 ## Commands Executed
 
@@ -223,6 +254,20 @@ python3 -m verifier.verify_candidate \
   --seed 0xC32A5EED
 ```
 
+The completed Phase 5 reconstruction and Phase 6 verification commands are:
+
+```bash
+python3 -m optimizer.phase5_exact \
+  --candidate results/phase4/candidate_b_refined.v \
+  --checkpoint results/checkpoints/phase5_exact_exclusive_cones.json \
+  --search-log results/search_log.jsonl \
+  --output results/phase5/exact_exclusive_cone_study.json \
+  --max-cone-nodes 6 \
+  --limit 20 \
+  --timeout-ms 1000
+python3 -m verifier.verify_final
+```
+
 Tool versions used locally:
 
 - Python 3.10.12
@@ -264,13 +309,23 @@ Tool versions used locally:
 - Regression tests cover completed-checkpoint output recovery and rejection of
   stale frontier verification evidence, plus recovery when the log is ahead of
   its checkpoint.
+- The Phase 5 v2 record contains 20 outcomes: 13 UNSAT and seven unknown due to
+  the 1,000 ms per-query timeout. No outcome contains a witness.
+- The three Phase 6 frontier artifacts each passed the restricted parser, 97
+  exact vectors, 100,000 random vectors with seed `0xC32A5EED`, independent
+  metric recomputation, and Yosys SMTBMC/Z3 formal equivalence.
+- Phase 6 frontier regression tests reject duplicate topology, missing required
+  classes, dominated entries, and fewer than three candidates.
 
-## Not Started
+## Remaining Work
 
-- Candidates B and C, broader stochastic/local optimization, depth-bounded
-  search, and exact-subcircuit search
-- A final multi-candidate Pareto frontier and final report
-- Literature and open-source comparison research
+- Rebuild every generated artifact from a clean checkout and compare it with
+  the committed result.
+- Complete the literature and open-source generator comparison.
+- Finish the report's comparison, reproducibility, and publishability sections.
+- Decide whether the Phase 6 artifacts replace or remain alongside the
+  historical Phase 3 one-candidate `results/pareto_frontier.json` and
+  `results/metrics.csv` records.
 
 ## Semantic Ambiguities or Discrepancies
 
@@ -324,11 +379,10 @@ Tool versions used locally:
 
 ## Unresolved Issues
 
-- Candidate A used the fixed 10,000-seed budget. Set and record separate budgets
-  for Candidates B and C and solver-backed searches before those phases begin.
-- Batch orchestration for formally checking multiple future candidates belongs
-  to later phases; the Phase 1 runner already requires one explicit network per
-  invocation and validates its module name.
+- The final report still needs sourced external comparisons under exactly
+  compatible CRC semantics, width, and XOR2 metric conventions.
+- The initial Phase 6 report is not final and G6 must not be marked complete
+  until its clean-checkout reproduction and reporting requirements pass.
 - Pinning or containerizing the Yosys/ABC toolchain is deferred; a different
   release may produce a different valid conventional-synthesis baseline.
 
@@ -380,3 +434,29 @@ Tool versions used locally:
 - [x] Candidate A, its independently recomputed metrics, and the one-entry
   frontier agree.
 - [x] Candidates B and C were not started.
+
+## Gate G4 Checklist
+
+- [x] Candidate A continuation seeds 10,000 through 19,999 completed.
+- [x] Candidate B refinement seeds 20,000 through 29,999 completed.
+- [x] Candidate C refinement seeds 30,000 through 39,999 completed.
+- [x] Candidate A, B, and C representatives passed independent acceptance.
+- [x] Candidate B satisfies the depth-at-most-8 bound.
+
+## Gate G5 Checklist
+
+- [x] The exclusive-cone v2 configuration, solver version, roots, timeout, and
+  complete outcomes are recorded.
+- [x] All 20 v2 log records reconcile with the completed checkpoint and output.
+- [x] Thirteen encoded lower bounds are UNSAT and seven timed out; no timeout is
+  represented as an optimality certificate.
+- [x] No replacement required integration because no witness was found.
+
+## Gate G6 Checklist
+
+- [x] A manifest selects three distinct nondominated verified circuits.
+- [x] Candidate classes A, B, and C are represented in the generated frontier.
+- [x] Phase 6 frontier JSON and metrics CSV regenerate from independent checks.
+- [ ] Every generated artifact is rebuilt from a clean checkout.
+- [ ] External literature and open-source comparisons are complete.
+- [ ] The final report and publishability assessment are complete.

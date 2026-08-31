@@ -1,0 +1,218 @@
+{
+  "completed_roots": [
+    "n117",
+    "n179",
+    "n138",
+    "n148",
+    "n153",
+    "n155",
+    "n170",
+    "n175",
+    "n181",
+    "n183",
+    "n187",
+    "n188",
+    "n89",
+    "n202",
+    "n226",
+    "n280",
+    "n294",
+    "n309",
+    "n324",
+    "n330"
+  ],
+  "configuration": {
+    "algorithm": "phase5-exact-exclusive-cone-v2",
+    "candidate": "results/phase4/candidate_b_refined.v",
+    "max_cone_nodes": 6,
+    "random_seed": 3274333933,
+    "random_tests": 100000,
+    "roots": [
+      "n117",
+      "n179",
+      "n138",
+      "n148",
+      "n153",
+      "n155",
+      "n170",
+      "n175",
+      "n181",
+      "n183",
+      "n187",
+      "n188",
+      "n89",
+      "n202",
+      "n226",
+      "n280",
+      "n294",
+      "n309",
+      "n324",
+      "n330"
+    ],
+    "timeout_ms": 1000
+  },
+  "outcomes": [
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n117",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 4,
+      "original_gate_count": 3,
+      "replacement_gate_count": null,
+      "root": "n179",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n138",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n148",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n153",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n155",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n170",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n175",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n181",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n183",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n187",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n188",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 3,
+      "original_gate_count": 2,
+      "replacement_gate_count": null,
+      "root": "n89",
+      "solver_status": "unsat",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 7,
+      "original_gate_count": 6,
+      "replacement_gate_count": null,
+      "root": "n202",
+      "solver_status": "unknown",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 7,
+      "original_gate_count": 6,
+      "replacement_gate_count": null,
+      "root": "n226",
+      "solver_status": "unknown",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 7,
+      "original_gate_count": 6,
+      "replacement_gate_count": null,
+      "root": "n280",
+      "solver_status": "unknown",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 7,
+      "original_gate_count": 6,
+      "replacement_gate_count": null,
+      "root": "n294",
+      "solver_status": "unknown",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 7,
+      "original_gate_count": 6,
+      "replacement_gate_count": null,
+      "root": "n309",
+      "solver_status": "unknown",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 7,
+      "original_gate_count": 6,
+      "replacement_gate_count": null,
+      "root": "n324",
+      "solver_status": "unknown",
+      "witness": null
+    },
+    {
+      "cut_leaf_count": 7,
+      "original_gate_count": 6,
+      "replacement_gate_count": null,
+      "root": "n330",
+      "solver_status": "unknown",
+      "witness": null
+    }
+  ],
+  "solver_version": "Z3 version 4.8.12 - 64 bit",
+  "status": "completed"
+}

@@ -165,8 +165,10 @@ the checkpoint, output JSON, and append-only search log.
 
 The earlier v1 non-exclusive 20-cone study remains an exploratory historical
 record only. Its counts included shared fan-in nodes and it is not used as G5
-evidence. The corrected exclusive-cone v2 budget must complete before G5 can
-pass.
+evidence. The corrected exclusive-cone v2 budget completed over 20 roots: 13
+queries proved that no strict gate reduction exists in the encoded cone and
+seven reached the configured timeout. No replacement witness was found or
+integrated.
 
 Scope:
 
@@ -188,7 +190,20 @@ Any completed v2 negative results apply only to the stated single-output cone
 encodings and timeout; they do not establish global or whole-network
 optimality.
 
+G5 passed locally after the completed v2 checkpoint, output, and 20 canonical
+log records were reconciled. No full-network re-verification of a replacement
+was necessary because the study produced no witness.
+
 ## Phase 6 — Final Verification, Comparison, and Reporting
+
+Phase 6 began by defining a checked candidate manifest and independently
+regenerating a three-circuit nondominated frontier. Candidate A and Candidate B
+share one physical implementation, as permitted by the class rules. The
+normalized Yosys/ABC circuit supplies the distinct depth-7 tradeoff between
+that implementation and Candidate C. All three selected artifacts passed the
+restricted parser, 97 exact vectors, 100,000 seeded random vectors, independent
+metric recomputation, and formal equivalence. Literature comparison,
+clean-checkout reproduction, and final report completion remain pending.
 
 Scope:
 
