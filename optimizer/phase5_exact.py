@@ -30,7 +30,7 @@ from verifier.verify_network import (
     verification_report,
 )
 
-ALGORITHM = "phase5-exact-single-cone-v1"
+ALGORITHM = "phase5-exact-exclusive-cone-v2"
 
 
 @dataclass(frozen=True)
@@ -60,21 +60,50 @@ def _z3_version() -> str:
 
 
 def _cone(network: NormalizedNetwork, root: str) -> Cone:
+    """Return the removable fan-in cone rooted at ``root``.
+
+    A non-root node is retained only when every one of its consumers is also
+    retained. Nodes shared with the rest of the submitted network therefore
+    become cut leaves and are not counted as removable gates.
+    """
+
     node_names = {node.output for node in network.nodes}
     if root not in node_names:
         raise ValueError(f"root is not a retained XOR node: {root}")
 
-    retained: set[str] = set()
+    transitive_inputs: set[str] = set()
 
     def visit(signal: str) -> None:
-        if signal not in node_names or signal in retained:
+        if signal not in node_names or signal in transitive_inputs:
             return
-        retained.add(signal)
+        transitive_inputs.add(signal)
         input_a, input_b = network.canonical_inputs[signal]
         visit(input_a)
         visit(input_b)
 
     visit(root)
+    consumers: dict[str, set[str]] = {name: set() for name in node_names}
+    for output, inputs in network.canonical_inputs.items():
+        for source in inputs:
+            if source in consumers:
+                consumers[source].add(output)
+    for source in network.output_sources:
+        if source in consumers:
+            consumers[source].add("next_crc")
+
+    retained = {root}
+    while True:
+        additions = {
+            node.output
+            for node in network.nodes
+            if node.output in transitive_inputs
+            and node.output not in retained
+            and consumers[node.output] <= retained
+        }
+        if not additions:
+            break
+        retained.update(additions)
+
     nodes = tuple(node.output for node in network.nodes if node.output in retained)
     leaves = tuple(
         sorted(
@@ -221,10 +250,42 @@ def _write_json(path: Path, document: dict[str, object]) -> None:
     temporary.replace(path)
 
 
-def _completed_roots(log_path: Path, roots: set[str]) -> set[str]:
+def _stored_outcomes(
+    output_path: Path, configuration: dict[str, object], roots: set[str]
+) -> dict[str, dict[str, object]]:
+    if not output_path.exists():
+        return {}
+    document = json.loads(output_path.read_text())
+    if document.get("configuration") != configuration:
+        raise ValueError("study output configuration does not match requested study")
+    raw_outcomes = document.get("outcomes")
+    if not isinstance(raw_outcomes, list):
+        raise ValueError("study output outcomes are malformed")
+    outcomes: dict[str, dict[str, object]] = {}
+    for outcome in raw_outcomes:
+        if not isinstance(outcome, dict) or not isinstance(outcome.get("root"), str):
+            raise ValueError("study output contains a malformed outcome")
+        root = outcome["root"]
+        if root not in roots or root in outcomes:
+            raise ValueError("study output contains an unexpected or duplicate root")
+        outcomes[root] = outcome
+    return outcomes
+
+
+def _completed_outcomes(
+    log_path: Path,
+    roots: set[str],
+    stored: dict[str, dict[str, object]],
+) -> dict[str, dict[str, object]]:
+    """Restore outcomes from the log, falling back to an older study output.
+
+    New records carry the full outcome. The output fallback preserves a record
+    already written by an older runner that did not embed that field in the log.
+    """
+
     if not log_path.exists():
-        return set()
-    completed = set()
+        return {}
+    completed: dict[str, dict[str, object]] = {}
     for line_number, line in enumerate(log_path.read_text().splitlines(), 1):
         record = json.loads(line)
         if not isinstance(record, dict):
@@ -233,7 +294,14 @@ def _completed_roots(log_path: Path, roots: set[str]) -> set[str]:
             continue
         root = record.get("parameters", {}).get("root")
         if root in roots:
-            completed.add(root)
+            outcome = record.get("study_outcome")
+            if outcome is None:
+                outcome = stored.get(root)
+            if not isinstance(outcome, dict) or outcome.get("root") != root:
+                raise ValueError(f"{log_path}:{line_number}: completed root has no stored outcome")
+            if root in completed and completed[root] != outcome:
+                raise ValueError(f"{log_path}:{line_number}: conflicting outcome for root {root}")
+            completed[root] = outcome
     return completed
 
 
@@ -271,10 +339,11 @@ def run_study(
         checkpoint = json.loads(checkpoint_path.read_text())
         if checkpoint.get("configuration") != configuration:
             raise ValueError("checkpoint configuration does not match requested study")
-    completed = _completed_roots(log_path, set(roots))
-    outcomes: list[dict[str, object]] = []
+    root_set = set(roots)
+    stored = _stored_outcomes(output_path, configuration, root_set)
+    outcomes_by_root = _completed_outcomes(log_path, root_set, stored)
     for cone in cones:
-        if cone.root in completed:
+        if cone.root in outcomes_by_root:
             continue
         started = time.perf_counter()
         result = solve_strict_improvement(cone, timeout_ms)
@@ -287,7 +356,7 @@ def run_study(
             "replacement_gate_count": result.gate_count,
             "witness": result.witness,
         }
-        outcomes.append(outcome)
+        outcomes_by_root[cone.root] = outcome
         accepted = False
         verification_passed = result.status in {"sat", "unsat"}
         reason = (
@@ -315,17 +384,20 @@ def run_study(
                 "accepted": accepted,
                 "rejection_reason": reason,
                 "artifact": None,
+                "study_outcome": outcome,
             },
         )
         _write_json(
             checkpoint_path,
             {
                 "configuration": configuration,
-                "completed_roots": sorted(completed | {item["root"] for item in outcomes}),
+                "completed_roots": sorted(outcomes_by_root),
+                "outcomes": [outcomes_by_root[root] for root in roots if root in outcomes_by_root],
                 "solver_version": solver_version,
                 "status": "running",
             },
         )
+    outcomes = [outcomes_by_root[root] for root in roots if root in outcomes_by_root]
     document = {
         "configuration": configuration,
         "outcomes": outcomes,
@@ -338,6 +410,7 @@ def run_study(
         {
             "configuration": configuration,
             "completed_roots": roots,
+            "outcomes": outcomes,
             "solver_version": solver_version,
             "status": "completed",
         },
@@ -348,9 +421,9 @@ def run_study(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", type=Path, default=Path("results/phase4/candidate_b_refined.v"))
-    parser.add_argument("--checkpoint", type=Path, default=Path("results/checkpoints/phase5_exact_cones.json"))
+    parser.add_argument("--checkpoint", type=Path, default=Path("results/checkpoints/phase5_exact_exclusive_cones.json"))
     parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
-    parser.add_argument("--output", type=Path, default=Path("results/phase5/exact_cone_study.json"))
+    parser.add_argument("--output", type=Path, default=Path("results/phase5/exact_exclusive_cone_study.json"))
     parser.add_argument("--max-cone-nodes", type=int, default=6)
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--timeout-ms", type=int, default=1000)

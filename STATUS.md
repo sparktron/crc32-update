@@ -1,10 +1,10 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-08-25
+Last updated: 2026-08-31
 
-Current phase: Phase 5 — Exact small-subcircuit improvement complete
+Current phase: Phase 5 — Exact small-subcircuit improvement in progress
 
-Current gate: G5 passed locally for the bounded exact-cone study
+Current gate: G4 passed locally; G5 pending the exclusive-cone study
 
 ## Current Best Results
 
@@ -29,13 +29,12 @@ Their refinements completed the configured 10,000-seed budgets for B
 (20,000–29,999) and C (30,000–39,999), with no accepted improvement over the
 verified starting incumbent in either class.
 
-Phase 5 completed its bounded exact-cone SMT study for Candidate B. It encodes
-a cone's GF(2) coefficient vectors, so SAT witnesses and UNSAT negative
-results cover every assignment to that cone's cut leaves. Of 20 selected
-high-fanout cones, 17 were proven to have no strict gate-count reduction and
-three six-gate cones reached the one-second solver limit; those timeouts are
-inconclusive. No Phase 5 replacement was accepted or integrated. Z3 4.8.12,
-constraints, limits, and outcomes are recorded in the committed study outputs.
+Phase 5's first 20-cone study is retained as an exploratory historical record,
+but it counted shared fan-in nodes that cannot be removed during integration.
+It is therefore not G5 evidence. The replacement v2 study cuts at shared
+signals, counts only exclusively removable gates, and stores complete outcomes
+in each append-only log record so resumed runs cannot discard prior results.
+No Phase 5 replacement has been accepted or integrated.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |

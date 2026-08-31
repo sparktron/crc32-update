@@ -262,9 +262,11 @@ append-only log make that manual command safe to resume.
 
 Phase 5 begins with an exact Z3 study of small Candidate B cones. Each query
 uses GF(2) coefficient vectors for the cone's cut leaves, so a SAT witness or
-UNSAT result applies to all local input assignments. The study does not alter a
-candidate: any strict-reduction witness still requires explicit integration and
-complete independent verification.
+UNSAT result applies to all local input assignments. Internally shared signals
+are cut leaves, not removable gates, so a strict reduction can be compared to
+the actual replaceable subcircuit. The study does not alter a candidate: any
+witness still requires explicit integration and complete independent
+verification.
 
 Run the initial budget manually because up to 20 cones and several bounded SMT
 queries per cone can exceed Codex's command limit:
@@ -272,20 +274,19 @@ queries per cone can exceed Codex's command limit:
 ```bash
 python3 -m optimizer.phase5_exact \
   --candidate results/phase4/candidate_b_refined.v \
-  --checkpoint results/checkpoints/phase5_exact_cones.json \
+  --checkpoint results/checkpoints/phase5_exact_exclusive_cones.json \
   --search-log results/search_log.jsonl \
-  --output results/phase5/exact_cone_study.json \
+  --output results/phase5/exact_exclusive_cone_study.json \
   --max-cone-nodes 6 \
   --limit 20 \
   --timeout-ms 1000
 ```
 
-The completed initial budget examined 20 cones using Z3 4.8.12 with a one-second
-per-query timeout. Seventeen cones had no strict gate-count reduction; three
-six-gate cones timed out and are inconclusive. No replacement was integrated.
-The checkpoint and canonical search log record completed roots, solver limits,
-and outcomes; rerun the same command after interruption to continue. Run it
-alone because it locks the shared canonical search log.
+The previous non-exclusive study is retained as an exploratory record but is
+not evidence of a whole-network reduction because its cones included shared
+fan-in gates. The corrected command above records each complete outcome in the
+canonical log and preserves all outcomes when resumed after interruption. Run
+it alone because it locks the shared canonical search log.
 
 Run only one invocation for a checkpoint at a time; the optimizer now rejects a
 second active invocation. If an older interrupted concurrent run left duplicate

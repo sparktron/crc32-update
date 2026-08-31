@@ -154,14 +154,19 @@ not a global-optimality claim.
 
 ## Phase 5 — Exact Small-Subcircuit Improvement
 
-The bounded single-cone SMT study over the verified Candidate B artifact is
-complete. It selected 20 small high-fanout cones and searched only for strict
-gate-count reductions. Seventeen cones were proven UNSAT for every smaller
-implementation; three six-gate cones reached the one-second per-query limit
-and remain inconclusive rather than negative certificates. No replacement was
-found or integrated. The Z3 version, timeout, selected roots, candidate
-verification evidence, and outcomes are recorded in the checkpoint, output
-JSON, and append-only search log.
+Phase 5 uses a bounded single-cone SMT study over the verified Candidate B
+artifact. It cuts at internally shared nodes and counts only exclusively
+removable XOR2 instances, so a future witness can be compared honestly with the
+part of the submitted network it can replace. Each append-only log record
+contains its complete solver outcome, allowing a resumed run to reconstruct
+the combined study output after interruption. The Z3 version, timeout,
+selected roots, candidate verification evidence, and outcomes are recorded in
+the checkpoint, output JSON, and append-only search log.
+
+The earlier v1 non-exclusive 20-cone study remains an exploratory historical
+record only. Its counts included shared fan-in nodes and it is not used as G5
+evidence. The corrected exclusive-cone v2 budget must complete before G5 can
+pass.
 
 Scope:
 
@@ -179,9 +184,9 @@ Validation gate G5:
 - Any optimality claim is limited to the exact encoded problem and accompanied
   by a checkable certificate or unsatisfiability result.
 
-G5 passed locally for this bounded study. Its negative results apply only to
-the stated single-output cone encodings and timeout; they do not establish
-global or whole-network optimality.
+Any completed v2 negative results apply only to the stated single-output cone
+encodings and timeout; they do not establish global or whole-network
+optimality.
 
 ## Phase 6 — Final Verification, Comparison, and Reporting
 
