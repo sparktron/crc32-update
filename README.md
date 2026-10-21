@@ -358,3 +358,32 @@ python3 -m optimizer.depth_bounded \
 Progress is in `completed_seeds` of the checkpoint and in the
 `kraft-bounded-bp-cse-depth7-v1` records of the search log. Rerunning the same
 command after completion changes nothing.
+
+## Depth-6 Bounded Search
+
+A second, separately recorded budget applies the same construction with a
+depth-6 cap, the minimum depth any XOR2 network for this function can reach.
+It is the minimum-depth (Candidate C) search counterpart to the balanced-tree
+starting point. It uses seeds 50,000 through 59,999, its own checkpoint,
+artifact, and incumbent directory, and the distinct
+`kraft-bounded-bp-cse-depth6-v1` algorithm name in the canonical search log:
+
+```bash
+python3 -m optimizer.depth_bounded \
+  --depth-cap 6 \
+  --seed-start 50000 \
+  --seed-count 10000 \
+  --workers 8 \
+  --checkpoint results/checkpoints/depth6_bounded_search.json \
+  --artifact results/phase6/candidate_depth6_bounded.v \
+  --incumbent-dir results/checkpoints/depth6_bounded_incumbents \
+  --search-log results/search_log.jsonl \
+  --random-tests 100000 \
+  --random-seed 0xC32A5EED
+```
+
+Run the depth-7 and depth-6 budgets one after the other: both lock the
+canonical search log, so a second concurrent invocation is refused. Without
+explicit paths, the checkpoint, artifact, incumbent directory, and seed start
+default to the recorded budget for the requested `--depth-cap`. A checkpoint
+from a different cap or seed range is rejected.

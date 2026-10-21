@@ -213,7 +213,9 @@ three that `SPEC.md` Section 4 requires; a further recorded search is needed
 before G6 can pass. That search is a separately recorded depth-7 bounded
 budget over seeds 40,000–49,999. Because no earlier attempt reached depth 7, it
 enforces the cap during construction with a per-output Kraft-inequality check
-rather than filtering unbounded results.
+rather than filtering unbounded results. A second, separately recorded depth-6
+budget over seeds 50,000–59,999 applies the same construction to the
+minimum-depth class.
 
 Validation gate G6:
 

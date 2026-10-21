@@ -43,6 +43,8 @@ from verifier.verify_network import (
 ALGORITHM_PREFIX = "kraft-bounded-bp-cse"
 ALGORITHM_VERSION = "v1"
 DEFAULT_DEPTH_CAP = 7
+# Each cap is a separately recorded budget over a disjoint seed range.
+RECORDED_SEED_STARTS = {7: 40_000, 6: 50_000}
 
 
 def algorithm_name(depth_cap: int) -> str:
@@ -434,21 +436,28 @@ def run_bounded_search(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--depth-cap", type=int, default=DEFAULT_DEPTH_CAP)
-    parser.add_argument("--seed-start", type=int, default=40000)
+    parser.add_argument(
+        "--seed-start",
+        type=int,
+        help="defaults to the recorded budget start for the cap "
+        f"({', '.join(f'{cap}: {start}' for cap, start in RECORDED_SEED_STARTS.items())})",
+    )
     parser.add_argument("--seed-count", type=int, default=10000)
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument(
         "--checkpoint",
         type=Path,
-        default=Path("results/checkpoints/depth7_bounded_search.json"),
+        help="defaults to results/checkpoints/depth<cap>_bounded_search.json",
     )
     parser.add_argument(
-        "--artifact", type=Path, default=Path("results/phase6/candidate_depth7_bounded.v")
+        "--artifact",
+        type=Path,
+        help="defaults to results/phase6/candidate_depth<cap>_bounded.v",
     )
     parser.add_argument(
         "--incumbent-dir",
         type=Path,
-        default=Path("results/checkpoints/depth7_bounded_incumbents"),
+        help="defaults to results/checkpoints/depth<cap>_bounded_incumbents",
     )
     parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
@@ -456,6 +465,18 @@ def main() -> int:
         "--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED
     )
     args = parser.parse_args()
+    cap = args.depth_cap
+    if args.seed_start is None:
+        if cap not in RECORDED_SEED_STARTS:
+            parser.error(f"--seed-start is required for unrecorded depth cap {cap}")
+        args.seed_start = RECORDED_SEED_STARTS[cap]
+    args.checkpoint = args.checkpoint or Path(
+        f"results/checkpoints/depth{cap}_bounded_search.json"
+    )
+    args.artifact = args.artifact or Path(f"results/phase6/candidate_depth{cap}_bounded.v")
+    args.incumbent_dir = args.incumbent_dir or Path(
+        f"results/checkpoints/depth{cap}_bounded_incumbents"
+    )
     try:
         # Every search appends to one canonical log, so lock the log itself.
         with _exclusive_search_lock(args.search_log):

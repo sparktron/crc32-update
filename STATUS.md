@@ -410,13 +410,18 @@ The regenerated frontier (`schema_version` 2) has two entries:
   until then. A separately recorded depth-7 bounded search
   (`optimizer/depth_bounded.py`, seeds 40,000–49,999) is implemented but its
   budget has not been run; see the README for the manual, resumable command.
-  Its result must be added to `verifier/build_results.py` submissions and the
-  results regenerated after it completes.
+  A second recorded budget, the depth-6 bounded search (seeds 50,000–59,999,
+  `results/checkpoints/depth6_bounded_search.json`,
+  `results/phase6/candidate_depth6_bounded.v`), is also configured and not
+  run. Each completed result must be added to `verifier/build_results.py`
+  submissions and the results regenerated.
 - Unrecorded development probes (not search-log attempts) of the depth-bounded
   generator gave 448–459 XOR2 at depth 7 for seeds 40,000–40,007 and about 495
-  XOR2 at depth 6 for seeds 40,000–40,001. A depth-6 result of that kind would
-  dominate the current Candidate C, but only a separately recorded and verified
-  budget may support that claim.
+  XOR2 at depth 6 for seeds 40,000–40,001. A scratch dry run of the depth-6
+  runner on seeds 50,000–50,002 (not in the canonical log) reached 482 XOR2,
+  depth 6, maximum fanout 6, excess 25, and passed formal equivalence. A
+  depth-6 result of that kind would dominate the current Candidate C, but only
+  the completed recorded budget may support that claim.
 - Candidate C equals the balanced-tree baseline. Reporting must not present it
   as a search-derived improvement.
 - Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
