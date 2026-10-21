@@ -324,3 +324,37 @@ Add `--check` to confirm the committed files match regeneration without
 writing them; CI runs this form. Add `--require-spec-minimum` to exit nonzero
 while fewer than the three distinct nondominated circuits required by `SPEC.md`
 Section 4 exist.
+
+## Depth-7 Bounded Search
+
+No Candidate A, B, or C attempt reached depth 7 or lower: across 40,000 logged
+trials the shallowest seeded result was depth 8. A separately recorded
+depth-bounded search therefore enforces the cap during construction. Each
+sharing, rewrite, and finishing move is applied to an output only while that
+output's signal depths still satisfy the Kraft inequality
+`sum(2 ** depth) <= 2 ** cap`, which is the exact condition for an XOR2 tree
+within the cap to exist. Every new incumbent passes the restricted parser, 97
+exact vectors, 100,000 random vectors, and formal equivalence before
+acceptance.
+
+The budget is seeds 40,000 through 49,999, which do not overlap any earlier
+range. Run it manually; it resumes from its checkpoint and logged seed prefix
+after interruption and locks the canonical search log:
+
+```bash
+python3 -m optimizer.depth_bounded \
+  --depth-cap 7 \
+  --seed-start 40000 \
+  --seed-count 10000 \
+  --workers 8 \
+  --checkpoint results/checkpoints/depth7_bounded_search.json \
+  --artifact results/phase6/candidate_depth7_bounded.v \
+  --incumbent-dir results/checkpoints/depth7_bounded_incumbents \
+  --search-log results/search_log.jsonl \
+  --random-tests 100000 \
+  --random-seed 0xC32A5EED
+```
+
+Progress is in `completed_seeds` of the checkpoint and in the
+`kraft-bounded-bp-cse-depth7-v1` records of the search log. Rerunning the same
+command after completion changes nothing.

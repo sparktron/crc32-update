@@ -157,6 +157,7 @@ jobs:
             verifier.test_build_results \
             generator.test_baseline_generator \
             optimizer.test_optimize
+            optimizer.test_depth_bounded
 
       - name: Run Phase 1 acceptance verifier
         shell: bash

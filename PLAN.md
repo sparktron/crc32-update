@@ -210,7 +210,10 @@ their completed checkpoint, search-log, and Phase 5 records. The Phase 3
 Candidate A records are kept under `results/phase3/`. The first regeneration
 found two distinct nondominated circuits (A and B share a netlist), short of the
 three that `SPEC.md` Section 4 requires; a further recorded search is needed
-before G6 can pass.
+before G6 can pass. That search is a separately recorded depth-7 bounded
+budget over seeds 40,000–49,999. Because no earlier attempt reached depth 7, it
+enforces the cap during construction with a per-output Kraft-inequality check
+rather than filtering unbounded results.
 
 Validation gate G6:
 

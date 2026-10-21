@@ -190,6 +190,8 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 
 ## Files Created for Phase 6
 
+- `optimizer/depth_bounded.py`
+- `optimizer/test_depth_bounded.py`
 - `verifier/build_results.py`
 - `verifier/test_build_results.py`
 - `results/phase3/candidate_a_frontier.json` (moved from `results/`)
@@ -311,8 +313,8 @@ Tool versions used locally:
   IDs with 12 retained-incumbent records.
 - Phase 6 suite (`verifier.test_verifier`, `verifier.test_verify_candidate`,
   `verifier.test_build_results`, `generator.test_baseline_generator`,
-  `optimizer.test_optimize`, `optimizer.test_phase5_exact`): 43 tests passed,
-  0 failed, 0 skipped.
+  `optimizer.test_optimize`, `optimizer.test_phase5_exact`,
+  `optimizer.test_depth_bounded`): 48 tests passed, 0 failed, 0 skipped.
 - Phase 6 regeneration re-verified Candidates A, B, and C (structural, 97 exact,
   100,000 random, formal) and `--check` confirmed the committed
   `results/metrics.csv` and `results/pareto_frontier.json` match it.
@@ -403,11 +405,18 @@ The regenerated frontier (`schema_version` 2) has two entries:
 ## Unresolved Issues
 
 - `SPEC.md` Section 4 requires at least three distinct nondominated circuits.
-  The submitted candidates give two (A/B share one netlist). A new, separately
-  recorded search is needed — for example a depth-7 bounded search, where the
-  undominated Yosys/ABC baseline shows a trade-off point exists — before G6
-  can pass. `python3 -m verifier.build_results --require-spec-minimum` exits
-  nonzero until then.
+  The submitted candidates give two (A/B share one netlist), so G6 cannot pass
+  yet; `python3 -m verifier.build_results --require-spec-minimum` exits nonzero
+  until then. A separately recorded depth-7 bounded search
+  (`optimizer/depth_bounded.py`, seeds 40,000–49,999) is implemented but its
+  budget has not been run; see the README for the manual, resumable command.
+  Its result must be added to `verifier/build_results.py` submissions and the
+  results regenerated after it completes.
+- Unrecorded development probes (not search-log attempts) of the depth-bounded
+  generator gave 448–459 XOR2 at depth 7 for seeds 40,000–40,007 and about 495
+  XOR2 at depth 6 for seeds 40,000–40,001. A depth-6 result of that kind would
+  dominate the current Candidate C, but only a separately recorded and verified
+  budget may support that claim.
 - Candidate C equals the balanced-tree baseline. Reporting must not present it
   as a search-derived improvement.
 - Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
