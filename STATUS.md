@@ -1,10 +1,11 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-08-31
+Last updated: 2026-10-20
 
 Current phase: Phase 5 — Exact small-subcircuit improvement in progress
 
-Current gate: G4 passed locally; G5 pending the exclusive-cone study
+Current gate: G4 passed locally; v2 exclusive-cone budget completed, G5 pending
+review
 
 ## Current Best Results
 
@@ -34,7 +35,17 @@ but it counted shared fan-in nodes that cannot be removed during integration.
 It is therefore not G5 evidence. The replacement v2 study cuts at shared
 signals, counts only exclusively removable gates, and stores complete outcomes
 in each append-only log record so resumed runs cannot discard prior results.
-No Phase 5 replacement has been accepted or integrated.
+
+The v2 study (`phase5-exact-exclusive-cone-v2`) completed its 20-cone budget on
+the Phase 4 refined Candidate B with a six-node cone limit, a 1,000 ms per-query
+timeout, and Z3 4.8.12. Thirteen two- or three-gate cones returned UNSAT for a
+strict gate reduction. The seven six-gate cones (roots n202, n226, n280, n294,
+n309, n324, and n330) returned `unknown` at the timeout; these are not
+certificates. Every attempt is logged with `accepted: false`. Outputs are in
+`results/phase5/exact_exclusive_cone_study.json` and
+`results/checkpoints/phase5_exact_exclusive_cones.json`. The UNSAT results apply
+only to those single-cone encodings, not to the whole network. No Phase 5
+replacement has been accepted or integrated.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |
@@ -98,10 +109,18 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 - Every new count/depth incumbent was independently parsed, checked on 97 exact
   vectors and 100,000 seeded random vectors, and formally proved before
   acceptance. Twelve incumbents were accepted during the search.
-- Seed 3,195 produced the best-found 439-XOR, depth-9 network. The result
-  artifact reproduces byte-for-byte from that seed.
-- `results/metrics.csv` and `results/pareto_frontier.json` contain Candidate A
-  only and match the independent verifier. Candidates B and C were not run.
+- Seed 3,195 produced the best Phase 3 network: 439 XOR2, depth 9. The result
+  artifact reproduces byte-for-byte from that seed. The Phase 4 continuation
+  later found seed 16,564 (439 XOR2, depth 8), recorded in
+  `results/phase4/candidate_a_extended.v` and
+  `results/phase4/candidate_a_metrics.csv`.
+- `results/metrics.csv` and `results/pareto_frontier.json` still contain only
+  the Phase 3 Candidate A (seed 3,195) and match the independent verifier.
+  Phase 4 Candidate A, B, and C artifacts are under `results/phase4/` and are
+  not yet merged into the top-level frontier.
+- Phase 4 Candidate B (depth at most 8) and Candidate C (minimum depth) starting
+  points passed structural, exact, randomized, and formal checks, and their
+  10,000-seed refinement budgets completed with no accepted improvement.
 - Completed-checkpoint replay recreates requested candidate, frontier, metrics,
   and search-log outputs while refusing conflicting append-only logs.
 - Resume reconciles complete log records written immediately before an
@@ -267,9 +286,10 @@ Tool versions used locally:
 
 ## Not Started
 
-- Candidates B and C, broader stochastic/local optimization, depth-bounded
-  search, and exact-subcircuit search
-- A final multi-candidate Pareto frontier and final report
+- G5 review and closure of Phase 5
+- Phase 6 clean-checkout rebuild and full re-verification of every submitted
+  candidate
+- A final multi-candidate Pareto frontier, metrics table, and final report
 - Literature and open-source comparison research
 
 ## Semantic Ambiguities or Discrepancies
@@ -324,8 +344,11 @@ Tool versions used locally:
 
 ## Unresolved Issues
 
-- Candidate A used the fixed 10,000-seed budget. Set and record separate budgets
-  for Candidates B and C and solver-backed searches before those phases begin.
+- The top-level `results/metrics.csv` and `results/pareto_frontier.json` predate
+  Phase 4 and list only the seed-3,195 Candidate A. Phase 6 must regenerate
+  them from the Phase 4 and Phase 5 artifacts.
+- Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
+  separately recorded budget, not a continuation of the completed one.
 - Batch orchestration for formally checking multiple future candidates belongs
   to later phases; the Phase 1 runner already requires one explicit network per
   invocation and validates its module name.
@@ -379,4 +402,5 @@ Tool versions used locally:
 - [x] Candidate A reproduces byte-for-byte from seed 3,195.
 - [x] Candidate A, its independently recomputed metrics, and the one-entry
   frontier agree.
-- [x] Candidates B and C were not started.
+- [x] Candidates B and C were not started before G3 closed (they were run
+  in Phase 4).
