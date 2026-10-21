@@ -6,8 +6,9 @@ Current phase: Phase 6 — Final verification, comparison, and reporting (in
 progress)
 
 Current gate: G6 open. G5 passed locally after the v2 exclusive-cone budget
-completed. The regenerated frontier holds two distinct nondominated circuits;
-`SPEC.md` Section 4 requires three, so G6 cannot pass yet.
+completed. The SPEC.md Section 4 minimum of three distinct nondominated
+circuits is now met; the clean-checkout rebuild, comparison research, and final
+report remain.
 
 ## Current Best Results
 
@@ -53,7 +54,9 @@ replacement has been accepted or integrated.
 | --- | ---: | ---: | --- | --- |
 | A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
 | B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
-| C — minimum-depth search | 1,390 | 6 | Passed | Best found; no refinement improvement |
+| C — minimum-depth search | 1,390 | 6 | Passed | Balanced-tree starting point; dominated by C6 |
+| B7 — bounded depth at most 7 | 441 | 7 | Passed | Best found; seed 40,505 of 40,000–49,999 |
+| C6 — minimum depth (6) search | 470 | 6 | Passed | Best found; seed 56,140 of 50,000–59,999 |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector
@@ -196,6 +199,12 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 - `verifier/test_build_results.py`
 - `results/phase3/candidate_a_frontier.json` (moved from `results/`)
 - `results/phase3/candidate_a_metrics.csv` (moved from `results/`)
+- `results/phase6/candidate_depth7_bounded.v`
+- `results/phase6/candidate_depth6_bounded.v`
+- `results/checkpoints/depth7_bounded_search.json`
+- `results/checkpoints/depth7_bounded_incumbents/*.v`
+- `results/checkpoints/depth6_bounded_search.json`
+- `results/checkpoints/depth6_bounded_incumbents/*.v`
 - `results/pareto_frontier.json` (regenerated)
 - `results/metrics.csv` (regenerated)
 
@@ -314,7 +323,7 @@ Tool versions used locally:
 - Phase 6 suite (`verifier.test_verifier`, `verifier.test_verify_candidate`,
   `verifier.test_build_results`, `generator.test_baseline_generator`,
   `optimizer.test_optimize`, `optimizer.test_phase5_exact`,
-  `optimizer.test_depth_bounded`): 48 tests passed, 0 failed, 0 skipped.
+  `optimizer.test_depth_bounded`): 53 tests passed, 0 failed, 0 skipped.
 - Phase 6 regeneration re-verified Candidates A, B, and C (structural, 97 exact,
   100,000 random, formal) and `--check` confirmed the committed
   `results/metrics.csv` and `results/pareto_frontier.json` match it.
@@ -324,31 +333,43 @@ Tool versions used locally:
 
 ## Phase 6 Progress
 
-The regenerated frontier (`schema_version` 2) has two entries:
+The regenerated frontier (`schema_version` 2) has three distinct
+nondominated circuits, meeting the `SPEC.md` Section 4 minimum;
+`python3 -m verifier.build_results --check --require-spec-minimum` passes.
 
 | Circuit | Classes | XOR2 | Depth | Max fanout | Excess fanout >4 |
 | --- | --- | ---: | ---: | ---: | ---: |
 | `1472a09886a8` | A, B | 439 | 8 | 5 | 5 |
-| `0c80bfcc8e2b` | C | 1,390 | 6 | 20 | 1,038 |
+| `b65a4c2b615e` | B7 | 441 | 7 | 5 | 5 |
+| `b8edf279b361` | C6 | 470 | 6 | 6 | 20 |
+
+Submitted but dominated: Candidate C (`0c80bfcc8e2b`, 1,390 XOR2, depth 6,
+maximum fanout 20, excess 1,038), which C6 dominates on every objective.
 
 - Candidates A and B are the same netlist apart from the module name: the
   seed-16,564 Candidate A already satisfies the depth-8 bound, and B's
   refinement found nothing better. The frontier lists that circuit once with
   both class labels.
-- Candidate C has the same structural hash as the
-  `balanced_per_output` baseline. Its refinement budget found no improvement,
-  so the minimum-depth class is represented only by the baseline construction.
-- Against the frontier, the Yosys/ABC baseline (1,123 XOR2, depth 7, maximum
-  fanout 15, excess 536) is not dominated, and `balanced_per_output` ties C.
-  The other two baselines are dominated. This comparison reads the recorded
+- B7 is the best trial of the completed depth-7 Kraft-bounded budget (seeds
+  40,000–49,999, 10,000 logged attempts, 6 accepted incumbents, best seed
+  40,505). C6 is the best trial of the completed depth-6 budget (seeds
+  50,000–59,999, 10,000 logged attempts, 10 accepted incumbents, best seed
+  56,140). Both passed the restricted parser, 97 exact vectors, 100,000 random
+  vectors, and formal equivalence, and each replays byte-for-byte from its seed.
+- B7 and C6 are labelled as Candidate B-family (bounded depth) and Candidate
+  C-family (minimum depth) searches. C6 is the best verified minimum-depth
+  circuit; the original Candidate C remains reported because its class label
+  is required, but it is no longer on the frontier.
+- Every recorded baseline is now dominated by a frontier circuit, including
+  Yosys/ABC (1,123 XOR2, depth 7) and `balanced_per_output`, which is
+  structurally identical to Candidate C. This comparison reads the recorded
   `results/baseline_metrics.csv`.
 - The superseded Phase 3 Candidate A (439 XOR2, depth 9, maximum fanout 6) is
   dominated by the Phase 4 Candidate A and is not submitted.
 
 ## Not Started
 
-- Clean-checkout rebuild of every artifact and a third distinct verified
-  nondominated candidate
+- Clean-checkout rebuild of every artifact
 - The final report
 - Literature and open-source comparison research
 
@@ -404,26 +425,11 @@ The regenerated frontier (`schema_version` 2) has two entries:
 
 ## Unresolved Issues
 
-- `SPEC.md` Section 4 requires at least three distinct nondominated circuits.
-  The submitted candidates give two (A/B share one netlist), so G6 cannot pass
-  yet; `python3 -m verifier.build_results --require-spec-minimum` exits nonzero
-  until then. A separately recorded depth-7 bounded search
-  (`optimizer/depth_bounded.py`, seeds 40,000–49,999) is implemented but its
-  budget has not been run; see the README for the manual, resumable command.
-  A second recorded budget, the depth-6 bounded search (seeds 50,000–59,999,
-  `results/checkpoints/depth6_bounded_search.json`,
-  `results/phase6/candidate_depth6_bounded.v`), is also configured and not
-  run. Each completed result must be added to `verifier/build_results.py`
-  submissions and the results regenerated.
-- Unrecorded development probes (not search-log attempts) of the depth-bounded
-  generator gave 448–459 XOR2 at depth 7 for seeds 40,000–40,007 and about 495
-  XOR2 at depth 6 for seeds 40,000–40,001. A scratch dry run of the depth-6
-  runner on seeds 50,000–50,002 (not in the canonical log) reached 482 XOR2,
-  depth 6, maximum fanout 6, excess 25, and passed formal equivalence. A
-  depth-6 result of that kind would dominate the current Candidate C, but only
-  the completed recorded budget may support that claim.
-- Candidate C equals the balanced-tree baseline. Reporting must not present it
-  as a search-derived improvement.
+- Candidate C equals the balanced-tree baseline and is dominated by C6.
+  Reporting must not present it as a search-derived improvement.
+- B7 and C6 are best found for their recorded 10,000-seed budgets, not optimal
+  circuits. The Kraft check makes the depth cap exact, but the sharing choices
+  remain greedy and seeded.
 - Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
   separately recorded budget, not a continuation of the completed one.
 - Batch orchestration for formally checking multiple future candidates belongs

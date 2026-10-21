@@ -3,8 +3,9 @@
     {
       "baseline": "independent_per_output",
       "dominated_by": [
-        "0c80bfcc8e2b",
-        "1472a09886a8"
+        "1472a09886a8",
+        "b65a4c2b615e",
+        "b8edf279b361"
       ],
       "metrics": {
         "maximum_depth": 51,
@@ -15,7 +16,9 @@
     },
     {
       "baseline": "balanced_per_output",
-      "dominated_by": [],
+      "dominated_by": [
+        "b8edf279b361"
+      ],
       "metrics": {
         "maximum_depth": 6,
         "maximum_fanout": 20,
@@ -26,7 +29,8 @@
     {
       "baseline": "greedy_cse",
       "dominated_by": [
-        "1472a09886a8"
+        "1472a09886a8",
+        "b65a4c2b615e"
       ],
       "metrics": {
         "maximum_depth": 9,
@@ -37,7 +41,10 @@
     },
     {
       "baseline": "yosys_abc",
-      "dominated_by": [],
+      "dominated_by": [
+        "b65a4c2b615e",
+        "b8edf279b361"
+      ],
       "metrics": {
         "maximum_depth": 7,
         "maximum_fanout": 15,
@@ -47,59 +54,6 @@
     }
   ],
   "entries": [
-    {
-      "artifacts": [
-        "results/phase4/candidate_c_refined.v"
-      ],
-      "candidate_classes": [
-        "C"
-      ],
-      "circuit_id": "0c80bfcc8e2b",
-      "metrics": {
-        "direct_output_alias_count": 32,
-        "intermediate_node_count": 1390,
-        "maximum_depth": 6,
-        "maximum_fanout": 20,
-        "output_depths": [
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6,
-          6
-        ],
-        "total_excess_fanout_above_4": 1038,
-        "total_fanout": 2812,
-        "xor2_count": 1390
-      },
-      "structural_sha256": "0c80bfcc8e2be8a92e72e23c6481ae71277be12629f646704ab7d67099de78ae"
-    },
     {
       "artifacts": [
         "results/phase4/candidate_a_extended.v",
@@ -154,6 +108,112 @@
         "xor2_count": 439
       },
       "structural_sha256": "1472a09886a8797900bedcfa3453a569d3729fd53d33fd855948a307e0955896"
+    },
+    {
+      "artifacts": [
+        "results/phase6/candidate_depth7_bounded.v"
+      ],
+      "candidate_classes": [
+        "B7"
+      ],
+      "circuit_id": "b65a4c2b615e",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 441,
+        "maximum_depth": 7,
+        "maximum_fanout": 5,
+        "output_depths": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "total_excess_fanout_above_4": 5,
+        "total_fanout": 914,
+        "xor2_count": 441
+      },
+      "structural_sha256": "b65a4c2b615e65a5b6c83cdeda85a1ac5620bb681c5cca029f896f709b15041b"
+    },
+    {
+      "artifacts": [
+        "results/phase6/candidate_depth6_bounded.v"
+      ],
+      "candidate_classes": [
+        "C6"
+      ],
+      "circuit_id": "b8edf279b361",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 470,
+        "maximum_depth": 6,
+        "maximum_fanout": 6,
+        "output_depths": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "total_excess_fanout_above_4": 20,
+        "total_fanout": 972,
+        "xor2_count": 470
+      },
+      "structural_sha256": "b8edf279b361938883063e4218885c6dfe222e0449ee4d21c20d0d7d62fda312"
     }
   ],
   "generated_by": "phase6-final-results-v1",
@@ -182,13 +242,15 @@
   "schema_version": 2,
   "specification_checks": {
     "candidate_b_depth_bound": 8,
-    "distinct_pareto_candidates": 2,
+    "distinct_pareto_candidates": 3,
     "minimum_distinct_pareto_candidates": 3,
-    "minimum_distinct_pareto_candidates_met": false,
+    "minimum_distinct_pareto_candidates_met": true,
     "reported_candidate_classes": [
       "A",
       "B",
-      "C"
+      "B7",
+      "C",
+      "C6"
     ],
     "required_candidate_classes": [
       "A",
@@ -394,7 +456,7 @@
         "xor2_count": 1390
       },
       "module": "candidate_c_min_depth",
-      "on_pareto_frontier": true,
+      "on_pareto_frontier": false,
       "provenance": {
         "refinement": {
           "accepted_improvements": 0,
@@ -409,6 +471,148 @@
       },
       "seed": null,
       "structural_sha256": "0c80bfcc8e2be8a92e72e23c6481ae71277be12629f646704ab7d67099de78ae",
+      "verification": {
+        "exact_vectors": 97,
+        "formal_equivalence": "passed",
+        "random_seed": 3274333933,
+        "random_vectors": 100000,
+        "structural": "passed"
+      }
+    },
+    {
+      "artifact": "results/phase6/candidate_depth7_bounded.v",
+      "candidate_class": "B7",
+      "circuit_id": "b65a4c2b615e",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 441,
+        "maximum_depth": 7,
+        "maximum_fanout": 5,
+        "output_depths": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "total_excess_fanout_above_4": 5,
+        "total_fanout": 914,
+        "xor2_count": 441
+      },
+      "module": "candidate_depth7_bounded",
+      "on_pareto_frontier": true,
+      "provenance": {
+        "accepted_incumbents": 6,
+        "algorithm": "kraft-bounded-bp-cse-depth7-v1",
+        "checkpoint": "results/checkpoints/depth7_bounded_search.json",
+        "depth_cap": 7,
+        "logged_attempts": 10000,
+        "replayed_from_seed": true,
+        "seed": 40505,
+        "seed_count": 10000,
+        "seed_start": 40000,
+        "winning_attempt_id": "kraft-bounded-bp-cse-depth7-v1-seed-40505"
+      },
+      "seed": 40505,
+      "structural_sha256": "b65a4c2b615e65a5b6c83cdeda85a1ac5620bb681c5cca029f896f709b15041b",
+      "verification": {
+        "exact_vectors": 97,
+        "formal_equivalence": "passed",
+        "random_seed": 3274333933,
+        "random_vectors": 100000,
+        "structural": "passed"
+      }
+    },
+    {
+      "artifact": "results/phase6/candidate_depth6_bounded.v",
+      "candidate_class": "C6",
+      "circuit_id": "b8edf279b361",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 470,
+        "maximum_depth": 6,
+        "maximum_fanout": 6,
+        "output_depths": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "total_excess_fanout_above_4": 20,
+        "total_fanout": 972,
+        "xor2_count": 470
+      },
+      "module": "candidate_depth6_bounded",
+      "on_pareto_frontier": true,
+      "provenance": {
+        "accepted_incumbents": 10,
+        "algorithm": "kraft-bounded-bp-cse-depth6-v1",
+        "checkpoint": "results/checkpoints/depth6_bounded_search.json",
+        "depth_cap": 6,
+        "logged_attempts": 10000,
+        "replayed_from_seed": true,
+        "seed": 56140,
+        "seed_count": 10000,
+        "seed_start": 50000,
+        "winning_attempt_id": "kraft-bounded-bp-cse-depth6-v1-seed-56140"
+      },
+      "seed": 56140,
+      "structural_sha256": "b8edf279b361938883063e4218885c6dfe222e0449ee4d21c20d0d7d62fda312",
       "verification": {
         "exact_vectors": 97,
         "formal_equivalence": "passed",

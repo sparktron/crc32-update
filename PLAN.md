@@ -216,6 +216,9 @@ enforces the cap during construction with a per-output Kraft-inequality check
 rather than filtering unbounded results. A second, separately recorded depth-6
 budget over seeds 50,000–59,999 applies the same construction to the
 minimum-depth class.
+Both budgets completed. With their best trials (B7: 441 XOR2 at depth 7; C6:
+470 XOR2 at depth 6) the regenerated frontier has three distinct nondominated
+circuits, meeting the Section 4 minimum.
 
 Validation gate G6:
 

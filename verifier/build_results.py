@@ -129,6 +129,28 @@ SUBMISSIONS = (
             Path("results/checkpoints/candidate_c_refinement.json"),
         ),
     ),
+    # Separately recorded Kraft-bounded budgets: B7 is a bounded-depth
+    # (Candidate B family) search at depth 7, and C6 is a minimum-depth
+    # (Candidate C family) search at depth 6, the lowest depth any XOR2
+    # network for the widest output row can reach.
+    Submission(
+        "B7",
+        Path("results/phase6/candidate_depth7_bounded.v"),
+        bounded=BoundedBudget(
+            7,
+            Path("results/checkpoints/depth7_bounded_search.json"),
+            Path("results/checkpoints/depth7_bounded_incumbents"),
+        ),
+    ),
+    Submission(
+        "C6",
+        Path("results/phase6/candidate_depth6_bounded.v"),
+        bounded=BoundedBudget(
+            6,
+            Path("results/checkpoints/depth6_bounded_search.json"),
+            Path("results/checkpoints/depth6_bounded_incumbents"),
+        ),
+    ),
 )
 
 

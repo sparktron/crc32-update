@@ -387,3 +387,9 @@ canonical search log, so a second concurrent invocation is refused. Without
 explicit paths, the checkpoint, artifact, incumbent directory, and seed start
 default to the recorded budget for the requested `--depth-cap`. A checkpoint
 from a different cap or seed range is rejected.
+
+Both budgets have completed. The depth-7 budget's best trial (seed 40,505) has
+441 XOR2 and the depth-6 budget's (seed 56,140) has 470 XOR2. They are
+submitted as B7 and C6 in `verifier/build_results.py`, which checks each
+against its completed checkpoint, full logged seed range, accepted incumbent,
+and a replay from its seed before regenerating the result files.
