@@ -54,9 +54,9 @@ replacement has been accepted or integrated.
 | --- | ---: | ---: | --- | --- |
 | A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
 | B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
-| C — minimum-depth search | 1,390 | 6 | Passed | Balanced-tree starting point; dominated by C6 |
+| C0 — Phase 4 minimum-depth starting point | 1,390 | 6 | Passed | Balanced-tree baseline; dominated by C |
 | B7 — bounded depth at most 7 | 441 | 7 | Passed | Best found; seed 40,505 of 40,000–49,999 |
-| C6 — minimum depth (6) search | 470 | 6 | Passed | Best found; seed 56,140 of 50,000–59,999 |
+| C — minimum-depth search (depth-6 budget) | 470 | 6 | Passed | Best found; seed 56,140 of 50,000–59,999 |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector
@@ -341,10 +341,11 @@ nondominated circuits, meeting the `SPEC.md` Section 4 minimum;
 | --- | --- | ---: | ---: | ---: | ---: |
 | `1472a09886a8` | A, B | 439 | 8 | 5 | 5 |
 | `b65a4c2b615e` | B7 | 441 | 7 | 5 | 5 |
-| `b8edf279b361` | C6 | 470 | 6 | 6 | 20 |
+| `b8edf279b361` | C | 470 | 6 | 6 | 20 |
 
-Submitted but dominated: Candidate C (`0c80bfcc8e2b`, 1,390 XOR2, depth 6,
-maximum fanout 20, excess 1,038), which C6 dominates on every objective.
+Submitted but dominated: C0 (`0c80bfcc8e2b`, 1,390 XOR2, depth 6, maximum
+fanout 20, excess 1,038), the Phase 4 minimum-depth starting point, which
+Candidate C dominates on every objective.
 
 - Candidates A and B are the same netlist apart from the module name: the
   seed-16,564 Candidate A already satisfies the depth-8 bound, and B's
@@ -352,17 +353,20 @@ maximum fanout 20, excess 1,038), which C6 dominates on every objective.
   both class labels.
 - B7 is the best trial of the completed depth-7 Kraft-bounded budget (seeds
   40,000–49,999, 10,000 logged attempts, 6 accepted incumbents, best seed
-  40,505). C6 is the best trial of the completed depth-6 budget (seeds
+  40,505). Candidate C is the best trial of the completed depth-6 budget (seeds
   50,000–59,999, 10,000 logged attempts, 10 accepted incumbents, best seed
   56,140). Both passed the restricted parser, 97 exact vectors, 100,000 random
   vectors, and formal equivalence, and each replays byte-for-byte from its seed.
-- B7 and C6 are labelled as Candidate B-family (bounded depth) and Candidate
-  C-family (minimum depth) searches. C6 is the best verified minimum-depth
-  circuit; the original Candidate C remains reported because its class label
-  is required, but it is no longer on the frontier.
+- `SPEC.md` Section 4 defines Candidate C as minimum depth first, then
+  minimum XOR2 count, so the depth-6 budget's 470-gate circuit is Candidate C.
+  The Phase 4 balanced-tree starting point, which has the same depth but 1,390
+  gates, is reported as C0 for provenance and is not on the frontier. B7 is a
+  bounded-depth (Candidate B family) search at depth 7; Candidate B remains
+  the depth-8 circuit because it has fewer gates. `build_results` now rejects
+  any submission set in which A, B, or C does not win its class objective.
 - Every recorded baseline is now dominated by a frontier circuit, including
   Yosys/ABC (1,123 XOR2, depth 7) and `balanced_per_output`, which is
-  structurally identical to Candidate C. This comparison reads the recorded
+  structurally identical to C0. This comparison reads the recorded
   `results/baseline_metrics.csv`.
 - The superseded Phase 3 Candidate A (439 XOR2, depth 9, maximum fanout 6) is
   dominated by the Phase 4 Candidate A and is not submitted.
@@ -425,11 +429,11 @@ maximum fanout 20, excess 1,038), which C6 dominates on every objective.
 
 ## Unresolved Issues
 
-- Candidate C equals the balanced-tree baseline and is dominated by C6.
+- C0 equals the balanced-tree baseline and is dominated by Candidate C.
   Reporting must not present it as a search-derived improvement.
-- B7 and C6 are best found for their recorded 10,000-seed budgets, not optimal
-  circuits. The Kraft check makes the depth cap exact, but the sharing choices
-  remain greedy and seeded.
+- B7 and Candidate C are best found for their recorded 10,000-seed budgets,
+  not optimal circuits. The Kraft check makes the depth cap exact, but the
+  sharing choices remain greedy and seeded.
 - Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
   separately recorded budget, not a continuation of the completed one.
 - Batch orchestration for formally checking multiple future candidates belongs

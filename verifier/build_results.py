@@ -81,6 +81,7 @@ CSV_HEADER = (
 
 @dataclass(frozen=True)
 class Refinement:
+    search_class: str
     starting_algorithm: str
     starting_artifact: Path
     checkpoint: Path
@@ -115,24 +116,29 @@ SUBMISSIONS = (
         "B",
         Path("results/phase4/candidate_b_refined.v"),
         Refinement(
+            "B",
             "phase4-depth8-starting-point-v1",
             Path("results/phase4/candidate_b_depth8.v"),
             Path("results/checkpoints/candidate_b_refinement.json"),
         ),
     ),
+    # C0 is the Phase 4 minimum-depth starting point and its unimproved
+    # refinement. It is kept for provenance; the depth-6 budget below supplies
+    # the circuit that satisfies Candidate C's depth-then-gate-count objective.
     Submission(
-        "C",
+        "C0",
         Path("results/phase4/candidate_c_refined.v"),
         Refinement(
+            "C",
             "phase4-balanced-depth-starting-point-v1",
             Path("results/phase4/candidate_c_min_depth.v"),
             Path("results/checkpoints/candidate_c_refinement.json"),
         ),
     ),
     # Separately recorded Kraft-bounded budgets: B7 is a bounded-depth
-    # (Candidate B family) search at depth 7, and C6 is a minimum-depth
-    # (Candidate C family) search at depth 6, the lowest depth any XOR2
-    # network for the widest output row can reach.
+    # (Candidate B family) search at depth 7, and C is the minimum-depth search
+    # at depth 6, the lowest depth any XOR2 network for the widest output row
+    # can reach.
     Submission(
         "B7",
         Path("results/phase6/candidate_depth7_bounded.v"),
@@ -143,7 +149,7 @@ SUBMISSIONS = (
         ),
     ),
     Submission(
-        "C6",
+        "C",
         Path("results/phase6/candidate_depth6_bounded.v"),
         bounded=BoundedBudget(
             6,
@@ -321,7 +327,7 @@ def check_refinement(
         raise ValueError("starting-point log metrics do not match measurement")
     checkpoint = _json(refinement.checkpoint)
     _check_completed_checkpoint(checkpoint, refinement.checkpoint)
-    if checkpoint.get("candidate_class") != submission.candidate_class:
+    if checkpoint.get("candidate_class") != refinement.search_class:
         raise ValueError(f"{refinement.checkpoint} is for another candidate class")
     if checkpoint.get("incumbent_metrics") != _without_unreachable(measured):
         raise ValueError("refinement incumbent metrics do not match measurement")
@@ -424,6 +430,39 @@ def check_bounded_search(
         "seed": winner["seed"],
         "replayed_from_seed": replay,
     }
+
+
+def check_class_objectives(metrics_by_class: dict[str, dict[str, object]]) -> None:
+    """Require each SPEC.md Section 4 class to win its objective among submissions.
+
+    A minimizes XOR2 count; B minimizes XOR2 count within the depth-8 bound;
+    C minimizes depth first, then XOR2 count. Ties are allowed.
+    """
+    missing = [label for label in REQUIRED_CANDIDATE_CLASSES if label not in metrics_by_class]
+    if missing:
+        raise ValueError(f"required candidate classes are missing: {', '.join(missing)}")
+    points = list(metrics_by_class.values())
+
+    def best(eligible, key, label: str, objective: str) -> None:
+        candidates = [metrics for metrics in points if eligible(metrics)]
+        if not eligible(metrics_by_class[label]):
+            raise ValueError(f"Candidate {label} does not satisfy its class constraint")
+        if any(key(metrics) < key(metrics_by_class[label]) for metrics in candidates):
+            raise ValueError(f"Candidate {label} does not {objective} among submissions")
+
+    best(lambda m: True, lambda m: m["xor2_count"], "A", "minimize XOR2 count")
+    best(
+        lambda m: m["maximum_depth"] <= CANDIDATE_B_DEPTH_BOUND,
+        lambda m: m["xor2_count"],
+        "B",
+        f"minimize XOR2 count at depth {CANDIDATE_B_DEPTH_BOUND} or less",
+    )
+    best(
+        lambda m: True,
+        lambda m: (m["maximum_depth"], m["xor2_count"]),
+        "C",
+        "minimize depth, then XOR2 count,",
+    )
 
 
 def check_phase5(
@@ -557,13 +596,11 @@ def build_results(
         )
 
     by_class = {entry["candidate_class"]: entry for entry in submitted}
-    if by_class["B"]["metrics"]["maximum_depth"] > CANDIDATE_B_DEPTH_BOUND:
-        raise ValueError("Candidate B exceeds its depth bound")
-    if any(
-        by_class["C"]["metrics"]["maximum_depth"] > entry["metrics"]["maximum_depth"]
-        for entry in submitted
-    ):
-        raise ValueError("Candidate C is not the minimum-depth submitted circuit")
+    if len(by_class) != len(submitted):
+        raise ValueError("candidate class labels must be unique")
+    check_class_objectives(
+        {label: entry["metrics"] for label, entry in by_class.items()}
+    )
 
     phase5 = check_phase5(
         _json(PHASE5_STUDY),

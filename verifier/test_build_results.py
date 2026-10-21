@@ -13,6 +13,7 @@ from verifier.build_results import (
     BoundedBudget,
     Submission,
     check_bounded_search,
+    check_class_objectives,
     check_phase5,
     dominates,
     nondominated,
@@ -45,6 +46,40 @@ class ParetoTests(unittest.TestCase):
             "middle": _point(1123, 7, 15, 536),
         }
         self.assertEqual(nondominated(points), ["area", "depth", "middle"])
+
+
+class ClassObjectiveTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.metrics = {
+            "A": _point(439, 8, 5, 5),
+            "B": _point(439, 8, 5, 5),
+            "B7": _point(441, 7, 5, 5),
+            "C": _point(470, 6, 6, 20),
+            "C0": _point(1390, 6, 20, 1038),
+        }
+
+    def test_each_class_wins_its_objective(self) -> None:
+        check_class_objectives(self.metrics)
+
+    def test_candidate_c_needs_the_gate_count_tie_break(self) -> None:
+        self.metrics["C"], self.metrics["C0"] = self.metrics["C0"], self.metrics["C"]
+        with self.assertRaisesRegex(ValueError, "Candidate C does not minimize depth"):
+            check_class_objectives(self.metrics)
+
+    def test_candidate_b_must_win_within_its_depth_bound(self) -> None:
+        self.metrics["B"] = _point(441, 7, 5, 5)
+        with self.assertRaisesRegex(ValueError, "Candidate B does not minimize"):
+            check_class_objectives(self.metrics)
+
+    def test_candidate_b_must_meet_its_depth_bound(self) -> None:
+        self.metrics["B"] = _point(445, 9, 5, 5)
+        with self.assertRaisesRegex(ValueError, "class constraint"):
+            check_class_objectives(self.metrics)
+
+    def test_missing_required_class_is_rejected(self) -> None:
+        del self.metrics["C"]
+        with self.assertRaisesRegex(ValueError, "missing: C"):
+            check_class_objectives(self.metrics)
 
 
 class FingerprintTests(unittest.TestCase):
