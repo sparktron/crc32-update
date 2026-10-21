@@ -188,6 +188,10 @@ Any completed v2 negative results apply only to the stated single-output cone
 encodings and timeout; they do not establish global or whole-network
 optimality.
 
+G5 passed locally after the 20-cone v2 budget completed: 13 cones returned
+UNSAT, 7 returned `unknown` at the 1,000 ms timeout, and no replacement was
+integrated.
+
 ## Phase 6 — Final Verification, Comparison, and Reporting
 
 Scope:

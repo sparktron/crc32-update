@@ -2,10 +2,10 @@
 
 Last updated: 2026-10-20
 
-Current phase: Phase 5 — Exact small-subcircuit improvement in progress
+Current phase: Phase 5 — Exact small-subcircuit improvement complete; Phase 6
+next
 
-Current gate: G4 passed locally; v2 exclusive-cone budget completed, G5 pending
-review
+Current gate: G5 passed locally after the v2 exclusive-cone budget completed
 
 ## Current Best Results
 
@@ -286,7 +286,6 @@ Tool versions used locally:
 
 ## Not Started
 
-- G5 review and closure of Phase 5
 - Phase 6 clean-checkout rebuild and full re-verification of every submitted
   candidate
 - A final multi-candidate Pareto frontier, metrics table, and final report
@@ -404,3 +403,20 @@ Tool versions used locally:
   frontier agree.
 - [x] Candidates B and C were not started before G3 closed (they were run
   in Phase 4).
+
+## Gate G5 Checklist
+
+- [x] The corrected exclusive-cone v2 budget completed: 20 cones from the
+  Phase 4 refined Candidate B, six-node cone limit, 1,000 ms per-query timeout.
+- [x] The input candidate passed 100,000 seeded random vectors and formal
+  equivalence before any cone query ran.
+- [x] Every replacement has exact local-function evidence and full-network
+  verification. No replacement was found, accepted, or integrated, and the
+  submitted networks are unchanged.
+- [x] The Z3 version, cone constraints, timeout, selected roots, and every
+  outcome are recorded in the checkpoint, output JSON, and append-only search
+  log.
+- [x] Thirteen UNSAT results are claimed only for their single-cone encodings.
+  The seven `unknown` timeouts are recorded as negative results, not
+  certificates.
+- [x] No global or whole-network optimality is claimed.
