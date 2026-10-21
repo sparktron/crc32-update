@@ -157,25 +157,26 @@ On resume, a complete logged seed prefix takes precedence over a stale
 checkpoint counter, preventing duplicate attempts after interruption between a
 log append and checkpoint update.
 
-Replay only the verified winning seed recorded in the frontier and compare the
-result byte-for-byte:
+The Phase 3 frontier and metrics records are kept under `results/phase3/`;
+the top-level result files are the Phase 6 regeneration described below.
+Replay only the verified winning seed recorded in the Phase 3 frontier and
+compare the result byte-for-byte:
 
 ```bash
 python3 -m optimizer.optimize \
-  --replay-frontier results/pareto_frontier.json \
+  --replay-frontier results/phase3/candidate_a_frontier.json \
   --artifact /tmp/candidate_a_min_area.v
 cmp results/candidate_a_min_area.v /tmp/candidate_a_min_area.v
 ```
 
-Re-run the complete Candidate A acceptance flow and cross-check
-`results/metrics.csv` and `results/pareto_frontier.json` against the independent
-measurement:
+Re-run the complete Phase 3 Candidate A acceptance flow and cross-check its
+frontier and metrics records against the independent measurement:
 
 ```bash
 python3 -m verifier.verify_candidate \
   --candidate results/candidate_a_min_area.v \
-  --frontier results/pareto_frontier.json \
-  --metrics results/metrics.csv \
+  --frontier results/phase3/candidate_a_frontier.json \
+  --metrics results/phase3/candidate_a_metrics.csv \
   --random-tests 100000 \
   --seed 0xC32A5EED
 ```
@@ -298,3 +299,28 @@ python3 -m optimizer.repair_search_log \
   --log results/search_log.jsonl \
   --backup results/checkpoints/phase4_search_log_pre_dedup.jsonl
 ```
+
+## Phase 6 Final Results
+
+`results/metrics.csv` and `results/pareto_frontier.json` are generated only by
+re-verifying the submitted Phase 4 candidates — A
+(`results/phase4/candidate_a_extended.v`), B
+(`results/phase4/candidate_b_refined.v`), and C
+(`results/phase4/candidate_c_refined.v`) — with the restricted parser, 97 exact
+vectors, 100,000 seeded random vectors, and formal equivalence. The command
+then cross-checks each candidate against its completed checkpoints and
+search-log records, confirms the Phase 5 v2 study integrated no replacement,
+and computes the nondominated set over distinct circuits. Circuits are
+identified by a name-independent structural hash, so a netlist that satisfies
+more than one class appears once on the frontier with every class label.
+
+```bash
+python3 -m verifier.build_results \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
+```
+
+Add `--check` to confirm the committed files match regeneration without
+writing them; CI runs this form. Add `--require-spec-minimum` to exit nonzero
+while fewer than the three distinct nondominated circuits required by `SPEC.md`
+Section 4 exist.

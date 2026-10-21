@@ -2,10 +2,12 @@
 
 Last updated: 2026-10-20
 
-Current phase: Phase 5 — Exact small-subcircuit improvement complete; Phase 6
-next
+Current phase: Phase 6 — Final verification, comparison, and reporting (in
+progress)
 
-Current gate: G5 passed locally after the v2 exclusive-cone budget completed
+Current gate: G6 open. G5 passed locally after the v2 exclusive-cone budget
+completed. The regenerated frontier holds two distinct nondominated circuits;
+`SPEC.md` Section 4 requires three, so G6 cannot pass yet.
 
 ## Current Best Results
 
@@ -63,7 +65,7 @@ verification, and formal-equivalence time on the local toolchain.
 | Balanced per-output tree | 1,390 | 6 | 20 | 2,812 | 1,038 | 4.745530 | Passed |
 | Greedy common-subexpression elimination | 454 | 9 | 6 | 940 | 11 | 3.868081 | Passed |
 | Yosys/ABC normalized synthesis | 1,123 | 7 | 15 | 2,278 | 536 | 6.297098 | Passed |
-| Candidate A | 439 | 9 | 6 | 910 | 5 | — | Passed |
+| Candidate A (Phase 4, seed 16,564) | 439 | 8 | 5 | 910 | 5 | — | Passed |
 
 `results/baseline_metrics.csv` contains every output-bit depth, intermediate and
 alias counts, runtime components, exact/random vector counts, and formal status.
@@ -114,10 +116,19 @@ alias counts, runtime components, exact/random vector counts, and formal status.
   later found seed 16,564 (439 XOR2, depth 8), recorded in
   `results/phase4/candidate_a_extended.v` and
   `results/phase4/candidate_a_metrics.csv`.
-- `results/metrics.csv` and `results/pareto_frontier.json` still contain only
-  the Phase 3 Candidate A (seed 3,195) and match the independent verifier.
-  Phase 4 Candidate A, B, and C artifacts are under `results/phase4/` and are
-  not yet merged into the top-level frontier.
+- The Phase 3 Candidate A frontier and metrics records moved unchanged to
+  `results/phase3/candidate_a_frontier.json` and
+  `results/phase3/candidate_a_metrics.csv`; the Phase 3 optimizer and
+  `verify_candidate` defaults now point there so a Phase 3 replay cannot
+  overwrite the final results.
+- Phase 6 regenerated `results/metrics.csv` and `results/pareto_frontier.json`
+  with `python3 -m verifier.build_results`. All three submitted candidates
+  passed the restricted parser, 97 exact vectors, 100,000 random vectors with
+  seed `0xC32A5EED`, and Yosys SMTBMC/Z3 formal equivalence. Their metrics
+  matched the completed checkpoints and search log; Candidate A is the best of
+  all 20,000 logged Candidate A seeds, B and C are byte-identical to their
+  accepted starting points after unimproved refinement budgets, and the Phase 5
+  v2 study on Candidate B integrated no replacement.
 - Phase 4 Candidate B (depth at most 8) and Candidate C (minimum depth) starting
   points passed structural, exact, randomized, and formal checks, and their
   10,000-seed refinement budgets completed with no accepted improvement.
@@ -172,10 +183,19 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 - `optimizer/test_optimize.py`
 - `verifier/verify_candidate.py`
 - `results/candidate_a_min_area.v`
-- `results/pareto_frontier.json`
-- `results/metrics.csv`
+- `results/pareto_frontier.json` (now `results/phase3/candidate_a_frontier.json`)
+- `results/metrics.csv` (now `results/phase3/candidate_a_metrics.csv`)
 - `results/checkpoints/candidate_a_checkpoint.json`
 - `results/checkpoints/candidate_a_incumbents/*.v`
+
+## Files Created for Phase 6
+
+- `verifier/build_results.py`
+- `verifier/test_build_results.py`
+- `results/phase3/candidate_a_frontier.json` (moved from `results/`)
+- `results/phase3/candidate_a_metrics.csv` (moved from `results/`)
+- `results/pareto_frontier.json` (regenerated)
+- `results/metrics.csv` (regenerated)
 
 ## Commands Executed
 
@@ -231,15 +251,24 @@ python3 -m optimizer.optimize \
   --seed-count 10000 \
   --workers 8
 python3 -m optimizer.optimize \
-  --replay-frontier results/pareto_frontier.json \
+  --replay-frontier results/phase3/candidate_a_frontier.json \
   --artifact /tmp/candidate_a_min_area.v
 cmp results/candidate_a_min_area.v /tmp/candidate_a_min_area.v
 python3 -m verifier.verify_candidate \
   --candidate results/candidate_a_min_area.v \
-  --frontier results/pareto_frontier.json \
-  --metrics results/metrics.csv \
+  --frontier results/phase3/candidate_a_frontier.json \
+  --metrics results/phase3/candidate_a_metrics.csv \
   --random-tests 100000 \
   --seed 0xC32A5EED
+```
+
+The Phase 6 result regeneration commands were:
+
+```bash
+python3 -m verifier.build_results \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
+python3 -m verifier.build_results --check
 ```
 
 Tool versions used locally:
@@ -280,15 +309,45 @@ Tool versions used locally:
 - The winning seed replayed byte-for-byte, the frontier and metrics CSV matched
   independent recomputation, and the search log contains 10,000 unique attempt
   IDs with 12 retained-incumbent records.
+- Phase 6 suite (`verifier.test_verifier`, `verifier.test_verify_candidate`,
+  `verifier.test_build_results`, `generator.test_baseline_generator`,
+  `optimizer.test_optimize`, `optimizer.test_phase5_exact`): 43 tests passed,
+  0 failed, 0 skipped.
+- Phase 6 regeneration re-verified Candidates A, B, and C (structural, 97 exact,
+  100,000 random, formal) and `--check` confirmed the committed
+  `results/metrics.csv` and `results/pareto_frontier.json` match it.
 - Regression tests cover completed-checkpoint output recovery and rejection of
   stale frontier verification evidence, plus recovery when the log is ahead of
   its checkpoint.
 
+## Phase 6 Progress
+
+The regenerated frontier (`schema_version` 2) has two entries:
+
+| Circuit | Classes | XOR2 | Depth | Max fanout | Excess fanout >4 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `1472a09886a8` | A, B | 439 | 8 | 5 | 5 |
+| `0c80bfcc8e2b` | C | 1,390 | 6 | 20 | 1,038 |
+
+- Candidates A and B are the same netlist apart from the module name: the
+  seed-16,564 Candidate A already satisfies the depth-8 bound, and B's
+  refinement found nothing better. The frontier lists that circuit once with
+  both class labels.
+- Candidate C has the same structural hash as the
+  `balanced_per_output` baseline. Its refinement budget found no improvement,
+  so the minimum-depth class is represented only by the baseline construction.
+- Against the frontier, the Yosys/ABC baseline (1,123 XOR2, depth 7, maximum
+  fanout 15, excess 536) is not dominated, and `balanced_per_output` ties C.
+  The other two baselines are dominated. This comparison reads the recorded
+  `results/baseline_metrics.csv`.
+- The superseded Phase 3 Candidate A (439 XOR2, depth 9, maximum fanout 6) is
+  dominated by the Phase 4 Candidate A and is not submitted.
+
 ## Not Started
 
-- Phase 6 clean-checkout rebuild and full re-verification of every submitted
-  candidate
-- A final multi-candidate Pareto frontier, metrics table, and final report
+- Clean-checkout rebuild of every artifact and a third distinct verified
+  nondominated candidate
+- The final report
 - Literature and open-source comparison research
 
 ## Semantic Ambiguities or Discrepancies
@@ -343,9 +402,14 @@ Tool versions used locally:
 
 ## Unresolved Issues
 
-- The top-level `results/metrics.csv` and `results/pareto_frontier.json` predate
-  Phase 4 and list only the seed-3,195 Candidate A. Phase 6 must regenerate
-  them from the Phase 4 and Phase 5 artifacts.
+- `SPEC.md` Section 4 requires at least three distinct nondominated circuits.
+  The submitted candidates give two (A/B share one netlist). A new, separately
+  recorded search is needed — for example a depth-7 bounded search, where the
+  undominated Yosys/ABC baseline shows a trade-off point exists — before G6
+  can pass. `python3 -m verifier.build_results --require-spec-minimum` exits
+  nonzero until then.
+- Candidate C equals the balanced-tree baseline. Reporting must not present it
+  as a search-derived improvement.
 - Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
   separately recorded budget, not a continuation of the completed one.
 - Batch orchestration for formally checking multiple future candidates belongs

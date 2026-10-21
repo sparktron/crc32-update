@@ -18,7 +18,7 @@ jobs:
   scaffolding:
     name: Validate experiment scaffolding
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Check out repository
@@ -154,6 +154,7 @@ jobs:
           python3 -m unittest -v \
             verifier.test_verifier \
             verifier.test_verify_candidate \
+            verifier.test_build_results \
             generator.test_baseline_generator \
             optimizer.test_optimize
 
@@ -206,7 +207,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m optimizer.optimize \
-            --replay-frontier results/pareto_frontier.json \
+            --replay-frontier results/phase3/candidate_a_frontier.json \
             --artifact /tmp/candidate_a_min_area.v
           cmp results/candidate_a_min_area.v \
             /tmp/candidate_a_min_area.v
@@ -217,7 +218,16 @@ jobs:
           set -euo pipefail
           python3 -m verifier.verify_candidate \
             --candidate results/candidate_a_min_area.v \
-            --frontier results/pareto_frontier.json \
-            --metrics results/metrics.csv \
+            --frontier results/phase3/candidate_a_frontier.json \
+            --metrics results/phase3/candidate_a_metrics.csv \
+            --random-tests 100000 \
+            --seed 0xC32A5EED
+
+      - name: Re-verify submitted candidates and final result records
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m verifier.build_results \
+            --check \
             --random-tests 100000 \
             --seed 0xC32A5EED

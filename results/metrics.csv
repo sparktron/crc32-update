@@ -1,2 +1,4 @@
-candidate_class,artifact,seed,xor2_count,maximum_depth,output_depths,maximum_fanout,total_fanout,total_excess_fanout_above_4,intermediate_node_count,direct_output_alias_count,exact_vectors_checked,random_vectors_checked,random_seed,formal_equivalence,verification_status
-A,results/candidate_a_min_area.v,3195,439,9,"[8,7,7,8,8,7,7,8,7,7,8,7,8,8,7,7,9,8,7,8,8,7,7,8,8,7,7,8,7,8,8,9]",6,910,5,439,32,97,100000,3274333933,passed,passed
+candidate_class,artifact,circuit_id,on_pareto_frontier,seed,xor2_count,maximum_depth,output_depths,maximum_fanout,total_fanout,total_excess_fanout_above_4,intermediate_node_count,direct_output_alias_count,exact_vectors_checked,random_vectors_checked,random_seed,formal_equivalence,verification_status
+A,results/phase4/candidate_a_extended.v,1472a09886a8,true,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
+B,results/phase4/candidate_b_refined.v,1472a09886a8,true,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
+C,results/phase4/candidate_c_refined.v,0c80bfcc8e2b,true,,1390,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",20,2812,1038,1390,32,97,100000,3274333933,passed,passed
