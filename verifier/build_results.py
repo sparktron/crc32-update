@@ -36,6 +36,7 @@ OBJECTIVES = (
     "total_excess_fanout_above_4",
 )
 MINIMUM_DISTINCT_PARETO_CANDIDATES = 3
+REQUIRED_CANDIDATE_CLASSES = ("A", "B", "C")
 CANDIDATE_B_DEPTH_BOUND = 8
 CANDIDATE_A_ALGORITHM = "gf2-bp-cse-depth-stochastic-v1"
 CANDIDATE_A_CHECKPOINTS = (
@@ -86,10 +87,26 @@ class Refinement:
 
 
 @dataclass(frozen=True)
+class BoundedBudget:
+    depth_cap: int
+    checkpoint: Path
+    incumbent_dir: Path
+
+    @property
+    def algorithm(self) -> str:
+        return f"kraft-bounded-bp-cse-depth{self.depth_cap}-v1"
+
+    @property
+    def module_name(self) -> str:
+        return f"candidate_depth{self.depth_cap}_bounded"
+
+
+@dataclass(frozen=True)
 class Submission:
     candidate_class: str
     artifact: Path
     refinement: Refinement | None = None
+    bounded: BoundedBudget | None = None
 
 
 SUBMISSIONS = (
@@ -310,6 +327,83 @@ def check_refinement(
     }
 
 
+def _bounded_order(metrics: dict[str, object], seed: int) -> tuple[int, ...]:
+    """Incumbent order for bounded budgets: SPEC objective order, then seed."""
+    return (*(int(metrics[key]) for key in OBJECTIVES), seed)
+
+
+def check_bounded_search(
+    submission: Submission,
+    measured: dict[str, object],
+    records: list[dict[str, object]],
+    random_tests: int,
+    random_seed: int,
+    replay: bool = True,
+) -> dict[str, object]:
+    """Confirm the artifact is the best verified trial of a completed bounded budget."""
+    budget = submission.bounded
+    assert budget is not None
+    checkpoint = _json(budget.checkpoint)
+    _check_completed_checkpoint(checkpoint, budget.checkpoint)
+    expected = {
+        "algorithm": budget.algorithm,
+        "depth_cap": budget.depth_cap,
+        "random_seed": random_seed,
+    }
+    if {key: checkpoint.get(key) for key in expected} != expected:
+        raise ValueError(f"{budget.checkpoint} does not match the recorded budget")
+    recorded_tests = checkpoint.get("random_tests")
+    if not isinstance(recorded_tests, int) or recorded_tests < random_tests:
+        raise ValueError(f"{budget.checkpoint} used fewer random vectors than required")
+    if int(measured["maximum_depth"]) > budget.depth_cap:
+        raise ValueError(f"{submission.artifact} exceeds depth cap {budget.depth_cap}")
+    attempts = _seed_range_records(records, budget.algorithm, checkpoint)
+    for attempt in attempts:
+        metrics = attempt.get("final_metrics")
+        if not attempt.get("verification_passed") or not isinstance(metrics, dict):
+            raise ValueError(f"{attempt.get('attempt_id')} was not verified")
+        if int(metrics["maximum_depth"]) > budget.depth_cap:
+            raise ValueError(f"{attempt.get('attempt_id')} exceeds the depth cap")
+    winner = min(
+        attempts, key=lambda attempt: _bounded_order(attempt["final_metrics"], attempt["seed"])
+    )
+    accepted = [attempt for attempt in attempts if attempt.get("accepted")]
+    if not accepted or accepted[-1] is not winner:
+        raise ValueError("the best logged bounded trial is not the last accepted incumbent")
+    if checkpoint.get("incumbent_seed") != winner["seed"]:
+        raise ValueError("checkpoint incumbent seed is not the best logged trial")
+    measured_metrics = _without_unreachable(measured)
+    if winner["final_metrics"] != measured_metrics or checkpoint.get(
+        "incumbent_metrics"
+    ) != measured_metrics:
+        raise ValueError("bounded incumbent metrics do not match measurement")
+    incumbent = budget.incumbent_dir / f"seed_{winner['seed']}.v"
+    if Path(str(winner.get("artifact"))) != incumbent:
+        raise ValueError("winning log record names a different incumbent artifact")
+    if incumbent.read_bytes() != submission.artifact.read_bytes():
+        raise ValueError(f"{submission.artifact} differs from its accepted incumbent")
+    if replay:
+        # Reproducibility only: the metrics above come from the independent
+        # verifier, never from optimizer code.
+        from optimizer.depth_bounded import search_seed_bounded
+
+        regenerated = search_seed_bounded(winner["seed"], budget.depth_cap)
+        if regenerated.render(budget.module_name) != submission.artifact.read_text():
+            raise ValueError(f"{submission.artifact} does not replay from its seed")
+    return {
+        "algorithm": budget.algorithm,
+        "checkpoint": str(budget.checkpoint),
+        "depth_cap": budget.depth_cap,
+        "seed_start": checkpoint["seed_start"],
+        "seed_count": checkpoint["seed_count"],
+        "logged_attempts": len(attempts),
+        "accepted_incumbents": len(accepted),
+        "winning_attempt_id": winner["attempt_id"],
+        "seed": winner["seed"],
+        "replayed_from_seed": replay,
+    }
+
+
 def check_phase5(
     study: dict[str, object],
     checkpoint: dict[str, object],
@@ -405,7 +499,12 @@ def build_results(
             raise ValueError("verifier returned malformed metrics")
         if measured.get("unreachable_nodes"):
             raise ValueError(f"{submission.artifact} has unreachable nodes")
-        if submission.refinement is None:
+        if submission.bounded is not None:
+            provenance = check_bounded_search(
+                submission, measured, records, random_tests, random_seed
+            )
+            seed = provenance["seed"]
+        elif submission.refinement is None:
             provenance = check_candidate_a(measured, submission.artifact, records)
             seed = provenance["seed"]
         else:
@@ -477,13 +576,17 @@ def build_results(
             BASELINE_METRICS, {circuit_id: circuits[circuit_id] for circuit_id in frontier_ids}
         ),
         "specification_checks": {
-            "required_candidate_classes": ["A", "B", "C"],
+            "required_candidate_classes": list(REQUIRED_CANDIDATE_CLASSES),
+            "required_candidate_classes_reported": all(
+                label in by_class for label in REQUIRED_CANDIDATE_CLASSES
+            ),
             "reported_candidate_classes": sorted(by_class),
             "candidate_b_depth_bound": CANDIDATE_B_DEPTH_BOUND,
             "minimum_distinct_pareto_candidates": MINIMUM_DISTINCT_PARETO_CANDIDATES,
             "distinct_pareto_candidates": len(entries),
             "minimum_distinct_pareto_candidates_met": (
                 len(entries) >= MINIMUM_DISTINCT_PARETO_CANDIDATES
+                and all(label in by_class for label in REQUIRED_CANDIDATE_CLASSES)
             ),
         },
     }

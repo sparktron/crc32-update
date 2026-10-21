@@ -194,7 +194,8 @@
       "A",
       "B",
       "C"
-    ]
+    ],
+    "required_candidate_classes_reported": true
   },
   "submitted_candidates": [
     {
