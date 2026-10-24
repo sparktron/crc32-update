@@ -82,6 +82,14 @@ def _verify_and_record(
     return record
 
 
+def render_starting_points() -> dict[str, str]:
+    """Regenerate the Phase 4 starting-point sources without verifying or logging."""
+    return {
+        "candidate_b_depth8.v": search_seed(16564).render("candidate_b_depth8"),
+        "candidate_c_min_depth.v": _render_candidate_c(),
+    }
+
+
 def materialize(
     output_dir: Path,
     log_path: Path,
@@ -92,7 +100,7 @@ def materialize(
 
     if random_tests < DEFAULT_RANDOM_TESTS:
         raise ValueError(f"random_tests must be at least {DEFAULT_RANDOM_TESTS}")
-    candidate_b = search_seed(16564)
+    sources = render_starting_points()
     records = [
         _verify_and_record(
             "B",
@@ -105,7 +113,7 @@ def materialize(
                 "source_search": "phase4 Candidate A continuation",
             },
             output_dir / "candidate_b_depth8.v",
-            candidate_b.render("candidate_b_depth8"),
+            sources["candidate_b_depth8.v"],
             log_path,
             random_tests,
             random_seed,
@@ -120,7 +128,7 @@ def materialize(
                 "construction": "balanced per-output XOR2 trees",
             },
             output_dir / "candidate_c_min_depth.v",
-            _render_candidate_c(),
+            sources["candidate_c_min_depth.v"],
             log_path,
             random_tests,
             random_seed,
@@ -139,7 +147,18 @@ def main() -> int:
     parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument("--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED)
+    parser.add_argument(
+        "--replay-dir",
+        type=Path,
+        help="regenerate both starting-point sources into this directory without "
+        "verifying or logging them",
+    )
     args = parser.parse_args()
+    if args.replay_dir is not None:
+        args.replay_dir.mkdir(parents=True, exist_ok=True)
+        for name, source in render_starting_points().items():
+            (args.replay_dir / name).write_text(source)
+        return 0
     try:
         records = materialize(args.output_dir, args.search_log, args.random_tests, args.random_seed)
     except (OSError, RuntimeError, ValueError) as error:

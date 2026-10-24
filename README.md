@@ -393,3 +393,40 @@ Both budgets have completed. The depth-7 budget's best trial (seed 40,505) has
 submitted as B7 and Candidate C in `verifier/build_results.py`, which checks each
 against its completed checkpoint, full logged seed range, accepted incumbent,
 and a replay from its seed before regenerating the result files.
+
+## Clean-Checkout Rebuild
+
+One command clones a revision into a temporary directory and reruns the
+documented pipeline there, so local edits and untracked files cannot affect
+the result:
+
+```bash
+scripts/clean_rebuild.sh
+```
+
+Pass a revision (`scripts/clean_rebuild.sh <commit>`) to rebuild something
+other than `HEAD`, or `--in-place` to run in an already clean checkout, which
+is how CI runs it. The script:
+
+- runs every unit and rejection test;
+- regenerates the Phase 1 structural fixture and every baseline and compares
+  them byte-for-byte with the committed files (the Yosys/ABC baseline is only
+  reported if it differs, since it depends on the toolchain release);
+- regenerates every submitted candidate from its recorded seed or construction
+  (Phase 3 and Phase 4 Candidate A, the B and C0 starting points and their
+  unimproved refinements, B7, and Candidate C) and compares each with the
+  committed artifact;
+- re-verifies every candidate and requires the committed frontier and metrics
+  to match regeneration and to meet the `SPEC.md` minimum;
+- fails if the checkout was modified.
+
+The seeded search budgets and the Phase 5 SMT study are not re-executed, because
+they take hours. `verifier.build_results` instead cross-checks their completed
+checkpoints and complete search-log records. To replay a single artifact
+without logging an attempt:
+
+```bash
+python3 -m optimizer.phase4_candidates --replay-dir /tmp/phase4_replay
+python3 -m optimizer.depth_bounded --depth-cap 7 --replay-seed 40505 --artifact /tmp/depth7.v
+```
+

@@ -437,6 +437,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--depth-cap", type=int, default=DEFAULT_DEPTH_CAP)
     parser.add_argument(
+        "--replay-seed",
+        type=int,
+        help="regenerate one seed's network into --artifact without running or "
+        "logging a search",
+    )
+    parser.add_argument(
         "--seed-start",
         type=int,
         help="defaults to the recorded budget start for the cap "
@@ -477,6 +483,15 @@ def main() -> int:
     args.incumbent_dir = args.incumbent_dir or Path(
         f"results/checkpoints/depth{cap}_bounded_incumbents"
     )
+    if args.replay_seed is not None:
+        try:
+            candidate = search_seed_bounded(args.replay_seed, cap)
+            independently_check(candidate)
+            args.artifact.parent.mkdir(parents=True, exist_ok=True)
+            args.artifact.write_text(candidate.render(f"candidate_depth{cap}_bounded"))
+        except (OSError, RuntimeError, ValueError) as error:
+            parser.exit(1, f"Depth-bounded replay failed: {error}\n")
+        return 0
     try:
         # Every search appends to one canonical log, so lock the log itself.
         with _exclusive_search_lock(args.search_log):
