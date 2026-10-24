@@ -7,8 +7,9 @@ progress)
 
 Current gate: G6 open. G5 passed locally after the v2 exclusive-cone budget
 completed. The SPEC.md Section 4 minimum of three distinct nondominated
-circuits is now met and `scripts/clean_rebuild.sh` passes from a fresh clone;
-the comparison research and final report remain.
+circuits is now met, `scripts/clean_rebuild.sh` passes from a fresh clone, and
+the comparison research is in `docs/comparison_research.md`; the final report
+remains.
 
 ## Current Best Results
 
@@ -193,6 +194,7 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 
 ## Files Created for Phase 6
 
+- `docs/comparison_research.md`
 - `scripts/clean_rebuild.sh`
 - `optimizer/depth_bounded.py`
 - `optimizer/test_depth_bounded.py`
@@ -385,7 +387,6 @@ Candidate C dominates on every objective.
 ## Not Started
 
 - The final report
-- Literature and open-source comparison research
 
 ## Semantic Ambiguities or Discrepancies
 
@@ -440,6 +441,15 @@ Candidate C dominates on every objective.
 ## Unresolved Issues
 
 - C0 equals the balanced-tree baseline and is dominated by Candidate C.
+- Comparison research (`docs/comparison_research.md`, 2026-10-24) found one
+  directly comparable public figure: crcZero's unshared 1,390 XOR2 for
+  reflected CRC-32 at D=64, equal to our unshared baseline. Zhang–Tang (ISCAS
+  2021) report 469–503 XORs at CPD 6 for p = 64, but for a transformed
+  remainder rather than the standard update, so those figures are context
+  only. Campobello et al. (2003) and several older papers could not be read,
+  so a lower published standard-function count cannot be ruled out. Depth 6
+  is provably minimal (maximum row weight 52). No novelty or gate-count
+  optimality claim is supported.
   Reporting must not present it as a search-derived improvement.
 - B7 and Candidate C are best found for their recorded 10,000-seed budgets,
   not optimal circuits. The Kraft check makes the depth cap exact, but the
