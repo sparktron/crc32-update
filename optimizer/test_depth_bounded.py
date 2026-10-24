@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 from optimizer.depth_bounded import (
     _kraft_after,
@@ -42,7 +43,7 @@ class BoundedSeedTests(unittest.TestCase):
 
 
 class ResumeTests(unittest.TestCase):
-    def test_accepted_log_record_ahead_of_checkpoint_is_recovered(self) -> None:
+    def test_resume_recovers_log_and_restores_completed_outputs(self) -> None:
         seed = 40000
         candidate = search_seed_bounded(seed, 7)
         metrics = independently_check(candidate).to_dict()
@@ -91,6 +92,29 @@ class ResumeTests(unittest.TestCase):
             self.assertEqual(artifact.read_text(), source)
             self.assertEqual(len(log.read_text().splitlines()), 1)
             self.assertEqual(json.loads(checkpoint.read_text())["status"], "completed")
+
+            saved_log = log.read_bytes()
+            saved_checkpoint = checkpoint.read_bytes()
+            for state, requested_artifact in (
+                ("missing", artifact),
+                ("relocated", root / "relocated" / "candidate.v"),
+                ("stale", artifact),
+            ):
+                with self.subTest(state=state):
+                    if state == "missing":
+                        artifact.unlink()
+                    elif state == "stale":
+                        artifact.write_text("stale output\n")
+                    with mock.patch("optimizer.depth_bounded._worker") as worker:
+                        result = run_bounded_search(
+                            7, seed, 1, 1, checkpoint, requested_artifact,
+                            incumbents, log, 100_000, 0xC32A5EED,
+                        )
+                    worker.assert_not_called()
+                    self.assertEqual(result, (seed, metrics))
+                    self.assertEqual(requested_artifact.read_text(), source)
+                    self.assertEqual(log.read_bytes(), saved_log)
+                    self.assertEqual(checkpoint.read_bytes(), saved_checkpoint)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-10-20
+Last updated: 2026-10-24
 
 Current phase: Phase 6 — Final verification, comparison, and reporting (in
 progress)
@@ -337,6 +337,10 @@ Tool versions used locally:
 - Regression tests cover completed-checkpoint output recovery and rejection of
   stale frontier verification evidence, plus recovery when the log is ahead of
   its checkpoint.
+- Bounded-search resume regression (`python3 -B -m unittest -v
+  optimizer.test_depth_bounded`): 5 tests passed. Completed budgets restore
+  missing, stale, and relocated output artifacts from the replay-validated
+  incumbent without new trials or changes to the log and checkpoint bytes.
 
 ## Phase 6 Progress
 

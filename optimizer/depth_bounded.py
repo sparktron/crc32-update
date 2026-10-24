@@ -336,8 +336,6 @@ def run_bounded_search(
         checkpoint = json.loads(checkpoint_path.read_text())
         if {key: checkpoint.get(key) for key in configuration} != configuration:
             raise ValueError("checkpoint configuration does not match requested search")
-        if checkpoint.get("status") == "completed":
-            return checkpoint.get("incumbent_seed"), checkpoint.get("incumbent_metrics")
     attempts = logged_attempts(log_path, algorithm, seed_start, seed_count)
     completed = len(attempts)
 
