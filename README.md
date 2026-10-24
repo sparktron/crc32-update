@@ -4,11 +4,11 @@ This repository is the workspace for a reproducible search for optimized
 combinational XOR2 networks implementing a 64-bit parallel reflected IEEE
 CRC-32 state update.
 
-Phase 1 reference, matrix-generation, structural verification, metric, random,
-and formal-equivalence infrastructure is implemented. Phase 2 deterministic
-baselines are generated and verified. Phase 3 has produced and verified
-Candidate A with a reproducible multi-seed minimum-area search. Candidates B
-and C have not begun.
+The experiment is complete through gate G6. The verified Pareto frontier has
+three distinct circuits: 439 XOR2 at depth 8 (A/B), 441 at depth 7 (B7), and
+470 at depth 6 (C). Depth 6 is proven minimal; gate counts are best found for
+the recorded budgets. The [final report](report.md) documents methodology,
+results, comparisons, limitations, and reproduction.
 
 Experiment control documents:
 
@@ -429,4 +429,20 @@ without logging an attempt:
 python3 -m optimizer.phase4_candidates --replay-dir /tmp/phase4_replay
 python3 -m optimizer.depth_bounded --depth-cap 7 --replay-seed 40505 --artifact /tmp/depth7.v
 ```
+
+## External Generator Check
+
+`scripts/compare_crczero.py` checks the crcZero open-source generator against
+the frozen function. It does not download anything: obtain a crcZero checkout
+yourself, then run
+
+```bash
+python3 scripts/compare_crczero.py --crczero-src /path/to/crcZero --output results/external/crczero_comparison.json
+```
+
+crcZero runs only in an isolated `python3 -I -B` child process. Its emitted
+equations are compared bit-for-bit with the frozen matrix, then converted to
+XOR2 netlists (chained as written, and balanced) and passed through the
+verifier and formal-equivalence flow. The committed record was produced from
+crcZero commit `98c55152`.
 
