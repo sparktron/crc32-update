@@ -194,11 +194,17 @@ The dated source inventory and detailed comparability analysis are in
 is summarized here; this report does not claim that every external generator
 was executed or every cited paper was accessible.
 
-crcZero's package description reports 1,390 two-input XOR operations for
-reflected CRC-32 with 64-bit data, matching our unshared count. This is a
-comparison to its published figure, not a verified generated artifact: its
-code was not run through our verifier. See the
-[crcZero package metadata](https://pypi.org/pypi/crczero/json).
+crcZero (commit `98c55152`, version 1.2.0) was run for CRC-32/ISO-HDLC at
+D=64 with `scripts/compare_crczero.py`. All 32 emitted equations equal the
+frozen matrix, and they contain 1,390 two-input XOR operators, matching its
+[package metadata](https://pypi.org/pypi/crczero/json). Converted to the
+restricted XOR2 subset, both realizations passed 97 exact vectors, 100,000
+random vectors, and formal equivalence. Chained as written, the netlist has
+1,390 XOR2 at depth 51 and is structurally identical to
+`independent_per_output`. As balanced trees, it has 1,390 XOR2 at depth 6 and
+is structurally identical to `balanced_per_output` (C0). The record is
+`results/external/crczero_comparison.json`. Against this directly comparable
+generator, A/B, B7, and C use 31.6%, 31.7%, and 33.8% of the gates.
 XAPP209's cancellation within output equations and the OpenCores/CRC generator
 inventory provide context for equation generation; a missing resource count
 is not evidence of a competitive optimized circuit.
@@ -221,9 +227,9 @@ constraints in
 The local heuristic draws on established CSE/BP ideas; beating local
 baselines does not show a new optimization method. Campobello et al. and
 several older papers remain unread, and their results could change the
-assessment. The crcZero metadata and Zhang–Tang manuscript could not be
-fetched again during report preparation; their numerical summaries rely
-on the dated repository research record.
+assessment. The Zhang–Tang manuscript could not be fetched again during
+report preparation; its numerical summary relies on the dated repository
+research record.
 
 The supported publication claim is a reproducible, independently verified
 engineering result and a documented tradeoff frontier for this frozen

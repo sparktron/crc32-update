@@ -192,6 +192,8 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 
 ## Files Created for Phase 6
 
+- `scripts/compare_crczero.py`
+- `results/external/crczero_comparison.json`
 - `report.md`
 - `docs/comparison_research.md`
 - `scripts/clean_rebuild.sh`
@@ -445,7 +447,12 @@ limitations below remain in effect.
   Reporting must not present it as a search-derived improvement.
 - Comparison research (`docs/comparison_research.md`, 2026-10-24) found one
   directly comparable public figure: crcZero's unshared 1,390 XOR2 for
-  reflected CRC-32 at D=64, equal to our unshared baseline. Zhang–Tang (ISCAS
+  reflected CRC-32 at D=64, equal to our unshared baseline. Running crcZero
+  (commit `98c55152`) with `scripts/compare_crczero.py` confirmed it: all 32
+  equations equal the frozen matrix, and its chained and balanced
+  realizations pass exact, random, and formal checks and are structurally
+  identical to `independent_per_output` and `balanced_per_output`
+  (`results/external/crczero_comparison.json`). Zhang–Tang (ISCAS
   2021) report 469–503 XORs at CPD 6 for p = 64, but for a transformed
   remainder rather than the standard update, so those figures are context
   only. Campobello et al. (2003) and several older papers could not be read,

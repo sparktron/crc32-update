@@ -430,3 +430,19 @@ python3 -m optimizer.phase4_candidates --replay-dir /tmp/phase4_replay
 python3 -m optimizer.depth_bounded --depth-cap 7 --replay-seed 40505 --artifact /tmp/depth7.v
 ```
 
+## External Generator Check
+
+`scripts/compare_crczero.py` checks the crcZero open-source generator against
+the frozen function. It does not download anything: obtain a crcZero checkout
+yourself, then run
+
+```bash
+python3 scripts/compare_crczero.py --crczero-src /path/to/crcZero --output results/external/crczero_comparison.json
+```
+
+crcZero runs only in an isolated `python3 -I -B` child process. Its emitted
+equations are compared bit-for-bit with the frozen matrix, then converted to
+XOR2 netlists (chained as written, and balanced) and passed through the
+verifier and formal-equivalence flow. The committed record was produced from
+crcZero commit `98c55152`.
+
