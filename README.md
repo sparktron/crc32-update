@@ -4,11 +4,11 @@ This repository is the workspace for a reproducible search for optimized
 combinational XOR2 networks implementing a 64-bit parallel reflected IEEE
 CRC-32 state update.
 
-Phase 1 reference, matrix-generation, structural verification, metric, random,
-and formal-equivalence infrastructure is implemented. Phase 2 deterministic
-baselines are generated and verified. Phase 3 has produced and verified
-Candidate A with a reproducible multi-seed minimum-area search. Candidates B
-and C have not begun.
+The experiment is complete through gate G6. The verified Pareto frontier has
+three distinct circuits: 439 XOR2 at depth 8 (A/B), 441 at depth 7 (B7), and
+470 at depth 6 (C). Depth 6 is proven minimal; gate counts are best found for
+the recorded budgets. The [final report](report.md) documents methodology,
+results, comparisons, limitations, and reproduction.
 
 Experiment control documents:
 

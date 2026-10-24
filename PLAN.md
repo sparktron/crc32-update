@@ -243,6 +243,13 @@ Validation gate G6:
 - The report includes all required methodology, results, limitations, and
   reproduction sections.
 
+G6 passed locally on 2026-10-24. `report.md` records the methodology, final
+results, comparison limits, and reproduction procedure. The result-builder
+check re-verified all submitted artifacts and confirmed the three-circuit
+frontier; report tables agree with the machine-readable result records.
+The earlier clean-clone rebuild remains the reproduction evidence; the
+hours-long searches were not rerun for this documentation closeout.
+
 ## Planned Deliverable Layout
 
 Implementation phases will populate the following structure; Phase 0 creates
