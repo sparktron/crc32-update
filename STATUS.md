@@ -1,10 +1,15 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-08-31
+Last updated: 2026-10-24
 
-Current phase: Phase 5 — Exact small-subcircuit improvement in progress
+Current phase: Phase 6 — Final verification, comparison, and reporting (in
+progress)
 
-Current gate: G4 passed locally; G5 pending the exclusive-cone study
+Current gate: G6 open. G5 passed locally after the v2 exclusive-cone budget
+completed. The SPEC.md Section 4 minimum of three distinct nondominated
+circuits is now met, `scripts/clean_rebuild.sh` passes from a fresh clone, and
+the comparison research is in `docs/comparison_research.md`; the final report
+remains.
 
 ## Current Best Results
 
@@ -34,13 +39,25 @@ but it counted shared fan-in nodes that cannot be removed during integration.
 It is therefore not G5 evidence. The replacement v2 study cuts at shared
 signals, counts only exclusively removable gates, and stores complete outcomes
 in each append-only log record so resumed runs cannot discard prior results.
-No Phase 5 replacement has been accepted or integrated.
+
+The v2 study (`phase5-exact-exclusive-cone-v2`) completed its 20-cone budget on
+the Phase 4 refined Candidate B with a six-node cone limit, a 1,000 ms per-query
+timeout, and Z3 4.8.12. Thirteen two- or three-gate cones returned UNSAT for a
+strict gate reduction. The seven six-gate cones (roots n202, n226, n280, n294,
+n309, n324, and n330) returned `unknown` at the timeout; these are not
+certificates. Every attempt is logged with `accepted: false`. Outputs are in
+`results/phase5/exact_exclusive_cone_study.json` and
+`results/checkpoints/phase5_exact_exclusive_cones.json`. The UNSAT results apply
+only to those single-cone encodings, not to the whole network. No Phase 5
+replacement has been accepted or integrated.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |
 | A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
 | B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
-| C — minimum-depth search | 1,390 | 6 | Passed | Best found; no refinement improvement |
+| C0 — Phase 4 minimum-depth starting point | 1,390 | 6 | Passed | Balanced-tree baseline; dominated by C |
+| B7 — bounded depth at most 7 | 441 | 7 | Passed | Best found; seed 40,505 of 40,000–49,999 |
+| C — minimum-depth search (depth-6 budget) | 470 | 6 | Passed | Best found; seed 56,140 of 50,000–59,999 |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector
@@ -52,7 +69,7 @@ verification, and formal-equivalence time on the local toolchain.
 | Balanced per-output tree | 1,390 | 6 | 20 | 2,812 | 1,038 | 4.745530 | Passed |
 | Greedy common-subexpression elimination | 454 | 9 | 6 | 940 | 11 | 3.868081 | Passed |
 | Yosys/ABC normalized synthesis | 1,123 | 7 | 15 | 2,278 | 536 | 6.297098 | Passed |
-| Candidate A | 439 | 9 | 6 | 910 | 5 | — | Passed |
+| Candidate A (Phase 4, seed 16,564) | 439 | 8 | 5 | 910 | 5 | — | Passed |
 
 `results/baseline_metrics.csv` contains every output-bit depth, intermediate and
 alias counts, runtime components, exact/random vector counts, and formal status.
@@ -98,10 +115,27 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 - Every new count/depth incumbent was independently parsed, checked on 97 exact
   vectors and 100,000 seeded random vectors, and formally proved before
   acceptance. Twelve incumbents were accepted during the search.
-- Seed 3,195 produced the best-found 439-XOR, depth-9 network. The result
-  artifact reproduces byte-for-byte from that seed.
-- `results/metrics.csv` and `results/pareto_frontier.json` contain Candidate A
-  only and match the independent verifier. Candidates B and C were not run.
+- Seed 3,195 produced the best Phase 3 network: 439 XOR2, depth 9. The result
+  artifact reproduces byte-for-byte from that seed. The Phase 4 continuation
+  later found seed 16,564 (439 XOR2, depth 8), recorded in
+  `results/phase4/candidate_a_extended.v` and
+  `results/phase4/candidate_a_metrics.csv`.
+- The Phase 3 Candidate A frontier and metrics records moved unchanged to
+  `results/phase3/candidate_a_frontier.json` and
+  `results/phase3/candidate_a_metrics.csv`; the Phase 3 optimizer and
+  `verify_candidate` defaults now point there so a Phase 3 replay cannot
+  overwrite the final results.
+- Phase 6 regenerated `results/metrics.csv` and `results/pareto_frontier.json`
+  with `python3 -m verifier.build_results`. All three submitted candidates
+  passed the restricted parser, 97 exact vectors, 100,000 random vectors with
+  seed `0xC32A5EED`, and Yosys SMTBMC/Z3 formal equivalence. Their metrics
+  matched the completed checkpoints and search log; Candidate A is the best of
+  all 20,000 logged Candidate A seeds, B and C are byte-identical to their
+  accepted starting points after unimproved refinement budgets, and the Phase 5
+  v2 study on Candidate B integrated no replacement.
+- Phase 4 Candidate B (depth at most 8) and Candidate C (minimum depth) starting
+  points passed structural, exact, randomized, and formal checks, and their
+  10,000-seed refinement budgets completed with no accepted improvement.
 - Completed-checkpoint replay recreates requested candidate, frontier, metrics,
   and search-log outputs while refusing conflicting append-only logs.
 - Resume reconciles complete log records written immediately before an
@@ -153,10 +187,29 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 - `optimizer/test_optimize.py`
 - `verifier/verify_candidate.py`
 - `results/candidate_a_min_area.v`
-- `results/pareto_frontier.json`
-- `results/metrics.csv`
+- `results/pareto_frontier.json` (now `results/phase3/candidate_a_frontier.json`)
+- `results/metrics.csv` (now `results/phase3/candidate_a_metrics.csv`)
 - `results/checkpoints/candidate_a_checkpoint.json`
 - `results/checkpoints/candidate_a_incumbents/*.v`
+
+## Files Created for Phase 6
+
+- `docs/comparison_research.md`
+- `scripts/clean_rebuild.sh`
+- `optimizer/depth_bounded.py`
+- `optimizer/test_depth_bounded.py`
+- `verifier/build_results.py`
+- `verifier/test_build_results.py`
+- `results/phase3/candidate_a_frontier.json` (moved from `results/`)
+- `results/phase3/candidate_a_metrics.csv` (moved from `results/`)
+- `results/phase6/candidate_depth7_bounded.v`
+- `results/phase6/candidate_depth6_bounded.v`
+- `results/checkpoints/depth7_bounded_search.json`
+- `results/checkpoints/depth7_bounded_incumbents/*.v`
+- `results/checkpoints/depth6_bounded_search.json`
+- `results/checkpoints/depth6_bounded_incumbents/*.v`
+- `results/pareto_frontier.json` (regenerated)
+- `results/metrics.csv` (regenerated)
 
 ## Commands Executed
 
@@ -212,15 +265,24 @@ python3 -m optimizer.optimize \
   --seed-count 10000 \
   --workers 8
 python3 -m optimizer.optimize \
-  --replay-frontier results/pareto_frontier.json \
+  --replay-frontier results/phase3/candidate_a_frontier.json \
   --artifact /tmp/candidate_a_min_area.v
 cmp results/candidate_a_min_area.v /tmp/candidate_a_min_area.v
 python3 -m verifier.verify_candidate \
   --candidate results/candidate_a_min_area.v \
-  --frontier results/pareto_frontier.json \
-  --metrics results/metrics.csv \
+  --frontier results/phase3/candidate_a_frontier.json \
+  --metrics results/phase3/candidate_a_metrics.csv \
   --random-tests 100000 \
   --seed 0xC32A5EED
+```
+
+The Phase 6 result regeneration commands were:
+
+```bash
+python3 -m verifier.build_results \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
+python3 -m verifier.build_results --check
 ```
 
 Tool versions used locally:
@@ -261,16 +323,70 @@ Tool versions used locally:
 - The winning seed replayed byte-for-byte, the frontier and metrics CSV matched
   independent recomputation, and the search log contains 10,000 unique attempt
   IDs with 12 retained-incumbent records.
+- Phase 6 suite (`verifier.test_verifier`, `verifier.test_verify_candidate`,
+  `verifier.test_build_results`, `generator.test_baseline_generator`,
+  `optimizer.test_optimize`, `optimizer.test_phase5_exact`,
+  `optimizer.test_depth_bounded`): 53 tests passed, 0 failed, 0 skipped.
+- `scripts/clean_rebuild.sh` passed from a fresh clone in 73 seconds: 58 unit
+  tests, the Phase 1 fixture and all four baselines (including Yosys/ABC on
+  Yosys 0.9) regenerated byte-identically, every submitted artifact replayed
+  byte-identically from its seed or construction, `build_results --check
+  --require-spec-minimum` passed, and the clone was unchanged. A clone with a
+  tampered `results/phase6/candidate_depth7_bounded.v` failed with a mismatch.
+- Phase 6 regeneration re-verified Candidates A, B, and C (structural, 97 exact,
+  100,000 random, formal) and `--check` confirmed the committed
+  `results/metrics.csv` and `results/pareto_frontier.json` match it.
 - Regression tests cover completed-checkpoint output recovery and rejection of
   stale frontier verification evidence, plus recovery when the log is ahead of
   its checkpoint.
+- Bounded-search resume regression (`python3 -B -m unittest -v
+  optimizer.test_depth_bounded`): 5 tests passed. Completed budgets restore
+  missing, stale, and relocated output artifacts from the replay-validated
+  incumbent without new trials or changes to the log and checkpoint bytes.
+
+## Phase 6 Progress
+
+The regenerated frontier (`schema_version` 2) has three distinct
+nondominated circuits, meeting the `SPEC.md` Section 4 minimum;
+`python3 -m verifier.build_results --check --require-spec-minimum` passes.
+
+| Circuit | Classes | XOR2 | Depth | Max fanout | Excess fanout >4 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `1472a09886a8` | A, B | 439 | 8 | 5 | 5 |
+| `b65a4c2b615e` | B7 | 441 | 7 | 5 | 5 |
+| `b8edf279b361` | C | 470 | 6 | 6 | 20 |
+
+Submitted but dominated: C0 (`0c80bfcc8e2b`, 1,390 XOR2, depth 6, maximum
+fanout 20, excess 1,038), the Phase 4 minimum-depth starting point, which
+Candidate C dominates on every objective.
+
+- Candidates A and B are the same netlist apart from the module name: the
+  seed-16,564 Candidate A already satisfies the depth-8 bound, and B's
+  refinement found nothing better. The frontier lists that circuit once with
+  both class labels.
+- B7 is the best trial of the completed depth-7 Kraft-bounded budget (seeds
+  40,000–49,999, 10,000 logged attempts, 6 accepted incumbents, best seed
+  40,505). Candidate C is the best trial of the completed depth-6 budget (seeds
+  50,000–59,999, 10,000 logged attempts, 10 accepted incumbents, best seed
+  56,140). Both passed the restricted parser, 97 exact vectors, 100,000 random
+  vectors, and formal equivalence, and each replays byte-for-byte from its seed.
+- `SPEC.md` Section 4 defines Candidate C as minimum depth first, then
+  minimum XOR2 count, so the depth-6 budget's 470-gate circuit is Candidate C.
+  The Phase 4 balanced-tree starting point, which has the same depth but 1,390
+  gates, is reported as C0 for provenance and is not on the frontier. B7 is a
+  bounded-depth (Candidate B family) search at depth 7; Candidate B remains
+  the depth-8 circuit because it has fewer gates. `build_results` now rejects
+  any submission set in which A, B, or C does not win its class objective.
+- Every recorded baseline is now dominated by a frontier circuit, including
+  Yosys/ABC (1,123 XOR2, depth 7) and `balanced_per_output`, which is
+  structurally identical to C0. This comparison reads the recorded
+  `results/baseline_metrics.csv`.
+- The superseded Phase 3 Candidate A (439 XOR2, depth 9, maximum fanout 6) is
+  dominated by the Phase 4 Candidate A and is not submitted.
 
 ## Not Started
 
-- Candidates B and C, broader stochastic/local optimization, depth-bounded
-  search, and exact-subcircuit search
-- A final multi-candidate Pareto frontier and final report
-- Literature and open-source comparison research
+- The final report
 
 ## Semantic Ambiguities or Discrepancies
 
@@ -324,8 +440,22 @@ Tool versions used locally:
 
 ## Unresolved Issues
 
-- Candidate A used the fixed 10,000-seed budget. Set and record separate budgets
-  for Candidates B and C and solver-backed searches before those phases begin.
+- C0 equals the balanced-tree baseline and is dominated by Candidate C.
+- Comparison research (`docs/comparison_research.md`, 2026-10-24) found one
+  directly comparable public figure: crcZero's unshared 1,390 XOR2 for
+  reflected CRC-32 at D=64, equal to our unshared baseline. Zhang–Tang (ISCAS
+  2021) report 469–503 XORs at CPD 6 for p = 64, but for a transformed
+  remainder rather than the standard update, so those figures are context
+  only. Campobello et al. (2003) and several older papers could not be read,
+  so a lower published standard-function count cannot be ruled out. Depth 6
+  is provably minimal (maximum row weight 52). No novelty or gate-count
+  optimality claim is supported.
+  Reporting must not present it as a search-derived improvement.
+- B7 and Candidate C are best found for their recorded 10,000-seed budgets,
+  not optimal circuits. The Kraft check makes the depth cap exact, but the
+  sharing choices remain greedy and seeded.
+- Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
+  separately recorded budget, not a continuation of the completed one.
 - Batch orchestration for formally checking multiple future candidates belongs
   to later phases; the Phase 1 runner already requires one explicit network per
   invocation and validates its module name.
@@ -379,4 +509,22 @@ Tool versions used locally:
 - [x] Candidate A reproduces byte-for-byte from seed 3,195.
 - [x] Candidate A, its independently recomputed metrics, and the one-entry
   frontier agree.
-- [x] Candidates B and C were not started.
+- [x] Candidates B and C were not started before G3 closed (they were run
+  in Phase 4).
+
+## Gate G5 Checklist
+
+- [x] The corrected exclusive-cone v2 budget completed: 20 cones from the
+  Phase 4 refined Candidate B, six-node cone limit, 1,000 ms per-query timeout.
+- [x] The input candidate passed 100,000 seeded random vectors and formal
+  equivalence before any cone query ran.
+- [x] Every replacement has exact local-function evidence and full-network
+  verification. No replacement was found, accepted, or integrated, and the
+  submitted networks are unchanged.
+- [x] The Z3 version, cone constraints, timeout, selected roots, and every
+  outcome are recorded in the checkpoint, output JSON, and append-only search
+  log.
+- [x] Thirteen UNSAT results are claimed only for their single-cone encodings.
+  The seven `unknown` timeouts are recorded as negative results, not
+  certificates.
+- [x] No global or whole-network optimality is claimed.

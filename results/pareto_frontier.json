@@ -1,55 +1,618 @@
 {
-  "candidate_scope": [
-    "A"
+  "baseline_comparison": [
+    {
+      "baseline": "independent_per_output",
+      "dominated_by": [
+        "1472a09886a8",
+        "b65a4c2b615e",
+        "b8edf279b361"
+      ],
+      "metrics": {
+        "maximum_depth": 51,
+        "maximum_fanout": 20,
+        "total_excess_fanout_above_4": 1038,
+        "xor2_count": 1390
+      }
+    },
+    {
+      "baseline": "balanced_per_output",
+      "dominated_by": [
+        "b8edf279b361"
+      ],
+      "metrics": {
+        "maximum_depth": 6,
+        "maximum_fanout": 20,
+        "total_excess_fanout_above_4": 1038,
+        "xor2_count": 1390
+      }
+    },
+    {
+      "baseline": "greedy_cse",
+      "dominated_by": [
+        "1472a09886a8",
+        "b65a4c2b615e"
+      ],
+      "metrics": {
+        "maximum_depth": 9,
+        "maximum_fanout": 6,
+        "total_excess_fanout_above_4": 11,
+        "xor2_count": 454
+      }
+    },
+    {
+      "baseline": "yosys_abc",
+      "dominated_by": [
+        "b65a4c2b615e",
+        "b8edf279b361"
+      ],
+      "metrics": {
+        "maximum_depth": 7,
+        "maximum_fanout": 15,
+        "total_excess_fanout_above_4": 536,
+        "xor2_count": 1123
+      }
+    }
   ],
   "entries": [
     {
-      "artifact": "results/candidate_a_min_area.v",
-      "candidate_class": "A",
+      "artifacts": [
+        "results/phase4/candidate_a_extended.v",
+        "results/phase4/candidate_b_refined.v"
+      ],
+      "candidate_classes": [
+        "A",
+        "B"
+      ],
+      "circuit_id": "1472a09886a8",
       "metrics": {
         "direct_output_alias_count": 32,
         "intermediate_node_count": 439,
-        "maximum_depth": 9,
-        "maximum_fanout": 6,
+        "maximum_depth": 8,
+        "maximum_fanout": 5,
         "output_depths": [
           8,
-          7,
-          7,
           8,
-          8,
-          7,
-          7,
-          8,
-          7,
-          7,
           8,
           7,
           8,
           8,
-          7,
-          7,
-          9,
-          8,
-          7,
           8,
           8,
           7,
-          7,
-          8,
           8,
           7,
+          7,
+          6,
           7,
           8,
           7,
           8,
+          7,
+          7,
+          7,
+          7,
           8,
-          9
+          8,
+          8,
+          8,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8
         ],
         "total_excess_fanout_above_4": 5,
         "total_fanout": 910,
         "xor2_count": 439
       },
-      "seed": 3195,
+      "structural_sha256": "1472a09886a8797900bedcfa3453a569d3729fd53d33fd855948a307e0955896"
+    },
+    {
+      "artifacts": [
+        "results/phase6/candidate_depth7_bounded.v"
+      ],
+      "candidate_classes": [
+        "B7"
+      ],
+      "circuit_id": "b65a4c2b615e",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 441,
+        "maximum_depth": 7,
+        "maximum_fanout": 5,
+        "output_depths": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "total_excess_fanout_above_4": 5,
+        "total_fanout": 914,
+        "xor2_count": 441
+      },
+      "structural_sha256": "b65a4c2b615e65a5b6c83cdeda85a1ac5620bb681c5cca029f896f709b15041b"
+    },
+    {
+      "artifacts": [
+        "results/phase6/candidate_depth6_bounded.v"
+      ],
+      "candidate_classes": [
+        "C"
+      ],
+      "circuit_id": "b8edf279b361",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 470,
+        "maximum_depth": 6,
+        "maximum_fanout": 6,
+        "output_depths": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "total_excess_fanout_above_4": 20,
+        "total_fanout": 972,
+        "xor2_count": 470
+      },
+      "structural_sha256": "b8edf279b361938883063e4218885c6dfe222e0449ee4d21c20d0d7d62fda312"
+    }
+  ],
+  "generated_by": "phase6-final-results-v1",
+  "objectives": [
+    "xor2_count",
+    "maximum_depth",
+    "maximum_fanout",
+    "total_excess_fanout_above_4"
+  ],
+  "phase5_exact_study": {
+    "accepted_replacements": 0,
+    "algorithm": "phase5-exact-exclusive-cone-v2",
+    "cones": 20,
+    "exploratory_v1_attempts_not_used_as_evidence": 20,
+    "input_candidate": "results/phase4/candidate_b_refined.v",
+    "max_cone_nodes": 6,
+    "scope": "UNSAT results apply only to their single-cone encodings",
+    "solver_status_counts": {
+      "unknown": 7,
+      "unsat": 13
+    },
+    "solver_version": "Z3 version 4.8.12 - 64 bit",
+    "study": "results/phase5/exact_exclusive_cone_study.json",
+    "timeout_ms": 1000
+  },
+  "schema_version": 2,
+  "specification_checks": {
+    "candidate_b_depth_bound": 8,
+    "distinct_pareto_candidates": 3,
+    "minimum_distinct_pareto_candidates": 3,
+    "minimum_distinct_pareto_candidates_met": true,
+    "reported_candidate_classes": [
+      "A",
+      "B",
+      "B7",
+      "C",
+      "C0"
+    ],
+    "required_candidate_classes": [
+      "A",
+      "B",
+      "C"
+    ],
+    "required_candidate_classes_reported": true
+  },
+  "submitted_candidates": [
+    {
+      "artifact": "results/phase4/candidate_a_extended.v",
+      "candidate_class": "A",
+      "circuit_id": "1472a09886a8",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 439,
+        "maximum_depth": 8,
+        "maximum_fanout": 5,
+        "output_depths": [
+          8,
+          8,
+          8,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8,
+          7,
+          7,
+          6,
+          7,
+          8,
+          7,
+          8,
+          7,
+          7,
+          7,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8
+        ],
+        "total_excess_fanout_above_4": 5,
+        "total_fanout": 910,
+        "xor2_count": 439
+      },
+      "module": "candidate_a_min_area",
+      "on_pareto_frontier": true,
+      "provenance": {
+        "algorithm": "gf2-bp-cse-depth-stochastic-v1",
+        "budgets": [
+          {
+            "checkpoint": "results/checkpoints/candidate_a_checkpoint.json",
+            "seed_count": 10000,
+            "seed_start": 0
+          },
+          {
+            "checkpoint": "results/checkpoints/phase4_candidate_a_checkpoint.json",
+            "seed_count": 10000,
+            "seed_start": 10000
+          }
+        ],
+        "logged_attempts": 20000,
+        "seed": 16564,
+        "winning_attempt_id": "candidate-a-gf2-bp-cse-depth-stochastic-v1-seed-16564"
+      },
+      "seed": 16564,
+      "structural_sha256": "1472a09886a8797900bedcfa3453a569d3729fd53d33fd855948a307e0955896",
+      "verification": {
+        "exact_vectors": 97,
+        "formal_equivalence": "passed",
+        "random_seed": 3274333933,
+        "random_vectors": 100000,
+        "structural": "passed"
+      }
+    },
+    {
+      "artifact": "results/phase4/candidate_b_refined.v",
+      "candidate_class": "B",
+      "circuit_id": "1472a09886a8",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 439,
+        "maximum_depth": 8,
+        "maximum_fanout": 5,
+        "output_depths": [
+          8,
+          8,
+          8,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8,
+          7,
+          7,
+          6,
+          7,
+          8,
+          7,
+          8,
+          7,
+          7,
+          7,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8,
+          8,
+          8,
+          8,
+          7,
+          8
+        ],
+        "total_excess_fanout_above_4": 5,
+        "total_fanout": 910,
+        "xor2_count": 439
+      },
+      "module": "candidate_b_depth8",
+      "on_pareto_frontier": true,
+      "provenance": {
+        "refinement": {
+          "accepted_improvements": 0,
+          "algorithm": "phase4-depth8-refinement-v1",
+          "checkpoint": "results/checkpoints/candidate_b_refinement.json",
+          "seed_count": 10000,
+          "seed_start": 20000
+        },
+        "source_seed": 16564,
+        "starting_point_artifact": "results/phase4/candidate_b_depth8.v",
+        "starting_point_attempt_id": "candidate-b-phase4-starting-point-seed-16564"
+      },
+      "seed": 16564,
+      "structural_sha256": "1472a09886a8797900bedcfa3453a569d3729fd53d33fd855948a307e0955896",
+      "verification": {
+        "exact_vectors": 97,
+        "formal_equivalence": "passed",
+        "random_seed": 3274333933,
+        "random_vectors": 100000,
+        "structural": "passed"
+      }
+    },
+    {
+      "artifact": "results/phase4/candidate_c_refined.v",
+      "candidate_class": "C0",
+      "circuit_id": "0c80bfcc8e2b",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 1390,
+        "maximum_depth": 6,
+        "maximum_fanout": 20,
+        "output_depths": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "total_excess_fanout_above_4": 1038,
+        "total_fanout": 2812,
+        "xor2_count": 1390
+      },
+      "module": "candidate_c_min_depth",
+      "on_pareto_frontier": false,
+      "provenance": {
+        "refinement": {
+          "accepted_improvements": 0,
+          "algorithm": "phase4-min-depth-refinement-v1",
+          "checkpoint": "results/checkpoints/candidate_c_refinement.json",
+          "seed_count": 10000,
+          "seed_start": 30000
+        },
+        "source_seed": null,
+        "starting_point_artifact": "results/phase4/candidate_c_min_depth.v",
+        "starting_point_attempt_id": "candidate-c-phase4-balanced-starting-point-v1"
+      },
+      "seed": null,
+      "structural_sha256": "0c80bfcc8e2be8a92e72e23c6481ae71277be12629f646704ab7d67099de78ae",
+      "verification": {
+        "exact_vectors": 97,
+        "formal_equivalence": "passed",
+        "random_seed": 3274333933,
+        "random_vectors": 100000,
+        "structural": "passed"
+      }
+    },
+    {
+      "artifact": "results/phase6/candidate_depth7_bounded.v",
+      "candidate_class": "B7",
+      "circuit_id": "b65a4c2b615e",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 441,
+        "maximum_depth": 7,
+        "maximum_fanout": 5,
+        "output_depths": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "total_excess_fanout_above_4": 5,
+        "total_fanout": 914,
+        "xor2_count": 441
+      },
+      "module": "candidate_depth7_bounded",
+      "on_pareto_frontier": true,
+      "provenance": {
+        "accepted_incumbents": 6,
+        "algorithm": "kraft-bounded-bp-cse-depth7-v1",
+        "checkpoint": "results/checkpoints/depth7_bounded_search.json",
+        "depth_cap": 7,
+        "logged_attempts": 10000,
+        "replayed_from_seed": true,
+        "seed": 40505,
+        "seed_count": 10000,
+        "seed_start": 40000,
+        "winning_attempt_id": "kraft-bounded-bp-cse-depth7-v1-seed-40505"
+      },
+      "seed": 40505,
+      "structural_sha256": "b65a4c2b615e65a5b6c83cdeda85a1ac5620bb681c5cca029f896f709b15041b",
+      "verification": {
+        "exact_vectors": 97,
+        "formal_equivalence": "passed",
+        "random_seed": 3274333933,
+        "random_vectors": 100000,
+        "structural": "passed"
+      }
+    },
+    {
+      "artifact": "results/phase6/candidate_depth6_bounded.v",
+      "candidate_class": "C",
+      "circuit_id": "b8edf279b361",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 470,
+        "maximum_depth": 6,
+        "maximum_fanout": 6,
+        "output_depths": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "total_excess_fanout_above_4": 20,
+        "total_fanout": 972,
+        "xor2_count": 470
+      },
+      "module": "candidate_depth6_bounded",
+      "on_pareto_frontier": true,
+      "provenance": {
+        "accepted_incumbents": 10,
+        "algorithm": "kraft-bounded-bp-cse-depth6-v1",
+        "checkpoint": "results/checkpoints/depth6_bounded_search.json",
+        "depth_cap": 6,
+        "logged_attempts": 10000,
+        "replayed_from_seed": true,
+        "seed": 56140,
+        "seed_count": 10000,
+        "seed_start": 50000,
+        "winning_attempt_id": "kraft-bounded-bp-cse-depth6-v1-seed-56140"
+      },
+      "seed": 56140,
+      "structural_sha256": "b8edf279b361938883063e4218885c6dfe222e0449ee4d21c20d0d7d62fda312",
       "verification": {
         "exact_vectors": 97,
         "formal_equivalence": "passed",
@@ -58,7 +621,5 @@
         "structural": "passed"
       }
     }
-  ],
-  "generated_by": "gf2-bp-cse-depth-stochastic-v1",
-  "schema_version": 1
+  ]
 }

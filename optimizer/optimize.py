@@ -723,9 +723,11 @@ def main() -> int:
         "--artifact", type=Path, default=Path("results/candidate_a_min_area.v")
     )
     parser.add_argument(
-        "--frontier", type=Path, default=Path("results/pareto_frontier.json")
+        "--frontier", type=Path, default=Path("results/phase3/candidate_a_frontier.json")
     )
-    parser.add_argument("--metrics", type=Path, default=Path("results/metrics.csv"))
+    parser.add_argument(
+        "--metrics", type=Path, default=Path("results/phase3/candidate_a_metrics.csv")
+    )
     parser.add_argument(
         "--search-log", type=Path, default=Path("results/search_log.jsonl")
     )

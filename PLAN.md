@@ -188,6 +188,10 @@ Any completed v2 negative results apply only to the stated single-output cone
 encodings and timeout; they do not establish global or whole-network
 optimality.
 
+G5 passed locally after the 20-cone v2 budget completed: 13 cones returned
+UNSAT, 7 returned `unknown` at the 1,000 ms timeout, and no replacement was
+integrated.
+
 ## Phase 6 — Final Verification, Comparison, and Reporting
 
 Scope:
@@ -199,6 +203,36 @@ Scope:
 - Research relevant published approaches and open-source generators.
 - Document failed or misleading approaches and comparison limitations.
 - Assess publishability without overstating novelty or optimality.
+
+`python3 -m verifier.build_results` regenerates `results/metrics.csv` and
+`results/pareto_frontier.json` only from re-verified submitted candidates and
+their completed checkpoint, search-log, and Phase 5 records. The Phase 3
+Candidate A records are kept under `results/phase3/`. The first regeneration
+found two distinct nondominated circuits (A and B share a netlist), short of the
+three that `SPEC.md` Section 4 requires; a further recorded search is needed
+before G6 can pass. That search is a separately recorded depth-7 bounded
+budget over seeds 40,000–49,999. Because no earlier attempt reached depth 7, it
+enforces the cap during construction with a per-output Kraft-inequality check
+rather than filtering unbounded results. A second, separately recorded depth-6
+budget over seeds 50,000–59,999 applies the same construction to the
+minimum-depth class.
+Both budgets completed. With their best trials (B7: 441 XOR2 at depth 7;
+Candidate C: 470 XOR2 at depth 6) the regenerated frontier has three distinct
+nondominated circuits, meeting the Section 4 minimum. The Phase 4 balanced-tree
+starting point is reported as C0 because Candidate C must minimize depth, then
+XOR2 count.
+
+`scripts/clean_rebuild.sh` performs the clean-checkout rebuild: it clones a
+revision, regenerates every baseline and submitted artifact from its recorded
+seed or construction, compares each byte-for-byte with the committed file,
+re-verifies every candidate and result record, and requires the checkout to be
+unchanged. CI runs it with `--in-place`. Seeded budgets and the Phase 5 study
+are cross-checked from their records rather than re-executed.
+
+The `SPEC.md` Section 11 comparison research is recorded in
+`docs/comparison_research.md`. It separates sourced facts from inference,
+lists the sources that could not be read, and states what would reverse its
+recommendation.
 
 Validation gate G6:
 

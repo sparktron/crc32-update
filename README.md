@@ -157,25 +157,26 @@ On resume, a complete logged seed prefix takes precedence over a stale
 checkpoint counter, preventing duplicate attempts after interruption between a
 log append and checkpoint update.
 
-Replay only the verified winning seed recorded in the frontier and compare the
-result byte-for-byte:
+The Phase 3 frontier and metrics records are kept under `results/phase3/`;
+the top-level result files are the Phase 6 regeneration described below.
+Replay only the verified winning seed recorded in the Phase 3 frontier and
+compare the result byte-for-byte:
 
 ```bash
 python3 -m optimizer.optimize \
-  --replay-frontier results/pareto_frontier.json \
+  --replay-frontier results/phase3/candidate_a_frontier.json \
   --artifact /tmp/candidate_a_min_area.v
 cmp results/candidate_a_min_area.v /tmp/candidate_a_min_area.v
 ```
 
-Re-run the complete Candidate A acceptance flow and cross-check
-`results/metrics.csv` and `results/pareto_frontier.json` against the independent
-measurement:
+Re-run the complete Phase 3 Candidate A acceptance flow and cross-check its
+frontier and metrics records against the independent measurement:
 
 ```bash
 python3 -m verifier.verify_candidate \
   --candidate results/candidate_a_min_area.v \
-  --frontier results/pareto_frontier.json \
-  --metrics results/metrics.csv \
+  --frontier results/phase3/candidate_a_frontier.json \
+  --metrics results/phase3/candidate_a_metrics.csv \
   --random-tests 100000 \
   --seed 0xC32A5EED
 ```
@@ -298,3 +299,134 @@ python3 -m optimizer.repair_search_log \
   --log results/search_log.jsonl \
   --backup results/checkpoints/phase4_search_log_pre_dedup.jsonl
 ```
+
+## Phase 6 Final Results
+
+`results/metrics.csv` and `results/pareto_frontier.json` are generated only by
+re-verifying the submitted Phase 4 candidates — A
+(`results/phase4/candidate_a_extended.v`), B
+(`results/phase4/candidate_b_refined.v`), and C
+(`results/phase4/candidate_c_refined.v`) — with the restricted parser, 97 exact
+vectors, 100,000 seeded random vectors, and formal equivalence. The command
+then cross-checks each candidate against its completed checkpoints and
+search-log records, confirms the Phase 5 v2 study integrated no replacement,
+and computes the nondominated set over distinct circuits. Circuits are
+identified by a name-independent structural hash, so a netlist that satisfies
+more than one class appears once on the frontier with every class label.
+
+```bash
+python3 -m verifier.build_results \
+  --random-tests 100000 \
+  --seed 0xC32A5EED
+```
+
+Add `--check` to confirm the committed files match regeneration without
+writing them; CI runs this form. Add `--require-spec-minimum` to exit nonzero
+while fewer than the three distinct nondominated circuits required by `SPEC.md`
+Section 4 exist.
+
+## Depth-7 Bounded Search
+
+No Candidate A, B, or C attempt reached depth 7 or lower: across 40,000 logged
+trials the shallowest seeded result was depth 8. A separately recorded
+depth-bounded search therefore enforces the cap during construction. Each
+sharing, rewrite, and finishing move is applied to an output only while that
+output's signal depths still satisfy the Kraft inequality
+`sum(2 ** depth) <= 2 ** cap`, which is the exact condition for an XOR2 tree
+within the cap to exist. Every new incumbent passes the restricted parser, 97
+exact vectors, 100,000 random vectors, and formal equivalence before
+acceptance.
+
+The budget is seeds 40,000 through 49,999, which do not overlap any earlier
+range. Run it manually; it resumes from its checkpoint and logged seed prefix
+after interruption and locks the canonical search log:
+
+```bash
+python3 -m optimizer.depth_bounded \
+  --depth-cap 7 \
+  --seed-start 40000 \
+  --seed-count 10000 \
+  --workers 8 \
+  --checkpoint results/checkpoints/depth7_bounded_search.json \
+  --artifact results/phase6/candidate_depth7_bounded.v \
+  --incumbent-dir results/checkpoints/depth7_bounded_incumbents \
+  --search-log results/search_log.jsonl \
+  --random-tests 100000 \
+  --random-seed 0xC32A5EED
+```
+
+Progress is in `completed_seeds` of the checkpoint and in the
+`kraft-bounded-bp-cse-depth7-v1` records of the search log. Rerunning the same
+command after completion changes nothing.
+
+## Depth-6 Bounded Search
+
+A second, separately recorded budget applies the same construction with a
+depth-6 cap, the minimum depth any XOR2 network for this function can reach.
+It is the minimum-depth (Candidate C) search counterpart to the balanced-tree
+starting point. It uses seeds 50,000 through 59,999, its own checkpoint,
+artifact, and incumbent directory, and the distinct
+`kraft-bounded-bp-cse-depth6-v1` algorithm name in the canonical search log:
+
+```bash
+python3 -m optimizer.depth_bounded \
+  --depth-cap 6 \
+  --seed-start 50000 \
+  --seed-count 10000 \
+  --workers 8 \
+  --checkpoint results/checkpoints/depth6_bounded_search.json \
+  --artifact results/phase6/candidate_depth6_bounded.v \
+  --incumbent-dir results/checkpoints/depth6_bounded_incumbents \
+  --search-log results/search_log.jsonl \
+  --random-tests 100000 \
+  --random-seed 0xC32A5EED
+```
+
+Run the depth-7 and depth-6 budgets one after the other: both lock the
+canonical search log, so a second concurrent invocation is refused. Without
+explicit paths, the checkpoint, artifact, incumbent directory, and seed start
+default to the recorded budget for the requested `--depth-cap`. A checkpoint
+from a different cap or seed range is rejected.
+
+Both budgets have completed. The depth-7 budget's best trial (seed 40,505) has
+441 XOR2 and the depth-6 budget's (seed 56,140) has 470 XOR2. They are
+submitted as B7 and Candidate C in `verifier/build_results.py`, which checks each
+against its completed checkpoint, full logged seed range, accepted incumbent,
+and a replay from its seed before regenerating the result files.
+
+## Clean-Checkout Rebuild
+
+One command clones a revision into a temporary directory and reruns the
+documented pipeline there, so local edits and untracked files cannot affect
+the result:
+
+```bash
+scripts/clean_rebuild.sh
+```
+
+Pass a revision (`scripts/clean_rebuild.sh <commit>`) to rebuild something
+other than `HEAD`, or `--in-place` to run in an already clean checkout, which
+is how CI runs it. The script:
+
+- runs every unit and rejection test;
+- regenerates the Phase 1 structural fixture and every baseline and compares
+  them byte-for-byte with the committed files (the Yosys/ABC baseline is only
+  reported if it differs, since it depends on the toolchain release);
+- regenerates every submitted candidate from its recorded seed or construction
+  (Phase 3 and Phase 4 Candidate A, the B and C0 starting points and their
+  unimproved refinements, B7, and Candidate C) and compares each with the
+  committed artifact;
+- re-verifies every candidate and requires the committed frontier and metrics
+  to match regeneration and to meet the `SPEC.md` minimum;
+- fails if the checkout was modified.
+
+The seeded search budgets and the Phase 5 SMT study are not re-executed, because
+they take hours. `verifier.build_results` instead cross-checks their completed
+checkpoints and complete search-log records. To replay a single artifact
+without logging an attempt:
+
+```bash
+python3 -m optimizer.phase4_candidates --replay-dir /tmp/phase4_replay
+python3 -m optimizer.depth_bounded --depth-cap 7 --replay-seed 40505 --artifact /tmp/depth7.v
+```
+
