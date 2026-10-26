@@ -2,14 +2,12 @@
 
 Last updated: 2026-10-24
 
-Current phase: Phase 6 — Final verification, comparison, and reporting (in
-progress)
+Current phase: Phase 6 — Final verification, comparison, and reporting complete
 
-Current gate: G6 open. G5 passed locally after the v2 exclusive-cone budget
-completed. The SPEC.md Section 4 minimum of three distinct nondominated
-circuits is now met, `scripts/clean_rebuild.sh` passes from a fresh clone, and
-the comparison research is in `docs/comparison_research.md`; the final report
-remains.
+Current gate: G6 passed locally on 2026-10-24. The final report is in
+`report.md`; all submitted artifacts, final metrics, provenance records, and
+the three-circuit frontier agree. The recorded fresh-clone rebuild passed;
+it was not repeated for this documentation-only closeout.
 
 ## Current Best Results
 
@@ -194,6 +192,9 @@ alias counts, runtime components, exact/random vector counts, and formal status.
 
 ## Files Created for Phase 6
 
+- `scripts/compare_crczero.py`
+- `results/external/crczero_comparison.json`
+- `report.md`
 - `docs/comparison_research.md`
 - `scripts/clean_rebuild.sh`
 - `optimizer/depth_bounded.py`
@@ -384,9 +385,11 @@ Candidate C dominates on every objective.
 - The superseded Phase 3 Candidate A (439 XOR2, depth 9, maximum fanout 6) is
   dominated by the Phase 4 Candidate A and is not submitted.
 
-## Not Started
+## Remaining Work
 
-- The final report
+No required final deliverable remains. Optional follow-up work is limited to
+new search budgets, broader literature access, and toolchain pinning; the
+limitations below remain in effect.
 
 ## Semantic Ambiguities or Discrepancies
 
@@ -441,24 +444,30 @@ Candidate C dominates on every objective.
 ## Unresolved Issues
 
 - C0 equals the balanced-tree baseline and is dominated by Candidate C.
+  Reporting must not present it as a search-derived improvement.
 - Comparison research (`docs/comparison_research.md`, 2026-10-24) found one
   directly comparable public figure: crcZero's unshared 1,390 XOR2 for
-  reflected CRC-32 at D=64, equal to our unshared baseline. Zhang–Tang (ISCAS
+  reflected CRC-32 at D=64, equal to our unshared baseline. Running crcZero
+  (commit `98c55152`) with `scripts/compare_crczero.py` confirmed it: all 32
+  equations equal the frozen matrix, and its chained and balanced
+  realizations pass exact, random, and formal checks and are structurally
+  identical to `independent_per_output` and `balanced_per_output`
+  (`results/external/crczero_comparison.json`). Zhang–Tang (ISCAS
   2021) report 469–503 XORs at CPD 6 for p = 64, but for a transformed
   remainder rather than the standard update, so those figures are context
   only. Campobello et al. (2003) and several older papers could not be read,
   so a lower published standard-function count cannot be ruled out. Depth 6
   is provably minimal (maximum row weight 52). No novelty or gate-count
   optimality claim is supported.
-  Reporting must not present it as a search-derived improvement.
 - B7 and Candidate C are best found for their recorded 10,000-seed budgets,
   not optimal circuits. The Kraft check makes the depth cap exact, but the
   sharing choices remain greedy and seeded.
 - Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
   separately recorded budget, not a continuation of the completed one.
-- Batch orchestration for formally checking multiple future candidates belongs
-  to later phases; the Phase 1 runner already requires one explicit network per
-  invocation and validates its module name.
+- Dedicated simulated annealing, output-subset resynthesis, and separately
+  budgeted fanout-duplication studies are not established as completed
+  experiments. The report explicitly limits its claims to the recorded
+  heuristic and exact-cone budgets.
 - Pinning or containerizing the Yosys/ABC toolchain is deferred; a different
   release may produce a different valid conventional-synthesis baseline.
 
@@ -528,3 +537,42 @@ Candidate C dominates on every objective.
   The seven `unknown` timeouts are recorded as negative results, not
   certificates.
 - [x] No global or whole-network optimality is claimed.
+
+
+## Gate G6 Checklist
+
+- [x] Final structural artifacts, independent metrics, frontier JSON, canonical
+  search log, checkpoints, comparison research, and `report.md` exist.
+- [x] All five submitted artifacts passed structural, 97-vector exact,
+  100,000-vector seeded random, and formal-equivalence checks in the final
+  result-builder check; required A/B/C labels and three distinct nondominated
+  circuits are present.
+- [x] Report candidate/baseline tables, circuit IDs, seeds, scalar metrics,
+  frontier membership, Phase 5 outcomes, and search budgets agree with the
+  result files and provenance. The matrix has 1,422 ones and maximum row
+  weight 52, supporting the depth-6 lower bound.
+- [x] README reproduction commands have recorded fresh-clone evidence:
+  `scripts/clean_rebuild.sh` passed 58 tests and artifact replay checks.
+  That full rebuild was not repeated during this documentation closeout.
+- [x] `report.md` covers semantics, methodology, results, failed approaches,
+  comparison limitations, publishability, and reproduction. No gate-count
+  optimality, physical-performance, or research-novelty claim is made.
+
+### Final closeout validation (2026-10-24)
+
+- `python3 -B -m verifier.build_results --check --require-spec-minimum`:
+  passed; all five submitted artifacts formally proved and three distinct
+  Pareto circuits confirmed. The read-only sandbox attempt could not create
+  temporary files; the rerun with temporary-file access passed.
+- `python3 -B -m unittest discover`: passed, 58 tests in 21.566 seconds.
+- Final report/artifact consistency check: passed; candidate and baseline
+  tables match CSV rows, frontier entries match CSV metrics and circuit IDs,
+  all 60,042 log IDs are unique, budgets and Phase 5 counts match the JSON,
+  and the recomputed matrix supports the stated depth bound.
+- `git diff --check` and the report trailing-whitespace check: passed.
+- The hours-long search budgets and full clean-clone rebuild were not rerun.
+  No numerical result or circuit was changed for this closeout.
+
+Next: review and commit the final documentation on `phase6-final-results`.
+New optimization or stronger publication claims require a separate experiment
+and updated comparison evidence.

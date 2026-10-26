@@ -120,6 +120,18 @@ depth, and fanout unchanged (see Inference).
 
 ### Observed in this repository
 
+- crcZero commit `98c55152fa9724990eac47aa8a0107557c7396ef` (version 1.2.0),
+  run 2026-10-24 in isolation by `scripts/compare_crczero.py` for
+  CRC-32/ISO-HDLC at D=64: its self-test passed, its 32 emitted `assign`
+  equations equal the frozen matrix bit-for-bit, and they contain 1,390 XOR
+  operators. Converted to the restricted XOR2 subset, the operators chained as
+  written give 1,390 XOR2 at depth 51 (maximum fanout 20, excess 1,038), and
+  balanced trees give 1,390 XOR2 at depth 6. Both passed 97 exact vectors,
+  100,000 random vectors with seed `0xC32A5EED`, and formal equivalence. Their
+  structural hashes equal those of `independent_per_output` and
+  `balanced_per_output` respectively. —
+  `results/external/crczero_comparison.json`.
+
 - Our frozen 32×96 transformation matrix (`generator/build_matrix.py`) has 485
   ones in its 32 CRC-state columns and 937 ones in its 64 data columns, for
   1,422 in total. Its row weights range from 34 to 52. Each `crc[i]` column
@@ -132,12 +144,12 @@ depth, and fanout unchanged (see Inference).
 ## Inference
 
 - **crcZero's 1,390 is directly comparable and equals our unshared baseline.**
-  Its table counts two-input XOR operations for reflected CRC-32 at a 64-bit
-  data width, it emits per-output equations without sharing, and 1,390 is
-  exactly the unshared count for our matrix. Against that generator's own
+  Running it confirmed that it computes exactly the frozen function and
+  emits per-output equations without sharing. Its circuits are our two
+  unshared baselines. Against that generator's own
   figure, A/B uses 31.6% of the XOR2 gates (439/1,390), B7 31.7%, and C 33.8%.
-  crcZero gives no depth. A balanced realization of its equations would have
-  depth 6, the same as Candidate C.
+  crcZero states no depth. Its output read literally is a depth-51 chain, and
+  balanced it has depth 6, the same as Candidate C.
 - **The Zhang–Tang feedback matrix is our state block.** Their A^p has 485
   ones, exactly the number in our 32 CRC-state columns. A^64 is the
   state-transition part of every 64-bit parallel CRC-32 update, so up to the
@@ -207,10 +219,6 @@ depth, and fanout unchanged (see Inference).
   convention behind the Zhang–Tang counts. Whether its XOR counts are
   strictly two-input, and how it treats the final state-plus-data XOR, is
   inferred from context only.
-- **The crcZero repository and generator were not downloaded or run.** Its
-  1,390 comes from its package description. Running it and normalizing its
-  output through our verifier would confirm the figure and its depth. That
-  needs approval to download and execute third-party code.
 - **The OutputLogic whitepaper** (OpenCores doc 1247248105, dated 2009-06-28)
   contained no extractable text, so whether that generator shares
   subexpressions is unconfirmed.
@@ -243,8 +251,7 @@ search.
 
 Reverse this if a source with full text available gives a directly comparable
 (standard function, XOR2, 64-bit) count. If it is lower, report ours as not
-improving on it. If the crcZero figure does not reproduce when run through
-our verifier, drop it from tier 1.
+improving on it.
 
 ## Verify
 
@@ -255,6 +262,6 @@ our verifier, drop it from tier 1.
   direct computations at commit `bc951f1`.
 - [x] Unresolved is non-empty.
 - [x] The recommendation names what would reverse it.
-- Not run: crcZero execution and normalization through our verifier, which
-  needs approval to download and run third-party code. Paywalled papers were
-  not read because no access was available.
+- Not run: paywalled papers were not read because no access was available.
+  (crcZero was run and verified on 2026-10-24 with the user's approval; see
+  Observed in this repository.)
