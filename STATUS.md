@@ -455,7 +455,13 @@ limitations below remain in effect.
   (`results/external/crczero_comparison.json`). Zhang–Tang (ISCAS
   2021) report 469–503 XORs at CPD 6 for p = 64, but for a transformed
   remainder rather than the standard update, so those figures are context
-  only. Campobello et al. (2003) and several older papers could not be read,
+  only. Campobello et al. (2003) was read on 2026-10-24 from the authors'
+  archived preprint. All of its XOR2 figures are for w = 32, not 64: 452
+  unshared and 370 with manual sharing, plus Shieh et al.'s 448 → 408 that it
+  quotes. It reports no 64-bit count. Shieh et al. (JISE 2001) was read on
+  2026-10-26. Its Type-I design is the standard update, but its widest case
+  is r = 32: 448 XOR2 at 15 levels cascaded, and 408 at 7 levels after
+  Synopsys. It reports no 64-bit count. Several older papers remain unread,
   so a lower published standard-function count cannot be ruled out. Depth 6
   is provably minimal (maximum row weight 52). No novelty or gate-count
   optimality claim is supported.
