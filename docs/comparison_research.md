@@ -87,6 +87,61 @@ depth, and fanout unchanged (see Inference).
     of u(x)·x^j / g(x) rather than u(x)·x^(n−k) / g(x). They argue that error
     detection is unaffected when encoder and decoder use the same mapping, and
     that the post-processing multiplication by T can therefore be removed.
+- Campobello, Patanè and Russo, "Parallel CRC Realization", IEEE Trans.
+  Computers 52(10):1312–1319, 2003, DOI
+  [10.1109/TC.2003.1234528](https://doi.org/10.1109/TC.2003.1234528). Read
+  2026-10-24 from the authors' own copy, archived by the Wayback Machine on
+  2006-05-10:
+  [tccrc.pdf](https://web.archive.org/web/20060510231352/http://ai.unime.it/~gp/publications/full/tccrc.pdf).
+  This is a 20-page dvips manuscript created 2004-11-12, not IEEE's typeset
+  version. Its SHA-1 (base32 `KD43KIJXI75J2SFQLZTCF75OI5GAYVCO`) matches the
+  digest in the archive's index. Page and section numbers below are the
+  manuscript's.
+  - The method allows the parallel width w to differ from the degree m. For
+    the w = m case, each next-state bit is an XOR over the bits (x_j ⊕ d_j),
+    and the paper notes that each x_j occurs at most once per equation. For
+    CRC-32 (Sect. IV-B, p. 13) it prints only the 32×32 matrix F^32, as hex
+    rows.
+  - Sect. V (pp. 15–16) compares with Shieh et al. [14] (J. Inf. Sci. Eng.,
+    May 2001) at **m = w = 32**:
+    - [14] reports 448 2-input XORs at 15 XOR levels for the matrix
+      realization before optimization, and 408 2-input XORs at 7 gate levels
+      after Synopsys optimization.
+    - Campobello et al. count the ones in F^32 and build each multi-input
+      XOR as a binary tree. That gives **452 2-input XORs** with "only 5
+      levels" before optimization.
+    - Sharing common XOR subexpressions by hand reduces this to **370 gates**,
+      with no depth stated. The authors had no Synopsys and give no
+      tool-optimized count.
+  - Table I (p. 16) reports FPGA LUTs and delays for w = m only. For CRC-32
+    it gives 162 LUTs and 7.3 ns.
+  - The paper gives **no XOR2 count or depth for w = 64**, and no XOR2 count
+    for any w ≠ m.
+- Shieh, Sheu, Chen and Lo, "A Systematic Approach for Parallel CRC
+  Computations", J. Inf. Sci. Eng. 17(3):445–461, 2001, DOI
+  10.1688/JISE.2001.17.3.6. Read 2026-10-26 from the journal's free PDF,
+  downloaded by hand from the
+  [JISE paper record](https://jise.iis.sinica.edu.tw/JISESearch/pages/View/PaperView.jsf?keyId=84_1287)
+  (17 pages, SHA-1 `09061b5a78a4c1d0094d7bf259b6c6c4b8e1eaac`).
+  - The "Type-I" design computes the standard remainder
+    S(x) = x^(n−k)·M(x) mod G(x) with a shift register over r message bits
+    per clock (Sects. 2–3.1). Sect. 3.1 assumes r is less than the polynomial
+    degree.
+  - Table 3 (Sect. 4.2, p. 459) gives Type-I results for the CRC-32
+    polynomial at r = 1, 2, 4, 8, 16 and 32. It counts 2-input XORs, and
+    critical path delay (CPD) as 2-input XOR levels. Values come from
+    Synopsys, and gate count (GC) is in 2-input NAND equivalents from the
+    COMPASS library.
+    - Cascaded blocks: (N_z − 2)·r + r XORs, where N_z is the number of
+      nonzero polynomial coefficients (15 for CRC-32). At r = 16 that is
+      224 XORs at CPD 8; at **r = 32, 448 XORs at CPD 15**.
+    - Flattened blocks, optimized by Synopsys for area and timing: 177 XORs
+      at CPD 4 for r = 16, and **408 XORs at CPD 7 for r = 32**.
+    - Multi-width designs: 354 XORs for the r ∈ {16, 32} block (CPD 8 at
+      r = 32) and 384 for r ∈ {4, 8, 16, 32} (CPD 13 at r = 32). Both also
+      need 32 multiplexers.
+  - The largest width is r = 32. There is **no 64-bit result**. The test
+    chip (TSMC 0.6 µm) supports r = 1, 2, 4 or 8.
 - Brenningmeyer, Göttsche and Ruckelshausen, "Enhanced Reliability Design
   Automation Methodology considering the Generation of Parallel CRC Modules
   based on arbitrary CRC Polynomials and unlimited Data-Word Widths" (Osnabrück
@@ -140,6 +195,13 @@ depth, and fanout unchanged (see Inference).
 - Unshared XOR trees need (row weight − 1) gates per output, which gives
   1,422 − 32 = 1,390 for our matrix. That matches our `independent_per_output`
   and `balanced_per_output` baselines (`results/baseline_metrics.csv`).
+- The CRC-32 F^32 rows printed by Campobello et al. contain 452 ones in
+  total, with row weights from 12 to 17. Recomputing F^32 for polynomial
+  0x04C11DB7 from the shift-register companion matrix reproduces the
+  published rows exactly once bit indices are reversed (their x_0 is our
+  x_31). Then 32 (x_j ⊕ d_j) gates plus Σ(row weight − 1) = 420 give 452,
+  which is the paper's count. — computed 2026-10-24 in a scratch script, not
+  committed.
 
 ## Inference
 
@@ -170,6 +232,30 @@ depth, and fanout unchanged (see Inference).
   A^64 block alone, they report 221 XORs at depth 5. We have not measured our
   networks' cost for that block in isolation, because our circuits share
   gates across the state and data blocks, so no comparison is drawn.
+- **Campobello et al. do not report a directly comparable count.** All of
+  their XOR2 figures (452 unshared, 370 with manual sharing, and the 448/408
+  they quote from Shieh et al.) are for w = 32 data bits. That is a different
+  function: 64 inputs, against 96 in ours. Their 452 is the w = 32 analogue
+  of our 1,390 unshared baseline. Manual sharing removes about 18% of it
+  (370/452), while our searched networks remove about 68% at w = 64
+  (439/1,390). The functions differ, so this shows their sharing was not
+  systematic. It is not a head-to-head comparison. The main risk below is
+  closed for this paper.
+- **Their "5 levels" omits the input XOR level.** Their heaviest F^32 row
+  has 17 ones, so that output depends on 34 inputs (17 x_j and 17 d_j). By
+  the 2^d bound used below, it needs depth ⌈log2 34⌉ = 6. A 17-input tree has
+  depth ⌈log2 17⌉ = 5, so the paper's figure must leave out the level that
+  forms x_j ⊕ d_j. Their 5 is therefore not a 2-input depth in our sense.
+- **Shieh et al. do not report a directly comparable count either.** Their
+  Type-I function is the standard CRC-32 update, but only up to r = 32
+  (64 inputs, against 96 in ours). Campobello et al. quote its r = 32
+  figures (448 at 15 levels, 408 at 7) correctly. The cascaded formula gives
+  14·32 = 448, and CRC-32's 0x04C11DB7 has 14 nonzero bits plus x^32, so
+  N_z = 15. At r = 32, the 408 after Synopsys is below Campobello's
+  unshared 452 but above their 370 with manual sharing. The 354-XOR
+  multi-width block is smaller still, at depth 8. None of these numbers
+  says anything directly about w = 64. The main risk below is closed for
+  this paper too.
 - **Bit reflection does not affect any of our metrics.** Reflection reverses
   bit order in the inputs and outputs. Relabelling inputs and outputs is a
   graph isomorphism of the XOR network, so XOR2 count, depth, and fanout are
@@ -206,13 +292,8 @@ depth, and fanout unchanged (see Inference).
 
 ## Unresolved
 
-- **Campobello, Patanè and Russo, "Parallel CRC Realization", IEEE Trans.
-  Computers 52(10), 2003** (DOI 10.1109/TC.2003.1234528) is the most-cited
-  parallel-CRC paper. Search snippets attribute two-input XOR counts and XOR
-  levels for CRC-32 to it, but the full text was not accessible (ResearchGate
-  returned HTTP 403), so no number from it is used here. It needs institutional
-  IEEE Xplore access; check whether its data width equals the polynomial
-  degree (32) rather than 64.
+- **Campobello et al. was read from the authors' preprint,** not IEEE's
+  typeset version, so the published article's numbers could differ slightly.
 - **Pei and Zukowski (IEEE Trans. Commun., 1992), Glaise (IBM J. R&D, 1997),
   Spachmann (IEEE D&T, 2001), and Zhang's reference [10]** (IEEE TCAS-II,
   2019) were not read. [10] defines the substructure-sharing method and CPD
@@ -236,13 +317,19 @@ Report the comparison in two tiers.
 2. **Context only.** Cite Zhang–Tang (469–503 XORs at CPD 6) with an explicit
    statement that it computes a transformed, non-standard remainder, that its
    state block matches ours exactly, and that its totals are close to ours.
+   Cite Campobello et al. (452 XOR2 unshared and 370 with manual sharing, at
+   w = 32) and Shieh et al. (448 cascaded at 15 levels and 408 after
+   Synopsys at 7 levels, at r = 32) as the standard 32-bit-width reference
+   points, and say that none of them is at our width.
 
 State that depth 6 is proven minimal by the row-weight bound. Make no
 gate-count optimality or novelty claim.
 
-Main risk: an unread paper (Campobello et al. or a later one) may report a
-standard-function 64-bit CRC-32 XOR2 count at or below ours, which would turn
-our result into a reproduction rather than an improvement.
+Main risk: an unread paper (one listed under Unresolved, or a later one) may
+report a standard-function 64-bit CRC-32 XOR2 count at or below ours, which
+would turn our result into a reproduction rather than an improvement.
+Campobello et al. and Shieh et al. have now been read, and neither reports
+a 64-bit count.
 
 Strongest case against: the closest published work (Zhang–Tang) reaches
 roughly the same gate counts at the same depth for a closely related problem.
@@ -262,6 +349,9 @@ improving on it.
   direct computations at commit `bc951f1`.
 - [x] Unresolved is non-empty.
 - [x] The recommendation names what would reverse it.
-- Not run: paywalled papers were not read because no access was available.
-  (crcZero was run and verified on 2026-10-24 with the user's approval; see
-  Observed in this repository.)
+- Not run: the paywalled papers still listed under Unresolved were not read
+  because no access was available. (crcZero was run and verified on
+  2026-10-24 with the user's approval; see Observed in this repository.
+  Campobello et al. was read on 2026-10-24 from the authors' archived
+  preprint, also with the user's approval. Shieh et al. was read on
+  2026-10-26 from a PDF the user downloaded by hand.)

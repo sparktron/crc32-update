@@ -225,8 +225,29 @@ Boyar, Find, and Peralta describe DCLO with arrival-depth and output-depth
 constraints in
 [Small Low-Depth Circuits for Cryptographic Applications](https://csrc.nist.gov/pubs/journal/2018/03/small-lowdepth-circuits-for-cryptographic-applicat/final).
 The local heuristic draws on established CSE/BP ideas; beating local
-baselines does not show a new optimization method. Campobello et al. and
-several older papers remain unread, and their results could change the
+baselines does not show a new optimization method.
+
+Campobello, Patanè, and Russo, "Parallel CRC Realization"
+([DOI](https://doi.org/10.1109/TC.2003.1234528)), read from the authors'
+[archived preprint](https://web.archive.org/web/20060510231352/http://ai.unime.it/~gp/publications/full/tccrc.pdf),
+report two-input XOR counts for CRC-32 only at a 32-bit data width:
+- 452 XORs as unshared binary trees.
+- 370 XORs after manual sharing of common subexpressions, with no depth
+  given.
+- 448 → 408 XORs after Synopsys optimization, quoted from Shieh et al.
+
+Shieh, Sheu, Chen, and Lo, "A Systematic Approach for Parallel CRC
+Computations" (J. Inf. Sci. Eng. 17(3):445–461, 2001,
+[journal record](https://jise.iis.sinica.edu.tw/JISESearch/pages/View/PaperView.jsf?keyId=84_1287)),
+compute the standard CRC-32 remainder at widths up to r = 32. At r = 32 they
+report 448 two-input XORs at 15 levels with cascaded blocks, and 408 at
+7 levels after Synopsys optimization.
+
+A 32-bit update has 64 inputs, against 96 here, so these numbers from both
+papers are reference points at a smaller width, not a comparison with our
+circuits. Neither paper gives a 64-bit count.
+
+Several older papers remain unread, and their results could change the
 assessment. The Zhang–Tang manuscript could not be fetched again during
 report preparation; its numerical summary relies on the dated repository
 research record.
