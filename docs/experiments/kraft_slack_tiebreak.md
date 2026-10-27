@@ -92,7 +92,15 @@ follow-up (200,000–209,999).
   - `results/checkpoints/kraft_slack/<run>_search.json`
   - `results/checkpoints/kraft_slack/<run>_incumbents/`
   - `results/kraft_slack/<run>.v`
-- Exact commands and code version: recorded below before stage 1 starts.
+- Exact commands, run from the repository root. Each takes the search-log
+  lock and resumes from its checkpoint.
+
+```bash
+python3 -m optimizer.kraft_slack --stage stage1 --depth-cap 7 --workers 16
+python3 -m optimizer.kraft_slack --stage stage1 --depth-cap 6 --workers 16
+# Stage 2, only at a cap whose stage-1 z <= -3:
+python3 -m optimizer.kraft_slack --stage stage2 --depth-cap <cap> --workers 16
+```
 
 ## Baselines
 
@@ -107,7 +115,24 @@ These come from the recorded logs:
 
 ## Code version and environment
 
-Filled in before stage 1 starts.
+- **Code:** commit `3281250`, which adds `optimizer/kraft_slack.py`, on
+  branch `crczero-verification`.
+  - `python3 -m unittest optimizer.test_kraft_slack` passed: 5 tests.
+  - Stage 1 starts only after the running ablation follow-up has finished
+    and been committed. The tree is then clean except for an untracked
+    `docs/reviews/` directory, which this experiment did not create and does
+    not read.
+- **Determinism gate, passed before any stage ran:**
+  - With `use_slack=False`, seeds 40,000–40,019 (cap 7), 50,000–50,019
+    (cap 6) and the B7 and C seeds render identically to
+    `search_seed_bounded`, 42 of 42. Their metrics equal the logged records.
+  - The B7 and C incumbents reproduce byte for byte.
+- **Smoke trials:** seeds 1–3 at each cap, which are not in any budget. They
+  checked correctness and timing only, at about 5–7 s per trial with the CPU
+  shared. Because they are not evidence, their values are not recorded here.
+- **Environment:** as in `dclo_depth_bounded.md`.
+  - Python 3.10.12, i9-10900K, Yosys 0.9, Z3 4.8.12.
+  - 16 workers. Trials are deterministic per seed.
 
 ## Observed
 
