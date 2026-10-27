@@ -145,7 +145,40 @@ These come from the recorded logs:
 
 ## Observed
 
-Not run yet.
+**Stage 1.**
+- Run: 2026-10-27, 20:30:57–20:38:26 UTC, at `a46d292`, with a clean tree
+  apart from the untracked `docs/reviews/`.
+- Both caps completed 1,000 contiguous seeds. Every record has
+  `verification_passed: true`, and every trial met its cap.
+- Raw records:
+  - `results/search_log.jsonl`, algorithm
+    `kraft-adaptive-tiebreak-half-depth<cap>-v1`.
+  - `results/checkpoints/kraft_adaptive/stage1_depth<cap>_*`.
+  - `results/kraft_adaptive/stage1_depth<cap>.v`.
+
+| Cap | Mean | SD | Median | p1 | p10 | Best (seed) | Against baseline: shift, z | Against slack variant: shift, z |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
+| 7 | 458.45 | 4.34 | 458 | 448 | 453 | 445 (260,301) | +2.41, z = +16.01 | +0.10, z = +0.82 (n = 1,000) |
+| 6 | 485.46 | 5.46 | 485 | 472 | 478 | 468 (280,995) | −4.97, z = −25.65 | −0.03, z = −0.06 (n = 11,000) |
+
+- **Cap-6 low tail:** 468 ×1, 469 ×2, 470 ×3. The 468 (seed 280,995) has
+  maximum fanout 6 and excess fanout 20.
+- **H1 refuted.** Both conditions failed. Against the slack variant, z = +0.82
+  where z ≤ −3 was needed. Against the baseline, z = +16.01 where z < +3 was
+  needed.
+- **H2 confirmed.** Against the slack variant at cap 6, z = −0.06 < +3.
+- **Stage-2 rule, as pre-registered:**
+  - Cap 7: z = +16.01 against the baseline, so not triggered. H3 at cap 7 is
+    **not tested**.
+  - Cap 6: z = −0.06 against the slack variant, so triggered: seeds
+    281,000–290,999.
+
+**Stage 2 (cap 6).**
+- Command:
+  `python3 -m optimizer.kraft_adaptive --stage stage2 --depth-cap 6 --workers 16`
+- Code: the commit that records these stage-1 results. It changes no code
+  after `6e1b731`.
+- Results: not run yet.
 
 ## Interpretation
 
