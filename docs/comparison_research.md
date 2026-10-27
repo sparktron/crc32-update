@@ -142,6 +142,28 @@ depth, and fanout unchanged (see Inference).
       need 32 multiplexers.
   - The largest width is r = 32. There is **no 64-bit result**. The test
     chip (TSMC 0.6 µm) supports r = 1, 2, 4 or 8.
+- Glaise, "A two-step computation of cyclic redundancy code CRC-32 for ATM
+  networks", IBM J. Res. Dev. 41(6):705–709, November 1997, DOI
+  [10.1147/rd.416.0705](https://doi.org/10.1147/rd.416.0705). Read 2026-10-26
+  from IBM's former free copy, archived by the Wayback Machine on 2003-04-28:
+  [glaise.pdf](https://web.archive.org/web/20030428094855/http://www.research.ibm.com/journal/rd/416/glaise.pdf).
+  It is a complete 5-page scan of the published article. Its SHA-1 (base32
+  `EPBXZYSTI5M6FQYZTKWGRUDANRIFQZJI`) matches the digest in the archive's
+  index.
+  - The data width is **8 bits per clock** (per-byte processing) throughout.
+  - It cites the author's earlier per-byte design (Glaise and Jacquart,
+    ICCD 1993) as needing the equivalent of 114 two-input XORs plus an
+    eight-input XOR operator for the next state.
+  - Step 1 divides the message by M123(x) = x^123 + x^111 + x^92 + x^84 +
+    x^64 + x^46 + x^23 + 1, a multiple of the CRC-32 polynomial chosen with
+    few terms spaced at least 8 apart. That byte-wise state machine needs
+    "only 56 two-input XORs" and 123 latches, with only two-input XORs.
+  - Step 2 divides the 123-bit result by the CRC-32 polynomial once at the
+    end of the message, as a combinational parity array. The paper prints
+    that array (its H matrix) for the alternative M53, whose widest row is a
+    13-input XOR. It gives no total two-input XOR count for step 2.
+  - The paper gives **no count for any width other than 8 bits**, and none
+    for 64.
 - Brenningmeyer, Göttsche and Ruckelshausen, "Enhanced Reliability Design
   Automation Methodology considering the Generation of Parallel CRC Modules
   based on arbitrary CRC Polynomials and unlimited Data-Word Widths" (Osnabrück
@@ -256,6 +278,15 @@ depth, and fanout unchanged (see Inference).
   multi-width block is smaller still, at depth 8. None of these numbers
   says anything directly about w = 64. The main risk below is closed for
   this paper too.
+- **Glaise does not report a comparable count.** Its fast step computes a
+  remainder modulo a degree-123 multiple of the CRC-32 polynomial, 8 bits at
+  a time, with a 123-bit state. That is a different function from the
+  32-bit CRC-32 state update, and the conversion to the standard remainder
+  happens only once per message. The 56 XORs equal the 7 lower terms of
+  M123 times 8 bits, which confirms the scan reading. They show how cheap a
+  sparse multiple makes the per-byte step. They cannot be set against any
+  standard-function count, ours included. The main risk below is closed for
+  this paper as well.
 - **Bit reflection does not affect any of our metrics.** Reflection reverses
   bit order in the inputs and outputs. Relabelling inputs and outputs is a
   graph isomorphism of the XOR network, so XOR2 count, depth, and fanout are
@@ -294,12 +325,22 @@ depth, and fanout unchanged (see Inference).
 
 - **Campobello et al. was read from the authors' preprint,** not IEEE's
   typeset version, so the published article's numbers could differ slightly.
-- **Pei and Zukowski (IEEE Trans. Commun., 1992), Glaise (IBM J. R&D, 1997),
-  Spachmann (IEEE D&T, 2001), and Zhang's reference [10]** (IEEE TCAS-II,
-  2019) were not read. [10] defines the substructure-sharing method and CPD
-  convention behind the Zhang–Tang counts. Whether its XOR counts are
-  strictly two-input, and how it treats the final state-plus-data XOR, is
-  inferred from context only.
+- **Pei and Zukowski, "High-speed parallel CRC circuits in VLSI" (IEEE
+  Trans. Commun. 40(4), 1992, DOI 10.1109/26.141415), Spachmann, "Automatic
+  generation of parallel CRC circuits" (IEEE D&T 18(3), 2001, DOI
+  10.1109/54.922807), and Zhang's reference [10]** were not read. [10] is
+  X. Zhang, "A Low-Power Parallel Architecture for Linear Feedback Shift
+  Registers", IEEE TCAS-II (online 2018), DOI 10.1109/TCSII.2018.2860934.
+  - [10] defines the substructure-sharing method and CPD convention behind
+    the Zhang–Tang counts. Whether its XOR counts are strictly two-input,
+    and how it treats the final state-plus-data XOR, is inferred from
+    context only.
+  - Zhang and Tang's ISCAS 2019 paper (their [11], DOI
+    10.1109/ISCAS.2019.8702081), the source of the LST design, is also
+    unread.
+  - On 2026-10-26, OpenAlex and Semantic Scholar listed all four as closed
+    access. NSF PAR, web search and archived author pages turned up no free
+    copy.
 - **The OutputLogic whitepaper** (OpenCores doc 1247248105, dated 2009-06-28)
   contained no extractable text, so whether that generator shares
   subexpressions is unconfirmed.
@@ -328,8 +369,8 @@ gate-count optimality or novelty claim.
 Main risk: an unread paper (one listed under Unresolved, or a later one) may
 report a standard-function 64-bit CRC-32 XOR2 count at or below ours, which
 would turn our result into a reproduction rather than an improvement.
-Campobello et al. and Shieh et al. have now been read, and neither reports
-a 64-bit count.
+Campobello et al., Shieh et al. and Glaise have now been read, and none of
+them reports a 64-bit count.
 
 Strongest case against: the closest published work (Zhang–Tang) reaches
 roughly the same gate counts at the same depth for a closely related problem.
@@ -354,4 +395,5 @@ improving on it.
   2026-10-24 with the user's approval; see Observed in this repository.
   Campobello et al. was read on 2026-10-24 from the authors' archived
   preprint, also with the user's approval. Shieh et al. was read on
-  2026-10-26 from a PDF the user downloaded by hand.)
+  2026-10-26 from a PDF the user downloaded by hand. Glaise was read on
+  2026-10-26 from IBM's former free copy, archived by the Wayback Machine.)
