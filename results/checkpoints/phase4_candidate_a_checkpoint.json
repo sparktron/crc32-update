@@ -49,7 +49,7 @@
   "incumbent_seed": 16564,
   "random_seed": 3274333933,
   "random_tests": 100000,
-  "search_log_path": "../search_log.jsonl",
+  "search_log_path": "../search_logs/candidate_a.jsonl",
   "seed_count": 10000,
   "seed_start": 10000,
   "status": "completed"

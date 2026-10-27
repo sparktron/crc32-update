@@ -26,6 +26,7 @@ from generator.build_matrix import (
     build_transformation_matrix,
 )
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import log_file_for
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -729,7 +730,7 @@ def main() -> int:
         "--metrics", type=Path, default=Path("results/phase3/candidate_a_metrics.csv")
     )
     parser.add_argument(
-        "--search-log", type=Path, default=Path("results/search_log.jsonl")
+        "--search-log", type=Path, default=log_file_for(ALGORITHM)
     )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(

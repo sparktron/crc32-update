@@ -22,6 +22,7 @@ import time
 
 from optimizer.optimize import _exclusive_search_lock
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import log_file_for
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -422,7 +423,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", type=Path, default=Path("results/phase4/candidate_b_refined.v"))
     parser.add_argument("--checkpoint", type=Path, default=Path("results/checkpoints/phase5_exact_exclusive_cones.json"))
-    parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
+    parser.add_argument("--search-log", type=Path, default=log_file_for(ALGORITHM))
     parser.add_argument("--output", type=Path, default=Path("results/phase5/exact_exclusive_cone_study.json"))
     parser.add_argument("--max-cone-nodes", type=int, default=6)
     parser.add_argument("--limit", type=int, default=20)

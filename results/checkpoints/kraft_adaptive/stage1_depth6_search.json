@@ -48,7 +48,7 @@
   "incumbent_seed": 280995,
   "random_seed": 3274333933,
   "random_tests": 100000,
-  "search_log_path": "results/search_log.jsonl",
+  "search_log_path": "results/search_logs/kraft_adaptive_tiebreak.jsonl",
   "seed_count": 1000,
   "seed_start": 280000,
   "status": "completed"

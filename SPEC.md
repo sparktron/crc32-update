@@ -304,7 +304,14 @@ Pareto frontier.
 
 ## 9. Search Log Contract
 
-`results/search_log.jsonl` is append-only during optimization. It begins empty;
+Optimization attempts are recorded in append-only JSONL logs, one file per
+experiment under `results/search_logs/`. `verifier/search_logs.py` assigns each
+algorithm to exactly one file.
+- Until 2026-10-27 the records were one file, `results/search_log.jsonl`.
+- The split moved every record unchanged and kept each file's order.
+- One file would otherwise pass GitHub's file-size limit.
+
+The log began empty;
 documentation setup and non-search implementation work are not optimization
 attempts. Each line represents exactly one completed or interrupted
 optimization attempt and is a standalone JSON object with at least:
@@ -343,7 +350,8 @@ A candidate is accepted only when all of the following are true:
 - All metrics are independently recomputed.
 - The candidate is reproducible from committed source, configuration, and
   recorded seeds.
-- Its search attempt is recorded in `results/search_log.jsonl`.
+- Its search attempt is recorded in its experiment's log under
+  `results/search_logs/`.
 
 Acceptance establishes validity under this specification, not global
 optimality or novelty.

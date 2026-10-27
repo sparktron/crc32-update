@@ -48,7 +48,7 @@
   "incumbent_seed": 246653,
   "random_seed": 3274333933,
   "random_tests": 100000,
-  "search_log_path": "results/search_log.jsonl",
+  "search_log_path": "results/search_logs/kraft_slack_tiebreak.jsonl",
   "seed_count": 10000,
   "seed_start": 241000,
   "status": "completed"

@@ -2,3 +2,4 @@ __pycache__/
 *.py[cod]
 results/checkpoints/*_pre_dedup.jsonl
 results/search_log.jsonl.lock
+results/search_logs/*.lock

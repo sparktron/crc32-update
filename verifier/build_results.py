@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import SEARCH_LOG_DIR, read_records
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -213,7 +214,8 @@ def structural_fingerprint(path: Path) -> str:
 
 
 def _log_records(search_log: Path) -> list[dict[str, object]]:
-    return [json.loads(line) for line in search_log.read_text().splitlines() if line]
+    """Read every per-experiment log in a directory, or one log file."""
+    return read_records(search_log)
 
 
 def _check_completed_checkpoint(checkpoint: dict[str, object], name: Path) -> None:
@@ -547,7 +549,7 @@ def _baseline_comparison(
 def build_results(
     random_tests: int = DEFAULT_RANDOM_TESTS,
     random_seed: int = DEFAULT_RANDOM_SEED,
-    search_log: Path = Path("results/search_log.jsonl"),
+    search_log: Path = SEARCH_LOG_DIR,
 ) -> tuple[dict[str, object], str]:
     records = _log_records(search_log)
     submitted = []
@@ -691,7 +693,10 @@ def main() -> int:
     )
     parser.add_argument("--metrics", type=Path, default=Path("results/metrics.csv"))
     parser.add_argument(
-        "--search-log", type=Path, default=Path("results/search_log.jsonl")
+        "--search-log",
+        type=Path,
+        default=SEARCH_LOG_DIR,
+        help="directory of per-experiment logs, or one log file",
     )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(

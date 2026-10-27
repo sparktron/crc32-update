@@ -34,7 +34,6 @@ jobs:
             SPEC.md
             PLAN.md
             STATUS.md
-            results/search_log.jsonl
           )
 
           for required_file in "${required_files[@]}"; do
@@ -43,6 +42,11 @@ jobs:
               exit 1
             }
           done
+
+          compgen -G "results/search_logs/*.jsonl" > /dev/null || {
+            echo "Missing per-experiment search logs in results/search_logs/" >&2
+            exit 1
+          }
 
       - name: Reject trailing whitespace
         shell: bash
@@ -54,7 +58,7 @@ jobs:
             exit 1
           fi
 
-      - name: Validate optimization search log
+      - name: Validate optimization search logs
         shell: bash
         run: |
           set -euo pipefail
@@ -63,7 +67,14 @@ jobs:
           import json
           from pathlib import Path
 
-          path = Path("results/search_log.jsonl")
+          from verifier.search_logs import LEGACY_SEARCH_LOG, SEARCH_LOG_DIR, log_file_for
+
+          # GitHub warns above 50 MB and rejects files above 100 MB.
+          size_limit = 50 * 1024 * 1024
+          if LEGACY_SEARCH_LOG.exists():
+              raise SystemExit(
+                  f"{LEGACY_SEARCH_LOG} must not exist; logs live in {SEARCH_LOG_DIR}/"
+              )
           required_fields = {
               "timestamp_utc",
               "attempt_id",
@@ -80,54 +91,71 @@ jobs:
           }
           attempt_ids = set()
 
-          for line_number, raw_line in enumerate(path.read_text().splitlines(), 1):
-              if not raw_line.strip():
-                  raise SystemExit(f"{path}:{line_number}: blank JSONL record")
+          log_paths = sorted(SEARCH_LOG_DIR.glob("*.jsonl"))
+          for path in log_paths:
+              if path.stat().st_size > size_limit:
+                  raise SystemExit(f"{path}: exceeds 50 MB; start a new experiment log")
 
-              try:
-                  record = json.loads(raw_line)
-              except json.JSONDecodeError as error:
-                  raise SystemExit(f"{path}:{line_number}: {error}") from error
+              for line_number, raw_line in enumerate(path.read_text().splitlines(), 1):
+                  if not raw_line.strip():
+                      raise SystemExit(f"{path}:{line_number}: blank JSONL record")
 
-              if not isinstance(record, dict):
-                  raise SystemExit(f"{path}:{line_number}: record must be an object")
+                  try:
+                      record = json.loads(raw_line)
+                  except json.JSONDecodeError as error:
+                      raise SystemExit(f"{path}:{line_number}: {error}") from error
 
-              missing_fields = sorted(required_fields - record.keys())
-              if missing_fields:
-                  missing = ", ".join(missing_fields)
-                  raise SystemExit(
-                      f"{path}:{line_number}: missing required fields: {missing}"
-                  )
+                  if not isinstance(record, dict):
+                      raise SystemExit(f"{path}:{line_number}: record must be an object")
 
-              attempt_id = record["attempt_id"]
-              if not isinstance(attempt_id, str) or not attempt_id:
-                  raise SystemExit(
-                      f"{path}:{line_number}: attempt_id must be a nonempty string"
-                  )
-              if attempt_id in attempt_ids:
-                  raise SystemExit(
-                      f"{path}:{line_number}: duplicate attempt_id: {attempt_id}"
-                  )
-              attempt_ids.add(attempt_id)
+                  missing_fields = sorted(required_fields - record.keys())
+                  if missing_fields:
+                      missing = ", ".join(missing_fields)
+                      raise SystemExit(
+                          f"{path}:{line_number}: missing required fields: {missing}"
+                      )
 
-              if not isinstance(record["parameters"], dict):
-                  raise SystemExit(
-                      f"{path}:{line_number}: parameters must be an object"
-                  )
-              if type(record["verification_passed"]) is not bool:
-                  raise SystemExit(
-                      f"{path}:{line_number}: verification_passed must be boolean"
-                  )
-              if type(record["accepted"]) is not bool:
-                  raise SystemExit(
-                      f"{path}:{line_number}: accepted must be boolean"
-                  )
-              if not record["accepted"] and not record["rejection_reason"]:
-                  raise SystemExit(
-                      f"{path}:{line_number}: rejected attempt needs a reason"
-                  )
+                  attempt_id = record["attempt_id"]
+                  if not isinstance(attempt_id, str) or not attempt_id:
+                      raise SystemExit(
+                          f"{path}:{line_number}: attempt_id must be a nonempty string"
+                      )
+                  if attempt_id in attempt_ids:
+                      raise SystemExit(
+                          f"{path}:{line_number}: duplicate attempt_id: {attempt_id}"
+                      )
+                  attempt_ids.add(attempt_id)
 
-          print(f"Validated {len(attempt_ids)} optimization attempt record(s).")
+                  if not isinstance(record["parameters"], dict):
+                      raise SystemExit(
+                          f"{path}:{line_number}: parameters must be an object"
+                      )
+                  if type(record["verification_passed"]) is not bool:
+                      raise SystemExit(
+                          f"{path}:{line_number}: verification_passed must be boolean"
+                      )
+                  if type(record["accepted"]) is not bool:
+                      raise SystemExit(
+                          f"{path}:{line_number}: accepted must be boolean"
+                      )
+                  if not record["accepted"] and not record["rejection_reason"]:
+                      raise SystemExit(
+                          f"{path}:{line_number}: rejected attempt needs a reason"
+                      )
+
+                  try:
+                      expected_path = log_file_for(record["algorithm"], SEARCH_LOG_DIR)
+                  except ValueError as error:
+                      raise SystemExit(f"{path}:{line_number}: {error}") from error
+                  if expected_path != path:
+                      raise SystemExit(
+                          f"{path}:{line_number}: {record['algorithm']} belongs in {expected_path}"
+                      )
+
+          print(
+              f"Validated {len(attempt_ids)} optimization attempt record(s) "
+              f"in {len(log_paths)} search log(s)."
+          )
           PY
 
       - name: Install formal verification tools

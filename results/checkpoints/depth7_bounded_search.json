@@ -48,7 +48,7 @@
   "incumbent_seed": 40505,
   "random_seed": 3274333933,
   "random_tests": 100000,
-  "search_log_path": "results/search_log.jsonl",
+  "search_log_path": "results/search_logs/kraft_bounded.jsonl",
   "seed_count": 10000,
   "seed_start": 40000,
   "status": "completed"

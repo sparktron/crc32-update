@@ -27,6 +27,7 @@ from optimizer.depth_bounded import _kraft, _kraft_after, run_bounded_search
 from optimizer.kraft_slack import _SlackBuilder
 from optimizer.optimize import Candidate, _exclusive_search_lock, _prune_operations
 from verifier.verify_network import DEFAULT_RANDOM_SEED, DEFAULT_RANDOM_TESTS
+from verifier.search_logs import log_file_for
 
 THETA = 0.5
 ALGORITHM_VERSION = "v1"
@@ -107,13 +108,18 @@ def main() -> int:
     parser.add_argument("--stage", choices=["stage1", "stage2"], required=True)
     parser.add_argument("--depth-cap", type=int, choices=[6, 7], required=True)
     parser.add_argument("--workers", type=int, default=1)
-    parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
+    parser.add_argument(
+        "--search-log",
+        type=Path,
+        help="defaults to this algorithm's file under results/search_logs/",
+    )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(
         "--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED
     )
     args = parser.parse_args()
     cap = args.depth_cap
+    args.search_log = args.search_log or log_file_for(algorithm_name(cap))
     seed_start, seed_count = STAGES[(args.stage, cap)]
     run = f"{args.stage}_depth{cap}"
     checkpoints = Path("results/checkpoints/kraft_adaptive")

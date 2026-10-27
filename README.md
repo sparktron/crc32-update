@@ -18,8 +18,13 @@ Experiment control documents:
   gates.
 - [`STATUS.md`](STATUS.md) records completed work, current best results, and
   unresolved issues.
-- [`results/search_log.jsonl`](results/search_log.jsonl) contains one
-  machine-readable record for every optimization attempt.
+- [`results/search_logs/`](results/search_logs) contains one
+  machine-readable record for every optimization attempt, in one append-only
+  JSONL file per experiment. `verifier/search_logs.py` maps each algorithm to
+  its file.
+  - Until 2026-10-27 these records were a single file,
+    `results/search_log.jsonl`. `python3 -m scripts.split_search_log` split it
+    without changing any record.
 
 ## Continuous Integration
 
@@ -201,7 +206,7 @@ python3 -m optimizer.optimize \
   --artifact results/phase4/candidate_a_extended.v \
   --frontier results/phase4/candidate_a_frontier.json \
   --metrics results/phase4/candidate_a_metrics.csv \
-  --search-log results/search_log.jsonl
+  --search-log results/search_logs/candidate_a.jsonl
 ```
 
 The configured Candidate A continuation and Candidate B/C refinement budgets
@@ -220,7 +225,7 @@ formal equivalence before being accepted into the search log:
 ```bash
 python3 -m optimizer.phase4_candidates \
   --output-dir results/phase4 \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase4_refinement.jsonl \
   --random-tests 100000 \
   --random-seed 0xC32A5EED
 ```
@@ -239,7 +244,7 @@ python3 -m optimizer.refine_candidates B \
   --seed-count 10000 \
   --workers 8 \
   --output-dir results/phase4 \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase4_refinement.jsonl \
   --checkpoint results/checkpoints/candidate_b_refinement.json
 
 python3 -m optimizer.refine_candidates C \
@@ -247,7 +252,7 @@ python3 -m optimizer.refine_candidates C \
   --seed-count 10000 \
   --workers 8 \
   --output-dir results/phase4 \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase4_refinement.jsonl \
   --checkpoint results/checkpoints/candidate_c_refinement.json
 ```
 
@@ -276,7 +281,7 @@ queries per cone can exceed Codex's command limit:
 python3 -m optimizer.phase5_exact \
   --candidate results/phase4/candidate_b_refined.v \
   --checkpoint results/checkpoints/phase5_exact_exclusive_cones.json \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase5_exact.jsonl \
   --output results/phase5/exact_exclusive_cone_study.json \
   --max-cone-nodes 6 \
   --limit 20 \
@@ -299,6 +304,9 @@ python3 -m optimizer.repair_search_log \
   --log results/search_log.jsonl \
   --backup results/checkpoints/phase4_search_log_pre_dedup.jsonl
 ```
+
+This one-time repair ran against the single log, before the 2026-10-27 split.
+Its Phase 4 records now live in `results/search_logs/phase4_refinement.jsonl`.
 
 ## Phase 6 Final Results
 
@@ -350,7 +358,7 @@ python3 -m optimizer.depth_bounded \
   --checkpoint results/checkpoints/depth7_bounded_search.json \
   --artifact results/phase6/candidate_depth7_bounded.v \
   --incumbent-dir results/checkpoints/depth7_bounded_incumbents \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/kraft_bounded.jsonl \
   --random-tests 100000 \
   --random-seed 0xC32A5EED
 ```
@@ -377,7 +385,7 @@ python3 -m optimizer.depth_bounded \
   --checkpoint results/checkpoints/depth6_bounded_search.json \
   --artifact results/phase6/candidate_depth6_bounded.v \
   --incumbent-dir results/checkpoints/depth6_bounded_incumbents \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/kraft_bounded.jsonl \
   --random-tests 100000 \
   --random-seed 0xC32A5EED
 ```
