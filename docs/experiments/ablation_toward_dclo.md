@@ -6,6 +6,11 @@ run. Completed 2026-10-27.
 - The consistency check passed.
 - The follow-up found the 440 to be a tail draw.
 
+**Log location.** The `results/search_log.jsonl` records cited below moved unchanged into
+`results/search_logs/ablation_toward_dclo.jsonl` on 2026-10-27, when the log was split into one file
+per experiment (`scripts/split_search_log.py`).
+
+
 **Background.** In `docs/experiments/dclo_depth_bounded.md`, DCLO did worse
 than the Kraft-bounded baseline (`kraft-bounded-bp-cse` v1) over 10,000 seeds
 per cap:

@@ -6,6 +6,11 @@ written or run. Completed 2026-10-27.
 - **H2 confirmed at cap 6:** 467 XOR2 at depth 6. H2 was not tested at
   cap 7.
 
+**Log location.** The `results/search_log.jsonl` records cited below moved unchanged into
+`results/search_logs/kraft_slack_tiebreak.jsonl` on 2026-10-27, when the log was split into one file
+per experiment (`scripts/split_search_log.py`).
+
+
 **Motivation.** In `docs/experiments/ablation_toward_dclo.md`, replacing the
 baseline's depth-aware tie-break with a uniform choice explained about 90–95%
 of DCLO's deficit (+4.81 XOR2 mean at cap 7, +8.01 at cap 6). If the

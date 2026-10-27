@@ -1,7 +1,16 @@
 # Experiment: a cap-adaptive (tight-row) Kraft-slack tie-break
 
 **Status:** pre-registered 2026-10-27, before any code for this variant was
-written or run.
+written or run. Completed 2026-10-27.
+- H1 refuted; H2 confirmed.
+- **H3 confirmed at cap 6:** a verified 466-gate network that dominates C.
+- Stage 2 stopped early at 3,862 of 10,000 seeds because of a trial failure
+  on seed 284,862. See Observed.
+
+**Log location.** The `results/search_log.jsonl` records cited below moved unchanged into
+`results/search_logs/kraft_adaptive_tiebreak.jsonl` on 2026-10-27, when the log was split into one file
+per experiment (`scripts/split_search_log.py`).
+
 
 **Motivation.** `docs/experiments/kraft_slack_tiebreak.md` found that putting
 the Kraft-slack cost ahead of the depth key:
@@ -178,12 +187,99 @@ These come from the recorded logs:
   `python3 -m optimizer.kraft_adaptive --stage stage2 --depth-cap 6 --workers 16`
 - Code: the commit that records these stage-1 results. It changes no code
   after `6e1b731`.
-- Results: not run yet.
+- Run: 2026-10-27, 20:39:12–20:55:03 UTC, at `5db74e9`. **It stopped early,
+  after 3,862 of 10,000 seeds.**
+  - The search exited with status 1:
+    `Adaptive search failed: no depth-feasible pair; Kraft invariant broken`.
+  - The failing trial is seed **284,862**, the first seed missing from the
+    contiguous logged prefix 281,000–284,861.
+  - It was reproduced in a separate worktree at `5db74e9`. The seed raises
+    the same RuntimeError under this variant *and* under the slack variant
+    (`search_seed_slack(284862, 6)`), which shares the finishing code. The
+    baseline completes the same seed.
+  - The run was not resumed. Trials are deterministic, so a resume would hit
+    the same seed again.
+- **Where the raw records are:**
+  - The log records went to `results/search_log.jsonl`. On 2026-10-27 they
+    moved unchanged into `results/search_logs/kraft_adaptive_tiebreak.jsonl`.
+  - Checkpoint: `results/checkpoints/kraft_adaptive/stage2_depth6_search.json`
+    (`status: running`, 3,862 completed).
+  - Incumbents: `results/checkpoints/kraft_adaptive/stage2_depth6_incumbents/`.
+  - The run never wrote its final artifact (`results/kraft_adaptive/stage2_depth6.v`),
+    because it stopped first.
+
+Results over the 3,862 completed seeds (281,000–284,861), all verified and all
+at depth ≤ 6:
+
+| Run | n | Mean | SD | Median | p1 | p10 | Best |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| adaptive stage 2 (incomplete) | 3,862 | 485.51 | 5.25 | 486 | 473 | 479 | **466** |
+| slack variant, cap 6 | 11,000 | 485.49 | 5.28 | 486 | — | — | 467 |
+
+- Against the slack variant: z = +0.28.
+- Low tail: 466 ×1, 467 ×1, 468 ×2, 469 ×2, 470 ×4.
+
+**The 466 network.**
+- Seed 281,125. Its file is
+  `results/checkpoints/kraft_adaptive/stage2_depth6_incumbents/seed_281125.v`.
+- Metrics: 466 XOR2, depth 6, maximum fanout 6, excess fanout 20, total
+  fanout 964.
+- It was re-verified separately. It replays byte for byte from its seed,
+  passes 97 exact vectors and 100,000 random vectors, and Yosys/SMTBMC/Z3
+  proves it equivalent.
+- **It dominates Candidate C** (470, 6, 6, 20, 972) on every recorded
+  objective.
+- It also dominates the 467 (fanout 7) and the 468 (seed 249,452) from the
+  slack variant.
+
+**Hypothesis outcomes.**
+- **H1 refuted.** This was settled at stage 1.
+- **H2 confirmed.** This was settled at stage 1.
+- **H3 confirmed at cap 6, with the run incomplete.** The pre-registered
+  condition was "≤ 466 XOR2 within 10,000 stage-2 seeds". It was met at seed
+  281,125, inside the 3,862 seeds that did run. A verified circuit's
+  existence does not depend on the unrun seeds. The run's distribution
+  statistics, however, cover only 3,862 seeds.
+- **H3 at cap 7 not tested**, because stage 2 was not triggered there.
 
 ## Interpretation
 
-Not run yet.
+Everything below is inference.
+
+- **At θ = 1/2 the adaptive rule is indistinguishable from the slack
+  variant at both caps.**
+  - Cap 7: z = +0.82 against the slack variant.
+  - Cap 6: z = −0.06 at stage 1 and z = +0.28 at stage 2.
+- **At cap 7 it keeps the slack variant's 2.4-gate loss.** The rule behaves
+  exactly like the baseline while no row is tight, so that loss is probably
+  not made in the early phase. It is probably made in late moves or in the
+  finishing pass, once rows are tight. This is untested.
+- **At cap 6 the 466 is a tail draw from the slack-family distribution.** It
+  is not evidence that the adaptive rule is better. Across 14,862 seeds of
+  this family at cap 6 (11,000 slack and 3,862 adaptive), one 466 and two
+  467s were found.
+- **The trial failure is a latent bug in the slack-family finishing pass.**
+  - It also hits the slack variant. It was simply not reached in that
+    variant's 11,000 seeds.
+  - The error message blames the Kraft invariant. The likely real cause:
+    every feasible merge in the row being finished produces a vector that
+    already exists as a deeper signal. The deduplicating `_target` then
+    reports that deeper depth, so no pair fits.
+  - The baseline shares the same code path but never hit the case in any of
+    its recorded trials. This is undiagnosed.
 
 ## Next decision
 
-Not run yet.
+- **Needs a decision by the project owner, not taken here.** Adopting the
+  verified **466-gate depth-6 network**, which dominates C, on the frontier.
+  It is better than every other depth-6 candidate found so far.
+- **Required before any further slack-family run:** fix the finishing-pass
+  failure on seed 284,862. For example, create a fresh gate when the existing
+  signal for a vector is too deep. The fix must carry a regression test on
+  that seed. Any run after the fix is a new algorithm version (`v2`) with its
+  own record. The aborted stage 2 is not resumed.
+- **Ruled out:** θ = 1/2 as a fix for cap 7. Other θ values were not tried,
+  by design.
+- **Not recommended:** further tie-break variants. The tie-break has been
+  shown to carry the effect. The remaining cap-7 loss sits in the late or
+  finishing phase.

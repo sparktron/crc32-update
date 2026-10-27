@@ -413,9 +413,22 @@ limitations below remain in effect.
     best is a verified **467-gate depth-6 network**. Seeds 249,452 (468) and
     248,720 (469) give verified networks that **dominate Candidate C**.
   - Cap 7: the mean is 2.3 gates worse.
+- **Cap-adaptive tie-break (2026-10-27).** Record:
+  `docs/experiments/kraft_adaptive_tiebreak.md`.
+  - With θ = 1/2 it matches the slack variant at both caps, so it does not
+    recover cap 7.
+  - Stage 2 at cap 6 stopped at 3,862 of 10,000 seeds because of a
+    slack-family finishing bug, reproduced on seed 284,862. That bug must be
+    fixed before any further slack-family run.
+  - Seed 281,125 gave a verified **466-gate depth-6 network** (fanout 6,
+    excess 20) that **dominates Candidate C**.
+- **Search logs split (2026-10-27).** The single 81 MB
+  `results/search_log.jsonl` is now one file per experiment under
+  `results/search_logs/`. Every record is unchanged.
 - **Pending a project-owner decision:** whether to adopt the 440 (depth 7)
-  and 467/468/469 (depth 6) networks on the frontier. Until then, the
-  frontier and `report.md` are unchanged.
+  and 466 (depth 6) networks on the frontier. The 466 dominates every other
+  depth-6 network found. Until then, the frontier and `report.md` are
+  unchanged.
 
 ## Semantic Ambiguities or Discrepancies
 

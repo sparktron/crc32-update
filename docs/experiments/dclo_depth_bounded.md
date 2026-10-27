@@ -3,6 +3,11 @@
 **Status:** pre-registered 2026-10-27, before any DCLO trial was run.
 Completed 2026-10-27. **Hypothesis refuted at both caps.**
 
+**Log location.** The `results/search_log.jsonl` records cited below moved unchanged into
+`results/search_logs/dclo.jsonl` on 2026-10-27, when the log was split into one file
+per experiment (`scripts/split_search_log.py`).
+
+
 ## Hypothesis
 
 A faithful implementation of DCLO (Boyar, Find and Peralta, *Small Low-Depth
