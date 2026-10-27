@@ -136,7 +136,40 @@ These come from the recorded logs:
 
 ## Observed
 
-Not run yet.
+**Stage 1.**
+- Run: 2026-10-27, 19:16:14–19:24:58 UTC, at code `a1e0493`, with a clean
+  tree apart from the untracked `docs/reviews/`.
+- Both caps completed 1,000 contiguous seeds. Every record has
+  `verification_passed: true`, and every trial met its cap.
+- Raw records:
+  - `results/search_log.jsonl`, algorithm `kraft-slack-tiebreak-depth<cap>-v1`.
+  - `results/checkpoints/kraft_slack/stage1_depth<cap>_*`.
+  - `results/kraft_slack/stage1_depth<cap>.v`.
+
+Shift is the stage-1 mean minus the baseline's 10,000-seed mean. z is against
+those 10,000 seeds.
+
+| Cap | Mean | Shift | z | SD | Median | p1 | p10 | Best (seed) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 7 | 458.36 | **+2.31** | +15.04 | 4.32 | 458 | 449 | 453 | 445 (220,445) |
+| 6 | 485.38 | **−5.05** | −26.20 | 5.35 | 485 | 474 | 478 | 470 (240,289) |
+
+- **Cap-6 best (seed 240,289):** 470 XOR2, maximum fanout 6, excess fanout
+  24. Candidate C (470, fanout 6, excess 20) still dominates it on excess
+  fanout.
+- **H1 refuted.** It required z ≤ −3 at both caps. Cap 7 moved the wrong way,
+  z = +15.0.
+- **Stage-2 rule, as pre-registered:**
+  - Triggered at cap 6 (z = −26.2): seeds 241,000–250,999.
+  - Not triggered at cap 7, so H2 at cap 7 is **not tested**.
+- The cap-6 stage-2 command and code are recorded below before it starts.
+
+**Stage 2 (cap 6).**
+- Command:
+  `python3 -m optimizer.kraft_slack --stage stage2 --depth-cap 6 --workers 16`
+- Code: the commit that records these stage-1 results. It changes no code
+  after `3281250`.
+- Results: not run yet.
 
 ## Interpretation
 
