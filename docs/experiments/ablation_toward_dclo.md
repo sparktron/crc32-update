@@ -112,7 +112,20 @@ range leaves room for a 10,000-seed extension.
 - Checkpoints: `results/checkpoints/ablation/<arm>_depth<cap>_search.json`.
 - Incumbents: `results/checkpoints/ablation/<arm>_depth<cap>_incumbents/`.
 - Best artifacts: `results/ablation/<arm>_depth<cap>.v`.
-- Exact commands and code version: recorded below before the run starts.
+- Exact commands, run from the repository root one after the other (each
+  takes the search-log lock, and each resumes from its checkpoint):
+
+```bash
+for arm in tiebreak second_best finish rewrite all; do
+  for cap in 7 6; do
+    python3 -m optimizer.ablation --arm "$arm" --depth-cap "$cap" --seed-count 1000 --workers 16
+  done
+done
+```
+
+- **Finishing fallbacks:** counted after the run by replaying every seed of
+  the `finish` and `all` arms with `optimizer.ablation.build_ablated` and
+  reading `finish_fallback_rows`.
 
 ## Baselines
 
@@ -130,7 +143,24 @@ seed, 40,505, falls inside the first 1,000.
 
 ## Code version and environment
 
-Filled in before the run starts.
+- **Code:** commit `fac8d3a` on branch `crczero-verification`, with a clean
+  tree; this record is committed on top of it before the run.
+  - `python3 -m unittest optimizer.test_ablation optimizer.test_dclo
+    optimizer.test_depth_bounded` passed: 16 tests.
+- **Determinism gate, passed before any arm ran:**
+  - Arm `none` re-rendered seeds 40,000–40,019 (cap 7) and 50,000–50,019
+    (cap 6), plus the B7 and C seeds. All 42 renders are identical to
+    `search_seed_bounded`, and their metrics equal the logged records.
+  - The B7 (seed 40,505) and C (seed 56,140) incumbents reproduce byte for
+    byte.
+- **Smoke trials:** one per arm and cap, at seed 1, which is not in any
+  budget. These checked correctness and timing only, at about 1.6–3.5 s per
+  trial.
+- **Environment:** the same as `dclo_depth_bounded.md`.
+  - Python 3.10.12, i9-10900K (10 cores, 20 threads), 31 GB RAM.
+  - Yosys 0.9, yosys-smtbmc, Z3 4.8.12.
+  - 16 workers. Trials are deterministic per seed, and the worker count
+    does not affect results.
 
 ## Observed
 
