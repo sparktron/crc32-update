@@ -1,6 +1,7 @@
 # Experiment: DCLO on the frozen 32×96 matrix at depth caps 6 and 7
 
 **Status:** pre-registered 2026-10-27, before any DCLO trial was run.
+Completed 2026-10-27. **Hypothesis refuted at both caps.**
 
 ## Hypothesis
 
@@ -128,12 +129,82 @@ In each budget, only one seed reached the best value.
 
 ## Observed
 
-Not run yet.
+Both budgets ran to completion on 2026-10-27 at code `7e16680` (`a8b7ca0`
+plus this record), with exit code 0:
+- Cap 7: 14:35:23–14:57:20 UTC, wall time 21 min 57 s.
+- Cap 6: 14:57:20–15:19:28 UTC, wall time 22 min 7 s.
+
+Raw results:
+- `results/search_log.jsonl`: one record per seed, 20,000 new records, all
+  with `verification_passed: true`.
+- `results/checkpoints/depth{7,6}_dclo_search.json`.
+- `results/checkpoints/depth{7,6}_dclo_incumbents/`: 8 accepted incumbents
+  per cap.
+- `results/phase7/candidate_depth{7,6}_dclo.v`.
+
+All of these are tracked in git.
+
+| Budget | Seeds | Best (seed) | p1 | p10 | Median | Mean | SD | Max | Mean runtime |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `dclo-kraft-depth7-v1` | 70,000–79,999 | **445** (72,230) | 451 | 456 | 462 | 461.42 | 4.41 | 476 | 2.11 s |
+| baseline cap 7 (B7) | 40,000–49,999 | 441 (40,505) | 446 | 450 | 456 | 456.05 | 4.29 | 472 | 4.84 s |
+| `dclo-kraft-depth6-v1` | 80,000–89,999 | **477** (87,829) | 486 | 492 | 499 | 498.90 | 5.34 | 520 | 2.12 s |
+| baseline cap 6 (C) | 50,000–59,999 | 470 (56,140) | 478 | 484 | 490 | 490.43 | 5.24 | 510 | 3.47 s |
+
+- **Best DCLO networks:**
+  - Seed 72,230: 445 XOR2, depth 7, maximum fanout 6, excess fanout 8.
+  - Seed 87,829: 477 XOR2, depth 6, maximum fanout 6, excess fanout 22.
+- **Verification of the best networks:**
+  - Each replays byte-for-byte from its seed.
+  - Each passes 97 exact vectors, 100,000 random vectors (seed 0xC32A5EED),
+    and the Yosys/SMTBMC/Z3 formal proof. These checks ran in the search and
+    were re-run separately afterwards.
+- **Domination:** B7 dominates the cap-7 network and Candidate C dominates
+  the cap-6 network on every recorded objective.
+- **Frontier:** `python3 -m verifier.build_results --check
+  --require-spec-minimum` still passes with the same 3 frontier circuits.
+- **Per-seed comparison** (Mann–Whitney, normal approximation):
+  - Cap 7: a random DCLO seed gives more gates than a random baseline seed
+    with probability 0.807 (z = 75.2).
+  - Cap 6: the same probability is 0.872 (z = 91.0).
+  - Only 0.64% (cap 7) and 0.41% (cap 6) of DCLO seeds reach the baseline's
+    10th percentile.
+- **Runtimes are not comparable.** DCLO ran with 16 workers on 10 physical
+  cores; the pilot took about 1 s per seed alone. The baseline's worker count
+  for its recorded runtimes is not in this record.
 
 ## Interpretation
 
-Not run yet.
+Everything below is inference.
+
+- **Refuted.** DCLO, as specified in the paper and given the same 10,000-seed
+  budget, does not improve on B7 or Candidate C. Its whole distribution is
+  shifted up by about 6 gates at cap 7 and about 9 at cap 6. That is far
+  outside seed noise: the SDs are about 4–5, with 10,000 seeds each.
+- **Likely cause, untested:** the baseline's deterministic tie-break.
+  - Among pairs with equal counts, the baseline prefers the one whose new
+    gate is shallower, then the lower-weight result.
+  - Under a tight cap, uniform random choice probably creates deeper gates
+    early. That uses up rows' Kraft slack and blocks later sharing.
+  - The larger gap at cap 6, where slack is scarcer, fits this explanation.
+    But tie-breaking was not separated from the other three differences
+    (second-best rate, finishing rule, rewrite scope), so this is a
+    hypothesis, not a finding.
+- **Rewrite scope:** DCLO's flips reach only gate-input triples, while the
+  baseline reuses any existing signal. This may also contribute; also
+  untested.
+- **Literature comparison:** this result does not show DCLO is weak in
+  general. It was designed and tuned on matrices far smaller than 32×96.
 
 ## Next decision
 
-Not run yet.
+- **Ruled out:** DCLO as published, as a way to beat B7 or C at a matched
+  budget. Larger DCLO budgets are not worth running: the baseline's whole
+  distribution is better.
+- **Open, if more search is wanted:** an ablation that changes one baseline
+  component at a time toward DCLO, starting with the tie-break. That would
+  show which baseline choice carries the advantage, and whether a stronger
+  depth-aware tie-break, such as minimizing the Kraft slack used, beats 441
+  or 470.
+- **Unchanged:** the frontier (A/B 439 at depth 8, B7 441 at depth 7, C 470
+  at depth 6), and every gate-count claim in `report.md`.

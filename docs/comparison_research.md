@@ -319,7 +319,13 @@ depth, and fanout unchanged (see Inference).
   that controls both ends would likely give gate counts below ours. That would
   be a different, non-interoperable function and outside this experiment.
 - Depth-constrained heuristics such as DCLO might find depth-6 or depth-7
-  networks below 470 or 441 gates. They have not been run on this matrix.
+  networks below 470 or 441 gates. **Tested 2026-10-27 for DCLO as
+  published: refuted.**
+  - With 10,000 seeds per cap, the best results were 445 XOR2 at depth 7
+    and 477 at depth 6.
+  - The per-seed medians were 6 and 9 gates worse than the Kraft-bounded
+    baseline. See `docs/experiments/dclo_depth_bounded.md`.
+  - Other depth-constrained heuristics remain untested.
 
 ## Unresolved
 

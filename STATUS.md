@@ -391,6 +391,16 @@ No required final deliverable remains. Optional follow-up work is limited to
 new search budgets, broader literature access, and toolchain pinning; the
 limitations below remain in effect.
 
+- **DCLO budget (2026-10-27), hypothesis refuted.** DCLO as published (Boyar,
+  Find and Peralta, 2019) was run with 10,000 seeds per cap.
+  - Seeds 70,000–79,999 at depth 7 and 80,000–89,999 at depth 6.
+  - Algorithms `dclo-kraft-depth{7,6}-v1`, implemented in `optimizer/dclo.py`.
+  - Best results: 445 XOR2 at depth 7 and 477 at depth 6. B7 and Candidate C
+    dominate both, so the frontier is unchanged.
+  - Per-seed medians were 462 and 499, against the baseline's 456 and 490.
+  - The pre-registered record, raw-result paths and the open ablation are in
+    `docs/experiments/dclo_depth_bounded.md`.
+
 ## Semantic Ambiguities or Discrepancies
 
 - The permitted structural representation is intentionally a strict,
