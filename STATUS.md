@@ -400,6 +400,22 @@ limitations below remain in effect.
   - Per-seed medians were 462 and 499, against the baseline's 456 and 490.
   - The pre-registered record, raw-result paths and the open ablation are in
     `docs/experiments/dclo_depth_bounded.md`.
+- **Ablation toward DCLO (2026-10-27).** Record:
+  `docs/experiments/ablation_toward_dclo.md`.
+  - The depth-aware tie-break accounts for 90–95% of DCLO's deficit. The
+    other components each move the mean by at most 0.35 gates.
+  - One ablation seed (160,832) gave a verified **440-gate depth-7 network**
+    that dominates B7. A 10,000-seed follow-up showed it is a tail draw
+    (mean 456.05, the same as the baseline).
+- **Kraft-slack tie-break (2026-10-27).** Record:
+  `docs/experiments/kraft_slack_tiebreak.md`.
+  - Cap 6: the mean is 5 gates lower, and 17 of 10,000 seeds beat 470. The
+    best is a verified **467-gate depth-6 network**. Seeds 249,452 (468) and
+    248,720 (469) give verified networks that **dominate Candidate C**.
+  - Cap 7: the mean is 2.3 gates worse.
+- **Pending a project-owner decision:** whether to adopt the 440 (depth 7)
+  and 467/468/469 (depth 6) networks on the frontier. Until then, the
+  frontier and `report.md` are unchanged.
 
 ## Semantic Ambiguities or Discrepancies
 
