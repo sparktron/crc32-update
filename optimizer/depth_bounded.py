@@ -21,7 +21,7 @@ import json
 from pathlib import Path
 import random
 import time
-from typing import Sequence
+from typing import Callable, Sequence
 
 from generator.build_matrix import INPUT_COUNT, build_transformation_matrix
 from optimizer.optimize import (
@@ -259,11 +259,14 @@ def search_seed_bounded(
     )
 
 
+Trial = Callable[[int, int], Candidate]
+
+
 def _worker(
-    seed: int, depth_cap: int, module_name: str
+    seed: int, depth_cap: int, module_name: str, trial: Trial = search_seed_bounded
 ) -> tuple[int, dict[str, object], str, float]:
     started = time.perf_counter()
-    candidate = search_seed_bounded(seed, depth_cap)
+    candidate = trial(seed, depth_cap)
     metrics = independently_check(candidate).to_dict()
     metrics.pop("unreachable_nodes")
     return seed, metrics, candidate.render(module_name), time.perf_counter() - started
@@ -315,15 +318,24 @@ def run_bounded_search(
     log_path: Path,
     random_tests: int,
     random_seed: int,
+    *,
+    trial: Trial = search_seed_bounded,
+    algorithm: str | None = None,
+    module_name: str | None = None,
 ) -> tuple[int | None, dict[str, object] | None]:
-    """Search a reproducible seed range and keep the best verified bounded network."""
+    """Search a reproducible seed range and keep the best verified bounded network.
+
+    ``trial`` builds one seeded network under the cap. The defaults run the
+    recorded Kraft-bounded search; other trial functions log under their own
+    ``algorithm`` name and render under their own ``module_name``.
+    """
 
     if seed_count <= 0 or workers <= 0:
         raise ValueError("seed_count and workers must be positive")
     if random_tests < DEFAULT_RANDOM_TESTS:
         raise ValueError(f"random_tests must be at least {DEFAULT_RANDOM_TESTS}")
-    algorithm = algorithm_name(depth_cap)
-    module_name = f"candidate_depth{depth_cap}_bounded"
+    algorithm = algorithm or algorithm_name(depth_cap)
+    module_name = module_name or f"candidate_depth{depth_cap}_bounded"
     configuration = {
         "algorithm": algorithm,
         "depth_cap": depth_cap,
@@ -346,7 +358,7 @@ def run_bounded_search(
     accepted = [record for record in attempts if record.get("accepted")]
     if accepted:
         best_seed = int(accepted[-1]["seed"])
-        replay = search_seed_bounded(best_seed, depth_cap)
+        replay = trial(best_seed, depth_cap)
         best_metrics = independently_check(replay).to_dict()
         best_metrics.pop("unreachable_nodes")
         if best_metrics != accepted[-1].get("final_metrics"):
@@ -369,9 +381,11 @@ def run_bounded_search(
     seeds = range(seed_start + completed, seed_start + seed_count)
     executor = ProcessPoolExecutor(max_workers=workers) if workers > 1 else None
     results = (
-        executor.map(_worker, seeds, repeat(depth_cap), repeat(module_name), chunksize=1)
+        executor.map(
+            _worker, seeds, repeat(depth_cap), repeat(module_name), repeat(trial), chunksize=1
+        )
         if executor
-        else (_worker(seed, depth_cap, module_name) for seed in seeds)
+        else (_worker(seed, depth_cap, module_name, trial) for seed in seeds)
     )
     try:
         for offset, (seed, metrics, source, runtime) in enumerate(results, 1):
