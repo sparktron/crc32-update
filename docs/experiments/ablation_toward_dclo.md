@@ -162,6 +162,37 @@ seed, 40,505, falls inside the first 1,000.
   - 16 workers. Trials are deterministic per seed, and the worker count
     does not affect results.
 
+## Follow-up run (recorded before it starts)
+
+**What triggered it.** The pre-registered improvement rule fired for one arm
+and cap. The `rewrite` arm's best at cap 7 is 440 XOR2 (seed 160,832), which
+meets the "≤ 440" condition. No arm met the z ≤ −3 condition. That 440
+circuit was re-verified independently: it replays byte for byte, and passes
+97 exact vectors, 100,000 random vectors and the formal proof.
+
+**Configuration.**
+- 10,000 *new* seeds, 200,000–209,999. The first 1,000 seeds are not
+  re-counted, so the follow-up is an independent sample.
+- Algorithm `ablation-rewrite-depth7-v1`; its seed range is disjoint from
+  every logged range.
+- Run name `rewrite_depth7_followup`, which gives:
+  - `results/checkpoints/ablation/rewrite_depth7_followup_search.json`
+  - `results/checkpoints/ablation/rewrite_depth7_followup_incumbents/`
+  - `results/ablation/rewrite_depth7_followup.v`
+- Command:
+
+```bash
+python3 -m optimizer.ablation --arm rewrite --depth-cap 7 --seed-start 200000 --seed-count 10000 --workers 16 --run-name rewrite_depth7_followup
+```
+
+- Code: the commit that adds `--run-name` (recorded in the log message).
+  It changes paths only, not the trial.
+
+**Follow-up question.** Is 440 a property of the `rewrite` arm, or a tail
+draw? This is not a new hypothesis. The 1,000-seed means already show no
+significant shift (+0.18, z = 1.1). The follow-up reports the arm's best of
+10,000 seeds and its distribution next to the baseline's.
+
 ## Observed
 
 Not run yet.

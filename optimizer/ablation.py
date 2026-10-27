@@ -272,6 +272,11 @@ def main() -> int:
     parser.add_argument("--depth-cap", type=int, required=True)
     parser.add_argument("--seed-start", type=int)
     parser.add_argument("--seed-count", type=int, default=1000)
+    parser.add_argument(
+        "--run-name",
+        help="names the checkpoint, incumbent directory and artifact; "
+        "defaults to <arm>_depth<cap>",
+    )
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
@@ -284,7 +289,7 @@ def main() -> int:
         if (arm, cap) not in RECORDED_SEED_STARTS:
             parser.error(f"--seed-start is required for unrecorded arm/cap {arm}/{cap}")
         args.seed_start = RECORDED_SEED_STARTS[(arm, cap)]
-    stem = f"{arm}_depth{cap}"
+    stem = args.run_name or f"{arm}_depth{cap}"
     checkpoints = Path("results/checkpoints/ablation")
     try:
         with _exclusive_search_lock(args.search_log):
