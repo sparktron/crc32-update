@@ -1,0 +1,22 @@
+{
+  "all/6": {
+    "fallback_rows_total": 0,
+    "seeds": 1000,
+    "trials_with_fallback": 0
+  },
+  "all/7": {
+    "fallback_rows_total": 0,
+    "seeds": 1000,
+    "trials_with_fallback": 0
+  },
+  "finish/6": {
+    "fallback_rows_total": 0,
+    "seeds": 1000,
+    "trials_with_fallback": 0
+  },
+  "finish/7": {
+    "fallback_rows_total": 0,
+    "seeds": 1000,
+    "trials_with_fallback": 0
+  }
+}
