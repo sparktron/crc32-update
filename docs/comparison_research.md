@@ -257,12 +257,14 @@ depth, and fanout unchanged (see Inference).
 - **Campobello et al. do not report a directly comparable count.** All of
   their XOR2 figures (452 unshared, 370 with manual sharing, and the 448/408
   they quote from Shieh et al.) are for w = 32 data bits. That is a different
-  function: 64 inputs, against 96 in ours. Their 452 is the w = 32 analogue
-  of our 1,390 unshared baseline. Manual sharing removes about 18% of it
-  (370/452), while our searched networks remove about 68% at w = 64
-  (439/1,390). The functions differ, so this shows their sharing was not
-  systematic. It is not a head-to-head comparison. The main risk below is
-  closed for this paper.
+  function: 64 inputs, against 96 in ours. Their 452 count already shares the
+  32 input terms `(x_j ⊕ d_j)` across outputs, while our 1,390 baseline
+  independently expands raw inputs in each output tree. Applying the same
+  input factoring to our matrix gives 937 gates, so the reduction from 937 to
+  439 is about 53%. These percentages use different widths and functions and
+  do not establish that either sharing method was more systematic. This is
+  not a head-to-head comparison. The main risk below is closed for this
+  paper.
 - **Their "5 levels" omits the input XOR level.** Their heaviest F^32 row
   has 17 ones, so that output depends on 34 inputs (17 x_j and 17 d_j). By
   the 2^d bound used below, it needs depth ⌈log2 34⌉ = 6. A 17-input tree has
