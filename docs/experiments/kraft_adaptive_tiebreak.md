@@ -102,7 +102,15 @@ These ranges are disjoint from every logged range.
   - `results/checkpoints/kraft_adaptive/<run>_search.json`
   - `results/checkpoints/kraft_adaptive/<run>_incumbents/`
   - `results/kraft_adaptive/<run>.v`
-- Exact commands and code version: recorded below before stage 1 starts.
+- Exact commands, run from the repository root. Each takes the search-log
+  lock and resumes from its checkpoint.
+
+```bash
+python3 -m optimizer.kraft_adaptive --stage stage1 --depth-cap 7 --workers 16
+python3 -m optimizer.kraft_adaptive --stage stage1 --depth-cap 6 --workers 16
+# Stage 2, only at a cap whose stage-1 z against its comparator is < +3:
+python3 -m optimizer.kraft_adaptive --stage stage2 --depth-cap <cap> --workers 16
+```
 
 ## Baselines
 
@@ -117,7 +125,23 @@ These come from the recorded logs:
 
 ## Code version and environment
 
-Filled in before stage 1 starts.
+- **Code:** commit `6e1b731`, which adds `optimizer/kraft_adaptive.py`, on
+  branch `crczero-verification`.
+  - `python3 -m unittest optimizer.test_kraft_adaptive` passed: 6 tests.
+  - The tree is clean apart from an untracked `docs/reviews/` directory that
+    this experiment did not create and does not read.
+- **Determinism gates, passed before any stage ran:**
+  - θ = 0 reproduces the slack variant. Seeds 220,000–220,019 and
+    240,000–240,019 give 40 of 40 identical renders, with metrics equal to
+    the log. The 467 network (seed 246,653) reproduces byte for byte.
+  - θ = 2 reproduces the baseline. Seeds 40,000–40,019 and 50,000–50,019
+    give 40 of 40 identical renders, with metrics equal to the log. The B7
+    and C incumbents reproduce byte for byte.
+- **Smoke trials:** seeds 1–3 at each cap, which are not in any budget. They
+  checked correctness, cap compliance and replay only. Their values were
+  withheld and are not evidence.
+- **Environment:** Python 3.10.12, i9-10900K (10 cores, 20 threads),
+  Yosys 0.9, Z3 4.8.12, 16 workers. Trials are deterministic per seed.
 
 ## Observed
 
