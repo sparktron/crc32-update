@@ -417,18 +417,22 @@ limitations below remain in effect.
   `docs/experiments/kraft_adaptive_tiebreak.md`.
   - With θ = 1/2 it matches the slack variant at both caps, so it does not
     recover cap 7.
-  - Stage 2 at cap 6 stopped at 3,862 of 10,000 seeds because of a
-    slack-family finishing bug, reproduced on seed 284,862. That bug must be
-    fixed before any further slack-family run.
+  - Stage 2 at cap 6 first stopped at 3,862 of 10,000 seeds because of a
+    slack-family finishing bug on seed 284,862. It is now fixed with a
+    fresh-gate fallback (`d37e628`), which leaves every recorded result
+    unchanged.
+  - A full v2 rerun reproduced v1 exactly on those 3,862 seeds. Its best is
+    **465**. Seed 286,375 gives a verified **465-gate depth-6 network**
+    (fanout 6, excess 19) that **dominates Candidate C**.
   - Seed 281,125 gave a verified **466-gate depth-6 network** (fanout 6,
     excess 20) that **dominates Candidate C**.
 - **Search logs split (2026-10-27).** The single 81 MB
   `results/search_log.jsonl` is now one file per experiment under
   `results/search_logs/`. Every record is unchanged.
 - **Pending a project-owner decision:** whether to adopt the 440 (depth 7)
-  and 466 (depth 6) networks on the frontier. The 466 dominates every other
-  depth-6 network found. Until then, the frontier and `report.md` are
-  unchanged.
+  and 465 (depth 6, seed 286,375) networks on the frontier. The 465
+  dominates every other depth-6 network found. Until then, the frontier and
+  `report.md` are unchanged.
 
 ## Semantic Ambiguities or Discrepancies
 

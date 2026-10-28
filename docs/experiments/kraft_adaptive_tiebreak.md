@@ -6,6 +6,9 @@ written or run. Completed 2026-10-27.
 - **H3 confirmed at cap 6:** a verified 466-gate network that dominates C.
 - Stage 2 stopped early at 3,862 of 10,000 seeds because of a trial failure
   on seed 284,862. See Observed.
+- After the fix, a full v2 rerun of stage 2 reproduced v1 exactly on those
+  3,862 seeds. Its best is **465 XOR2**. Seed 286,375 gives a 465-gate network
+  that dominates C.
 
 **Log location.** The `results/search_log.jsonl` records cited below moved unchanged into
 `results/search_logs/kraft_adaptive_tiebreak.jsonl` on 2026-10-27, when the log was split into one file
@@ -268,7 +271,40 @@ at depth ≤ 6:
 - **What it settles:** H3 is already confirmed (the 466). The rerun completes
   the pre-registered 10,000-seed stage-2 budget, so the cap-6 distribution
   and best-of-10,000 can be reported in full. It adds no new hypothesis.
-- **Results:** not run yet.
+- **Run:** 2026-10-28, 00:30:59–01:10:08 UTC, at `5fcd60e`.
+  - The search exited with status 0. The wrapper now reports the search's
+    own status.
+  - All 10,000 contiguous seeds completed. Every record has
+    `verification_passed: true`, and every trial is at depth ≤ 6.
+  - Raw records:
+    - `results/search_logs/kraft_adaptive_tiebreak.jsonl`, algorithm
+      `kraft-adaptive-tiebreak-half-depth6-v2`.
+    - `results/checkpoints/kraft_adaptive/stage2_rerun_depth6_*`.
+    - `results/kraft_adaptive/stage2_rerun_depth6.v`.
+    - `results/kraft_adaptive/notable/seed_286375_depth6.v`, saved after the
+      run by replaying its seed.
+- **Determinism check passed:** 3,862 of 3,862 seeds in 281,000–284,861 give
+  exactly v1's logged final metrics. Seed 284,862, where v1 failed, now
+  completes at 481 XOR2.
+
+| Run | Seeds | n | Mean | SD | Median | p1 | p10 | Best |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| adaptive stage 2, v2 | 281,000–290,999 | 10,000 | 485.45 | 5.30 | 486 | 473 | 479 | **465** |
+| slack variant, cap 6 | 240,000–250,999 | 11,000 | 485.49 | 5.28 | 486 | — | — | 467 |
+| baseline, cap 6 | 50,000–59,999 | 10,000 | 490.43 | 5.24 | 490 | 478 | 484 | 470 |
+
+- Against the slack variant: z = −0.30. Against the baseline: z = −60.62.
+- Low tail: 465 ×2, 466 ×1, 467 ×6, 468 ×2, 469 ×5. That is 16 seeds at 469
+  or fewer.
+
+**Networks re-verified separately.** Each replays byte for byte from its
+seed, passes 97 exact vectors and 100,000 random vectors, and is proved
+equivalent by Yosys/SMTBMC/Z3.
+
+| Seed | XOR2 | Depth | Max fanout | Excess > 4 | Total fanout | Compared with C (470, 6, 6, 20, 972) |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 286,375 | **465** | 6 | 6 | 19 | 962 | **dominates C**, and also the 466 |
+| 288,438 | **465** | 6 | 5 | 21 | 962 | better maximum fanout, worse excess; neither dominates |
 
 ## Interpretation
 
@@ -282,11 +318,17 @@ Everything below is inference.
   exactly like the baseline while no row is tight, so that loss is probably
   not made in the early phase. It is probably made in late moves or in the
   finishing pass, once rows are tight. This is untested.
-- **At cap 6 the 466 is a tail draw from the slack-family distribution.** It
-  is not evidence that the adaptive rule is better. Across 14,862 seeds of
-  this family at cap 6 (11,000 slack and 3,862 adaptive), one 466 and two
-  467s were found.
-- **The trial failure is a latent bug in the slack-family finishing pass.**
+- **At cap 6 the 466 and 465s are tail draws from the slack-family
+  distribution.** They are not evidence that the adaptive rule is better.
+  - The v2 rerun's mean matches the slack variant's (z = −0.30).
+  - Across 21,000 seeds of this family at cap 6 (11,000 slack and 10,000
+    adaptive v2), there were two 465s, one 466 and seven 467s.
+  - Per 10,000 seeds, the family reaches 465–467 about five times.
+  - Larger budgets of the same family would plausibly go lower still. This
+    is untested.
+- **The trial failure was a latent bug in the slack-family finishing pass.**
+  It is fixed in `d37e628`; the diagnosis is under "Stage 2 rerun" above.
+  The original account follows.
   - It also hits the slack variant. It was simply not reached in that
     variant's 11,000 seeds.
   - The error message blames the Kraft invariant. The likely real cause:
@@ -298,14 +340,15 @@ Everything below is inference.
 
 ## Next decision
 
-- **Needs a decision by the project owner, not taken here.** Adopting the
-  verified **466-gate depth-6 network**, which dominates C, on the frontier.
-  It is better than every other depth-6 candidate found so far.
-- **Required before any further slack-family run:** fix the finishing-pass
-  failure on seed 284,862. For example, create a fresh gate when the existing
-  signal for a vector is too deep. The fix must carry a regression test on
-  that seed. Any run after the fix is a new algorithm version (`v2`) with its
-  own record. The aborted stage 2 is not resumed.
+- **Needs a decision by the project owner, not taken here:** adopting a
+  depth-6 network on the frontier.
+  - The best is the verified **465-gate network from seed 286,375**
+    (`results/kraft_adaptive/notable/seed_286375_depth6.v`). It dominates C
+    and every other depth-6 network found so far.
+  - Seed 288,438 (465 XOR2, maximum fanout 5) is the non-dominated
+    alternative with lower maximum fanout.
+- **Done:** the finishing-pass failure is fixed in `d37e628`, with a
+  regression test, and the full stage-2 budget was rerun under v2.
 - **Ruled out:** θ = 1/2 as a fix for cap 7. Other θ values were not tried,
   by design.
 - **Not recommended:** further tie-break variants. The tie-break has been
