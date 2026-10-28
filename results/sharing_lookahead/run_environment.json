@@ -1,0 +1,37 @@
+{
+  "model name": "Intel(R) Core(TM) i9-10900K CPU @ 3.70GHz",
+  "siblings": "20",
+  "cpu cores": "10",
+  "workers": 16,
+  "multiprocessing_start_method": "fork",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "command": "python3 -B -m optimizer.sharing_lookahead --stage stage1 --workers 16",
+  "timing_note": "Raw worker runtime includes construction and independent exact checking, excludes parent incumbent acceptance; arms run sequentially with the same worker count.",
+  "concurrent_validation_during_cap7_candidate": [
+    "python3 -B -m unittest discover (101 passed, 346.024 seconds)",
+    "python3 -B -m verifier.build_results --check --require-spec-minimum (passed)"
+  ],
+  "runtime_limitations": "Arms were sequential; worker times include process scheduling/thermal/load effects. Concurrent validation during part of cap7 candidate makes its ratio descriptive, not an isolated benchmark. Separate timing-only pilots are also retained.",
+  "abc_version_output": "ABC command line: \"version\".\n\nUC Berkeley, ABC 1.01 (compiled Jan 29 2022 01:26:07)"
+}

@@ -198,3 +198,13 @@ finishing-scoring changes have no material gate-count support in this sample.
 Keep the 462 witnesses as additional research results with their explicit
 fanout tradeoff. Integrating them into the submitted frontier would require
 updating the submission/provenance checks and report together.
+
+### Follow-up recorded 2026-10-28
+
+The sharing-phase question was tested in the preregistered
+[bounded-lookahead experiment](sharing_lookahead.md). Its
+[completed results](sharing_lookahead_results.md) refute that two-move variant
+at both caps under its frozen criterion; neither cap extends. The unchanged
+baseline control nevertheless found a verified 438-gate depth-7 witness.
+Future work should distinguish residual feasible opportunities more effectively
+and isolate the shortlist policy from the future-information score.

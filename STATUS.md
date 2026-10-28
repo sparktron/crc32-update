@@ -689,3 +689,41 @@ and updated comparison evidence.
   residual completion cost. The finishing-phase gate-count explanation is
   contradicted by this experiment. The 462 witnesses demonstrate existence,
   rather than an improvement in the hybrid search distribution.
+
+### Bounded sharing-lookahead experiment (2026-10-28)
+
+- Completed the preregistered three-root, two-move lookahead comparison against
+  the best existing control at each cap: 1,000 matched seeds per arm/cap,
+  **4,000 independently checked trials**, 32 fully verified incumbents.
+  Code/protocol were committed before collection at `29704bf`.
+  Protocol: `docs/experiments/sharing_lookahead.md`; full observations,
+  refutations, runtime and interpretation:
+  `docs/experiments/sharing_lookahead_results.md`.
+- **Both method hypotheses refuted under the frozen rule.** At depth 7,
+  candidate-minus-baseline mean is -0.154 gates (approximate 95% interval
+  [-0.448, +0.140]); at depth 6, candidate-minus-both-phases-slack is +0.665
+  [+0.307, +1.023]. Neither screens at mean <=-0.5 and paired z<=-3.
+  The extension command selected zero runs; no 10,000-seed budget was opened.
+- Worker elapsed overhead was 5.817x at cap 7 and 4.742x at cap 6. Most probe
+  scores tied. Runtime includes process scheduling and some concurrent
+  regression work; separate timing pilots also showed roughly 5x overhead.
+- The unchanged **baseline control found a verified 438-XOR2, depth-7
+  circuit**, seed **400800**, meeting the <=439 target. Maximum fanout 5,
+  total fanout 908, excess fanout 6. This is the lowest recorded gate count
+  here, but has higher excess fanout than submitted B7 (440, excess 3) and
+  A/B (439/depth 8, excess 5). It demonstrates circuit existence, not a better
+  lookahead search. Artifact: `results/sharing_lookahead/stage1_control_depth7.v`.
+  Submitted artifacts/frontier/report remain unchanged.
+- Candidate bests: 442/depth 7 and 468/depth 6; cap-6 control best 471.
+  Neither cap-6 arm met <=461 or improved on the earlier 462-gate witnesses.
+- Validation: all 101 regression tests passed; submitted-result provenance
+  and formal checks passed; every accepted artifact matched its completed
+  formal-proof trace. All 32 incumbents replayed byte for byte; completed
+  budgets preserved 48 evidence files with no new trials; all four best
+  artifacts were independently rechecked and formally proved. Frozen-source
+  and raw-provenance audits passed. Full clean-clone rebuild was not repeated
+  locally.
+- Next: do not extend or tune this frozen variant. Before another large
+  experiment, preregister a residual feasible-opportunity score and a one-step
+  shortlist control to isolate future information. Treat integration of the
+  438 witness, including its fanout tradeoff and provenance, as separate work.
