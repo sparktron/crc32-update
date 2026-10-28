@@ -73,7 +73,7 @@ class OptimizeTests(unittest.TestCase):
             self.assertTrue(metrics.is_file())
             self.assertEqual(
                 search_log.read_bytes(),
-                (ROOT / "results/search_log.jsonl").read_bytes(),
+                (ROOT / "results/search_logs/candidate_a.jsonl").read_bytes(),
             )
 
     def test_log_ahead_of_checkpoint_resumes_without_duplicates(self) -> None:
@@ -81,7 +81,7 @@ class OptimizeTests(unittest.TestCase):
             temporary = Path(directory)
             log_path = temporary / "search.jsonl"
             records = (
-                ROOT / "results/search_log.jsonl"
+                ROOT / "results/search_logs/candidate_a.jsonl"
             ).read_text().splitlines()[:2]
             log_path.write_text("\n".join(records) + "\n")
             incumbent = search_seed(0, self.rows)

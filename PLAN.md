@@ -277,6 +277,6 @@ crc32-superopt/
 │   ├── candidate_c_min_depth.v
 │   ├── pareto_frontier.json
 │   ├── metrics.csv
-│   └── search_log.jsonl
+│   └── search_logs/          # one JSONL log per experiment (single file until 2026-10-27)
 └── report.md
 ```

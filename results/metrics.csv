@@ -2,5 +2,5 @@ candidate_class,artifact,circuit_id,on_pareto_frontier,seed,xor2_count,maximum_d
 A,results/phase4/candidate_a_extended.v,1472a09886a8,true,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
 B,results/phase4/candidate_b_refined.v,1472a09886a8,true,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
 C0,results/phase4/candidate_c_refined.v,0c80bfcc8e2b,false,,1390,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",20,2812,1038,1390,32,97,100000,3274333933,passed,passed
-B7,results/phase6/candidate_depth7_bounded.v,b65a4c2b615e,true,40505,441,7,"[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]",5,914,5,441,32,97,100000,3274333933,passed,passed
-C,results/phase6/candidate_depth6_bounded.v,b8edf279b361,true,56140,470,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",6,972,20,470,32,97,100000,3274333933,passed,passed
+B7,results/ablation/rewrite_depth7.v,ed4ed2ba71db,true,160832,440,7,"[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]",5,912,3,440,32,97,100000,3274333933,passed,passed
+C,results/kraft_adaptive/notable/seed_286375_depth6.v,900a2989cbc1,true,286375,465,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",6,962,19,465,32,97,100000,3274333933,passed,passed

@@ -21,7 +21,7 @@ import json
 from pathlib import Path
 import random
 import time
-from typing import Sequence
+from typing import Callable, Sequence
 
 from generator.build_matrix import INPUT_COUNT, build_transformation_matrix
 from optimizer.optimize import (
@@ -34,6 +34,7 @@ from optimizer.optimize import (
 )
 from optimizer.refine_candidates import _append_log, _metrics, _timestamp, _write_checkpoint
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import log_file_for
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -128,6 +129,41 @@ class _BoundedBuilder:
         self.operations.append(Operation(output, pair[0], pair[1]))
         return output
 
+    def _merge_fresh(self, expression: set[int]) -> tuple[tuple[int, int], int]:
+        """Take one finishing step for ``expression`` with a fresh, non-reused gate.
+
+        This runs only when no pair of ``expression`` fits as ``_target`` resolves
+        it. That happens when every merge that would fit has an XOR that already
+        exists as a signal too deep for this row; reusing that signal would break
+        the cap. Example: seed 284,862 of the Kraft-adaptive search, where the
+        row's Kraft sum is exactly 2**cap.
+
+        A Kraft-feasible row always has a pair that fits as a fresh gate at depth
+        1 + max(input depths). The two shallowest signals are one such pair. The
+        new gate repeats an existing vector at a lower depth, and the vector now
+        maps to it.
+
+        Every trial that completed before this method existed never reaches it,
+        so its result is unchanged.
+        """
+        kraft = _kraft(expression, self.depths)
+        options = []
+        for pair in combinations(sorted(expression), 2):
+            depth = 1 + max(self.depths[pair[0]], self.depths[pair[1]])
+            increase = (1 << depth) - (1 << self.depths[pair[0]]) - (1 << self.depths[pair[1]])
+            if kraft + increase <= self.limit:
+                options.append((depth, pair))
+        if not options:
+            raise RuntimeError("no depth-feasible pair even as a fresh gate")
+        depth, pair = min(options)
+        output = len(self.vectors)
+        self.vectors.append(self.vectors[pair[0]] ^ self.vectors[pair[1]])
+        self.depths.append(depth)
+        self.vector_to_signal[self.vectors[output]] = output
+        self.operations.append(Operation(output, pair[0], pair[1]))
+        _replace_pair(expression, pair, output)
+        return pair, output
+
     def _apply(self, pair: tuple[int, int]) -> None:
         """Replace ``pair`` in every expression where the result stays within the cap."""
         targets = [
@@ -201,7 +237,8 @@ class _BoundedBuilder:
                     if self._fits(expression, pair)
                 ]
                 if not pairs:
-                    raise RuntimeError("no depth-feasible pair; Kraft invariant broken")
+                    self._merge_fresh(expression)
+                    continue
                 known = []
                 for pair in pairs:
                     replacement, depth = self._target(pair)
@@ -259,11 +296,14 @@ def search_seed_bounded(
     )
 
 
+Trial = Callable[[int, int], Candidate]
+
+
 def _worker(
-    seed: int, depth_cap: int, module_name: str
+    seed: int, depth_cap: int, module_name: str, trial: Trial = search_seed_bounded
 ) -> tuple[int, dict[str, object], str, float]:
     started = time.perf_counter()
-    candidate = search_seed_bounded(seed, depth_cap)
+    candidate = trial(seed, depth_cap)
     metrics = independently_check(candidate).to_dict()
     metrics.pop("unreachable_nodes")
     return seed, metrics, candidate.render(module_name), time.perf_counter() - started
@@ -315,15 +355,24 @@ def run_bounded_search(
     log_path: Path,
     random_tests: int,
     random_seed: int,
+    *,
+    trial: Trial = search_seed_bounded,
+    algorithm: str | None = None,
+    module_name: str | None = None,
 ) -> tuple[int | None, dict[str, object] | None]:
-    """Search a reproducible seed range and keep the best verified bounded network."""
+    """Search a reproducible seed range and keep the best verified bounded network.
+
+    ``trial`` builds one seeded network under the cap. The defaults run the
+    recorded Kraft-bounded search; other trial functions log under their own
+    ``algorithm`` name and render under their own ``module_name``.
+    """
 
     if seed_count <= 0 or workers <= 0:
         raise ValueError("seed_count and workers must be positive")
     if random_tests < DEFAULT_RANDOM_TESTS:
         raise ValueError(f"random_tests must be at least {DEFAULT_RANDOM_TESTS}")
-    algorithm = algorithm_name(depth_cap)
-    module_name = f"candidate_depth{depth_cap}_bounded"
+    algorithm = algorithm or algorithm_name(depth_cap)
+    module_name = module_name or f"candidate_depth{depth_cap}_bounded"
     configuration = {
         "algorithm": algorithm,
         "depth_cap": depth_cap,
@@ -346,7 +395,7 @@ def run_bounded_search(
     accepted = [record for record in attempts if record.get("accepted")]
     if accepted:
         best_seed = int(accepted[-1]["seed"])
-        replay = search_seed_bounded(best_seed, depth_cap)
+        replay = trial(best_seed, depth_cap)
         best_metrics = independently_check(replay).to_dict()
         best_metrics.pop("unreachable_nodes")
         if best_metrics != accepted[-1].get("final_metrics"):
@@ -369,9 +418,11 @@ def run_bounded_search(
     seeds = range(seed_start + completed, seed_start + seed_count)
     executor = ProcessPoolExecutor(max_workers=workers) if workers > 1 else None
     results = (
-        executor.map(_worker, seeds, repeat(depth_cap), repeat(module_name), chunksize=1)
+        executor.map(
+            _worker, seeds, repeat(depth_cap), repeat(module_name), repeat(trial), chunksize=1
+        )
         if executor
-        else (_worker(seed, depth_cap, module_name) for seed in seeds)
+        else (_worker(seed, depth_cap, module_name, trial) for seed in seeds)
     )
     try:
         for offset, (seed, metrics, source, runtime) in enumerate(results, 1):
@@ -463,13 +514,18 @@ def main() -> int:
         type=Path,
         help="defaults to results/checkpoints/depth<cap>_bounded_incumbents",
     )
-    parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
+    parser.add_argument(
+        "--search-log",
+        type=Path,
+        help="defaults to this algorithm's file under results/search_logs/",
+    )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(
         "--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED
     )
     args = parser.parse_args()
     cap = args.depth_cap
+    args.search_log = args.search_log or log_file_for(algorithm_name(cap))
     if args.seed_start is None:
         if cap not in RECORDED_SEED_STARTS:
             parser.error(f"--seed-start is required for unrecorded depth cap {cap}")
@@ -491,7 +547,7 @@ def main() -> int:
             parser.exit(1, f"Depth-bounded replay failed: {error}\n")
         return 0
     try:
-        # Every search appends to one canonical log, so lock the log itself.
+        # Each experiment appends to its own log; lock that log.
         with _exclusive_search_lock(args.search_log):
             seed, metrics = run_bounded_search(
                 args.depth_cap,

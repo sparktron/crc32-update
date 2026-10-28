@@ -12,6 +12,7 @@ from generator.baseline_generator import render_balanced
 from generator.build_matrix import build_transformation_matrix
 from optimizer.optimize import search_seed
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import log_file_for
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -144,7 +145,7 @@ def materialize(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=Path("results/phase4"))
-    parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
+    parser.add_argument("--search-log", type=Path, default=log_file_for("phase4-"))
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument("--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED)
     parser.add_argument(

@@ -54,8 +54,8 @@ replacement has been accepted or integrated.
 | A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
 | B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
 | C0 — Phase 4 minimum-depth starting point | 1,390 | 6 | Passed | Balanced-tree baseline; dominated by C |
-| B7 — bounded depth at most 7 | 441 | 7 | Passed | Best found; seed 40,505 of 40,000–49,999 |
-| C — minimum-depth search (depth-6 budget) | 470 | 6 | Passed | Best found; seed 56,140 of 50,000–59,999 |
+| B7 — bounded depth at most 7 | 440 | 7 | Passed | Best found; seed 160,832, ablation `rewrite` arm (adopted 2026-10-27; was 441) |
+| C — minimum-depth search (depth 6) | 465 | 6 | Passed | Best found; seed 286,375, Kraft-adaptive v2 (adopted 2026-10-27; was 470) |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector
@@ -354,8 +354,8 @@ nondominated circuits, meeting the `SPEC.md` Section 4 minimum;
 | Circuit | Classes | XOR2 | Depth | Max fanout | Excess fanout >4 |
 | --- | --- | ---: | ---: | ---: | ---: |
 | `1472a09886a8` | A, B | 439 | 8 | 5 | 5 |
-| `b65a4c2b615e` | B7 | 441 | 7 | 5 | 5 |
-| `b8edf279b361` | C | 470 | 6 | 6 | 20 |
+| `ed4ed2ba71db` | B7 | 440 | 7 | 5 | 3 |
+| `900a2989cbc1` | C | 465 | 6 | 6 | 19 |
 
 Submitted but dominated: C0 (`0c80bfcc8e2b`, 1,390 XOR2, depth 6, maximum
 fanout 20, excess 1,038), the Phase 4 minimum-depth starting point, which
@@ -365,14 +365,29 @@ Candidate C dominates on every objective.
   seed-16,564 Candidate A already satisfies the depth-8 bound, and B's
   refinement found nothing better. The frontier lists that circuit once with
   both class labels.
-- B7 is the best trial of the completed depth-7 Kraft-bounded budget (seeds
-  40,000–49,999, 10,000 logged attempts, 6 accepted incumbents, best seed
-  40,505). Candidate C is the best trial of the completed depth-6 budget (seeds
-  50,000–59,999, 10,000 logged attempts, 10 accepted incumbents, best seed
-  56,140). Both passed the restricted parser, 97 exact vectors, 100,000 random
-  vectors, and formal equivalence, and each replays byte-for-byte from its seed.
+- **B7 and C were replaced on 2026-10-27** by circuits from the follow-up
+  experiments.
+  - B7 is now the incumbent of the ablation `rewrite` arm's completed depth-7
+    budget (seeds 160,000–160,999, seed 160,832): 440 XOR2, maximum fanout 5,
+    excess 3.
+  - C is now seed 286,375 of the completed Kraft-adaptive stage-2 rerun (v2,
+    seeds 281,000–290,999): 465 XOR2, maximum fanout 6, excess 19.
+  - That C is not its budget's incumbent. The incumbent, seed 288,438, also
+    has 465 gates but wins only on maximum fanout. `build_results` accepts a
+    selected trial only if it reaches the budget's minimum XOR2 count, is
+    nondominated within the budget, matches its logged metrics, and replays
+    byte for byte.
+  - Both passed the restricted parser, 97 exact vectors, 100,000 random
+    vectors, and formal equivalence.
+  - Each dominates the circuit it replaced: the original B7 (`b65a4c2b615e`,
+    441 XOR2, seed 40,505 of the depth-7 Kraft-bounded budget) and the
+    original C (`b8edf279b361`, 470 XOR2, seed 56,140 of the depth-6 budget).
+    Both originals stay in `results/phase6/` for provenance.
+  - The 440 is a tail draw from a baseline-equivalent distribution. The 465
+    is a tail draw from a search family whose depth-6 mean is about 5 gates
+    lower than the original budget's.
 - `SPEC.md` Section 4 defines Candidate C as minimum depth first, then
-  minimum XOR2 count, so the depth-6 budget's 470-gate circuit is Candidate C.
+  minimum XOR2 count, so the 465-gate depth-6 circuit is Candidate C.
   The Phase 4 balanced-tree starting point, which has the same depth but 1,390
   gates, is reported as C0 for provenance and is not on the frontier. B7 is a
   bounded-depth (Candidate B family) search at depth 7; Candidate B remains
@@ -390,6 +405,54 @@ Candidate C dominates on every objective.
 No required final deliverable remains. Optional follow-up work is limited to
 new search budgets, broader literature access, and toolchain pinning; the
 limitations below remain in effect.
+
+- **DCLO budget (2026-10-27), hypothesis refuted.** DCLO as published (Boyar,
+  Find and Peralta, 2019) was run with 10,000 seeds per cap.
+  - Seeds 70,000–79,999 at depth 7 and 80,000–89,999 at depth 6.
+  - Algorithms `dclo-kraft-depth{7,6}-v1`, implemented in `optimizer/dclo.py`.
+  - Best results: 445 XOR2 at depth 7 and 477 at depth 6. The original B7 and
+    Candidate C dominate both, so DCLO did not change the frontier.
+  - Per-seed medians were 462 and 499, against the baseline's 456 and 490.
+  - The pre-registered record, raw-result paths and the open ablation are in
+    `docs/experiments/dclo_depth_bounded.md`.
+- **Ablation toward DCLO (2026-10-27).** Record:
+  `docs/experiments/ablation_toward_dclo.md`.
+  - The depth-aware tie-break accounts for 90–95% of DCLO's deficit. The
+    other components each move the mean by at most 0.35 gates.
+  - One ablation seed (160,832) gave a verified **440-gate depth-7 network**
+    that dominates the original B7, and is now B7. A 10,000-seed follow-up
+    showed it is a tail draw (mean 456.05, the same as the baseline).
+- **Kraft-slack tie-break (2026-10-27).** Record:
+  `docs/experiments/kraft_slack_tiebreak.md`.
+  - Cap 6: the mean is 5 gates lower, and 17 of 10,000 seeds beat 470. The
+    best is a verified **467-gate depth-6 network**. Seeds 249,452 (468) and
+    248,720 (469) give verified networks that dominate the original
+    Candidate C.
+  - Cap 7: the mean is 2.3 gates worse.
+- **Cap-adaptive tie-break (2026-10-27).** Record:
+  `docs/experiments/kraft_adaptive_tiebreak.md`.
+  - With θ = 1/2 it matches the slack variant at both caps, so it does not
+    recover cap 7.
+  - Stage 2 at cap 6 first stopped at 3,862 of 10,000 seeds because of a
+    slack-family finishing bug on seed 284,862. It is now fixed with a
+    fresh-gate fallback (`d37e628`), which leaves every recorded result
+    unchanged.
+  - The v1 run had already found a verified **466-gate depth-6 network**
+    (seed 281,125, fanout 6, excess 20).
+  - A full v2 rerun reproduced v1 exactly on those 3,862 seeds. Its best is
+    **465**. Seed 286,375 gives a verified **465-gate depth-6 network**
+    (fanout 6, excess 19), which is now Candidate C.
+- **Search logs split (2026-10-27).** The single 81 MB
+  `results/search_log.jsonl` is now one file per experiment under
+  `results/search_logs/`. Every record is unchanged.
+- **Frontier updated (2026-10-27, at the project owner's request).** The 440
+  (seed 160,832) replaced B7 and the 465 (seed 286,375) replaced C.
+  - `verifier/build_results.py` submits them.
+  - `results/pareto_frontier.json` and `results/metrics.csv` are regenerated.
+  - `report.md` is updated.
+  - `python3 -m verifier.build_results --check --require-spec-minimum`
+    passes with 3 distinct Pareto circuits: 439/depth 8, 440/depth 7,
+    465/depth 6.
 
 ## Semantic Ambiguities or Discrepancies
 
@@ -582,3 +645,16 @@ limitations below remain in effect.
 Next: review and commit the final documentation on `phase6-final-results`.
 New optimization or stronger publication claims require a separate experiment
 and updated comparison evidence.
+
+
+### PR #11 review fixes (2026-10-27)
+
+- Integrated master’s corrected Campobello input-factoring comparison while
+  preserving the verified 465/440-gate frontier.
+- The current adaptive runner rejects historical v1 stages before locking or
+  writing logs. Its v2 finishing fallback must not continue the aborted v1
+  experiment; the registered `stage2_rerun` retains its v2 algorithm name.
+- Regression validation: `python3 -m unittest optimizer.test_kraft_adaptive
+  optimizer.test_depth_bounded verifier.test_search_logs`: 21 tests passed
+  in 29.596 seconds. `git diff --check` passed. Full clean rebuild remains
+  a CI check.

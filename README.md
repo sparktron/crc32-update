@@ -5,8 +5,8 @@ combinational XOR2 networks implementing a 64-bit parallel reflected IEEE
 CRC-32 state update.
 
 The experiment is complete through gate G6. The verified Pareto frontier has
-three distinct circuits: 439 XOR2 at depth 8 (A/B), 441 at depth 7 (B7), and
-470 at depth 6 (C). Depth 6 is proven minimal; gate counts are best found for
+three distinct circuits: 439 XOR2 at depth 8 (A/B), 440 at depth 7 (B7), and
+465 at depth 6 (C). Depth 6 is proven minimal; gate counts are best found for
 the recorded budgets. The [final report](report.md) documents methodology,
 results, comparisons, limitations, and reproduction.
 
@@ -18,8 +18,13 @@ Experiment control documents:
   gates.
 - [`STATUS.md`](STATUS.md) records completed work, current best results, and
   unresolved issues.
-- [`results/search_log.jsonl`](results/search_log.jsonl) contains one
-  machine-readable record for every optimization attempt.
+- [`results/search_logs/`](results/search_logs) contains one
+  machine-readable record for every optimization attempt, in one append-only
+  JSONL file per experiment. `verifier/search_logs.py` maps each algorithm to
+  its file.
+  - Until 2026-10-27 these records were a single file,
+    `results/search_log.jsonl`. `python3 -m scripts.split_search_log` split it
+    without changing any record.
 
 ## Continuous Integration
 
@@ -201,7 +206,7 @@ python3 -m optimizer.optimize \
   --artifact results/phase4/candidate_a_extended.v \
   --frontier results/phase4/candidate_a_frontier.json \
   --metrics results/phase4/candidate_a_metrics.csv \
-  --search-log results/search_log.jsonl
+  --search-log results/search_logs/candidate_a.jsonl
 ```
 
 The configured Candidate A continuation and Candidate B/C refinement budgets
@@ -220,7 +225,7 @@ formal equivalence before being accepted into the search log:
 ```bash
 python3 -m optimizer.phase4_candidates \
   --output-dir results/phase4 \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase4_refinement.jsonl \
   --random-tests 100000 \
   --random-seed 0xC32A5EED
 ```
@@ -239,7 +244,7 @@ python3 -m optimizer.refine_candidates B \
   --seed-count 10000 \
   --workers 8 \
   --output-dir results/phase4 \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase4_refinement.jsonl \
   --checkpoint results/checkpoints/candidate_b_refinement.json
 
 python3 -m optimizer.refine_candidates C \
@@ -247,7 +252,7 @@ python3 -m optimizer.refine_candidates C \
   --seed-count 10000 \
   --workers 8 \
   --output-dir results/phase4 \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase4_refinement.jsonl \
   --checkpoint results/checkpoints/candidate_c_refinement.json
 ```
 
@@ -276,7 +281,7 @@ queries per cone can exceed Codex's command limit:
 python3 -m optimizer.phase5_exact \
   --candidate results/phase4/candidate_b_refined.v \
   --checkpoint results/checkpoints/phase5_exact_exclusive_cones.json \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/phase5_exact.jsonl \
   --output results/phase5/exact_exclusive_cone_study.json \
   --max-cone-nodes 6 \
   --limit 20 \
@@ -299,6 +304,9 @@ python3 -m optimizer.repair_search_log \
   --log results/search_log.jsonl \
   --backup results/checkpoints/phase4_search_log_pre_dedup.jsonl
 ```
+
+This one-time repair ran against the single log, before the 2026-10-27 split.
+Its Phase 4 records now live in `results/search_logs/phase4_refinement.jsonl`.
 
 ## Phase 6 Final Results
 
@@ -350,7 +358,7 @@ python3 -m optimizer.depth_bounded \
   --checkpoint results/checkpoints/depth7_bounded_search.json \
   --artifact results/phase6/candidate_depth7_bounded.v \
   --incumbent-dir results/checkpoints/depth7_bounded_incumbents \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/kraft_bounded.jsonl \
   --random-tests 100000 \
   --random-seed 0xC32A5EED
 ```
@@ -377,7 +385,7 @@ python3 -m optimizer.depth_bounded \
   --checkpoint results/checkpoints/depth6_bounded_search.json \
   --artifact results/phase6/candidate_depth6_bounded.v \
   --incumbent-dir results/checkpoints/depth6_bounded_incumbents \
-  --search-log results/search_log.jsonl \
+  --search-log results/search_logs/kraft_bounded.jsonl \
   --random-tests 100000 \
   --random-seed 0xC32A5EED
 ```
@@ -389,10 +397,17 @@ default to the recorded budget for the requested `--depth-cap`. A checkpoint
 from a different cap or seed range is rejected.
 
 Both budgets have completed. The depth-7 budget's best trial (seed 40,505) has
-441 XOR2 and the depth-6 budget's (seed 56,140) has 470 XOR2. They are
-submitted as B7 and Candidate C in `verifier/build_results.py`, which checks each
-against its completed checkpoint, full logged seed range, accepted incumbent,
-and a replay from its seed before regenerating the result files.
+441 XOR2 and the depth-6 budget's (seed 56,140) has 470 XOR2. They were
+submitted as B7 and Candidate C until 2026-10-27, when verified circuits from
+the follow-up experiments replaced them (see
+[docs/experiments/](docs/experiments)):
+- B7: 440 XOR2, seed 160,832 of the ablation `rewrite` arm.
+- C: 465 XOR2, seed 286,375 of the Kraft-adaptive v2 rerun.
+
+`verifier/build_results.py` checks every bounded submission before
+regenerating the result files: against its completed checkpoint and full
+logged seed range, against its accepted incumbent or the selected-trial rule,
+and by a replay from its seed.
 
 ## Clean-Checkout Rebuild
 

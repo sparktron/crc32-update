@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import SEARCH_LOG_DIR, read_records
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -124,8 +125,7 @@ def verify_candidate_records(
         raise ValueError("checkpoint algorithm is malformed")
     attempts = [
         record
-        for line in search_log_path.read_text().splitlines()
-        for record in [json.loads(line)]
+        for record in read_records(search_log_path)
         if record.get("algorithm") == algorithm
         and isinstance(record.get("seed"), int)
         and seed_start <= record["seed"] < seed_start + expected_count
@@ -173,7 +173,10 @@ def main() -> int:
         default=Path("results/checkpoints/candidate_a_checkpoint.json"),
     )
     parser.add_argument(
-        "--search-log", type=Path, default=Path("results/search_log.jsonl")
+        "--search-log",
+        type=Path,
+        default=SEARCH_LOG_DIR,
+        help="directory of per-experiment logs, or one log file",
     )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(

@@ -4,8 +4,8 @@
       "baseline": "independent_per_output",
       "dominated_by": [
         "1472a09886a8",
-        "b65a4c2b615e",
-        "b8edf279b361"
+        "900a2989cbc1",
+        "ed4ed2ba71db"
       ],
       "metrics": {
         "maximum_depth": 51,
@@ -17,7 +17,7 @@
     {
       "baseline": "balanced_per_output",
       "dominated_by": [
-        "b8edf279b361"
+        "900a2989cbc1"
       ],
       "metrics": {
         "maximum_depth": 6,
@@ -30,7 +30,7 @@
       "baseline": "greedy_cse",
       "dominated_by": [
         "1472a09886a8",
-        "b65a4c2b615e"
+        "ed4ed2ba71db"
       ],
       "metrics": {
         "maximum_depth": 9,
@@ -42,8 +42,8 @@
     {
       "baseline": "yosys_abc",
       "dominated_by": [
-        "b65a4c2b615e",
-        "b8edf279b361"
+        "900a2989cbc1",
+        "ed4ed2ba71db"
       ],
       "metrics": {
         "maximum_depth": 7,
@@ -111,68 +111,15 @@
     },
     {
       "artifacts": [
-        "results/phase6/candidate_depth7_bounded.v"
-      ],
-      "candidate_classes": [
-        "B7"
-      ],
-      "circuit_id": "b65a4c2b615e",
-      "metrics": {
-        "direct_output_alias_count": 32,
-        "intermediate_node_count": 441,
-        "maximum_depth": 7,
-        "maximum_fanout": 5,
-        "output_depths": [
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7,
-          7
-        ],
-        "total_excess_fanout_above_4": 5,
-        "total_fanout": 914,
-        "xor2_count": 441
-      },
-      "structural_sha256": "b65a4c2b615e65a5b6c83cdeda85a1ac5620bb681c5cca029f896f709b15041b"
-    },
-    {
-      "artifacts": [
-        "results/phase6/candidate_depth6_bounded.v"
+        "results/kraft_adaptive/notable/seed_286375_depth6.v"
       ],
       "candidate_classes": [
         "C"
       ],
-      "circuit_id": "b8edf279b361",
+      "circuit_id": "900a2989cbc1",
       "metrics": {
         "direct_output_alias_count": 32,
-        "intermediate_node_count": 470,
+        "intermediate_node_count": 465,
         "maximum_depth": 6,
         "maximum_fanout": 6,
         "output_depths": [
@@ -209,11 +156,64 @@
           6,
           6
         ],
-        "total_excess_fanout_above_4": 20,
-        "total_fanout": 972,
-        "xor2_count": 470
+        "total_excess_fanout_above_4": 19,
+        "total_fanout": 962,
+        "xor2_count": 465
       },
-      "structural_sha256": "b8edf279b361938883063e4218885c6dfe222e0449ee4d21c20d0d7d62fda312"
+      "structural_sha256": "900a2989cbc11166c9350513438e889fcbbbef0a24ce605a5354fc1376b1d34b"
+    },
+    {
+      "artifacts": [
+        "results/ablation/rewrite_depth7.v"
+      ],
+      "candidate_classes": [
+        "B7"
+      ],
+      "circuit_id": "ed4ed2ba71db",
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 440,
+        "maximum_depth": 7,
+        "maximum_fanout": 5,
+        "output_depths": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "total_excess_fanout_above_4": 3,
+        "total_fanout": 912,
+        "xor2_count": 440
+      },
+      "structural_sha256": "ed4ed2ba71dbbc0030d81a4208ba1676fcb7bc80f8faa5f45f6a13e12969a3a9"
     }
   ],
   "generated_by": "phase6-final-results-v1",
@@ -480,12 +480,12 @@
       }
     },
     {
-      "artifact": "results/phase6/candidate_depth7_bounded.v",
+      "artifact": "results/ablation/rewrite_depth7.v",
       "candidate_class": "B7",
-      "circuit_id": "b65a4c2b615e",
+      "circuit_id": "ed4ed2ba71db",
       "metrics": {
         "direct_output_alias_count": 32,
-        "intermediate_node_count": 441,
+        "intermediate_node_count": 440,
         "maximum_depth": 7,
         "maximum_fanout": 5,
         "output_depths": [
@@ -522,26 +522,28 @@
           7,
           7
         ],
-        "total_excess_fanout_above_4": 5,
-        "total_fanout": 914,
-        "xor2_count": 441
+        "total_excess_fanout_above_4": 3,
+        "total_fanout": 912,
+        "xor2_count": 440
       },
-      "module": "candidate_depth7_bounded",
+      "module": "candidate_depth7_ablation_rewrite",
       "on_pareto_frontier": true,
       "provenance": {
-        "accepted_incumbents": 6,
-        "algorithm": "kraft-bounded-bp-cse-depth7-v1",
-        "checkpoint": "results/checkpoints/depth7_bounded_search.json",
+        "accepted_incumbents": 7,
+        "algorithm": "ablation-rewrite-depth7-v1",
+        "checkpoint": "results/checkpoints/ablation/rewrite_depth7_search.json",
         "depth_cap": 7,
-        "logged_attempts": 10000,
+        "logged_attempts": 1000,
         "replayed_from_seed": true,
-        "seed": 40505,
-        "seed_count": 10000,
-        "seed_start": 40000,
-        "winning_attempt_id": "kraft-bounded-bp-cse-depth7-v1-seed-40505"
+        "seed": 160832,
+        "seed_count": 1000,
+        "seed_start": 160000,
+        "selected_attempt_id": "ablation-rewrite-depth7-v1-seed-160832",
+        "selection": "budget incumbent",
+        "winning_attempt_id": "ablation-rewrite-depth7-v1-seed-160832"
       },
-      "seed": 40505,
-      "structural_sha256": "b65a4c2b615e65a5b6c83cdeda85a1ac5620bb681c5cca029f896f709b15041b",
+      "seed": 160832,
+      "structural_sha256": "ed4ed2ba71dbbc0030d81a4208ba1676fcb7bc80f8faa5f45f6a13e12969a3a9",
       "verification": {
         "exact_vectors": 97,
         "formal_equivalence": "passed",
@@ -551,12 +553,12 @@
       }
     },
     {
-      "artifact": "results/phase6/candidate_depth6_bounded.v",
+      "artifact": "results/kraft_adaptive/notable/seed_286375_depth6.v",
       "candidate_class": "C",
-      "circuit_id": "b8edf279b361",
+      "circuit_id": "900a2989cbc1",
       "metrics": {
         "direct_output_alias_count": 32,
-        "intermediate_node_count": 470,
+        "intermediate_node_count": 465,
         "maximum_depth": 6,
         "maximum_fanout": 6,
         "output_depths": [
@@ -593,26 +595,28 @@
           6,
           6
         ],
-        "total_excess_fanout_above_4": 20,
-        "total_fanout": 972,
-        "xor2_count": 470
+        "total_excess_fanout_above_4": 19,
+        "total_fanout": 962,
+        "xor2_count": 465
       },
-      "module": "candidate_depth6_bounded",
+      "module": "candidate_depth6_kraft_adaptive",
       "on_pareto_frontier": true,
       "provenance": {
-        "accepted_incumbents": 10,
-        "algorithm": "kraft-bounded-bp-cse-depth6-v1",
-        "checkpoint": "results/checkpoints/depth6_bounded_search.json",
+        "accepted_incumbents": 11,
+        "algorithm": "kraft-adaptive-tiebreak-half-depth6-v2",
+        "checkpoint": "results/checkpoints/kraft_adaptive/stage2_rerun_depth6_search.json",
         "depth_cap": 6,
         "logged_attempts": 10000,
         "replayed_from_seed": true,
-        "seed": 56140,
+        "seed": 286375,
         "seed_count": 10000,
-        "seed_start": 50000,
-        "winning_attempt_id": "kraft-bounded-bp-cse-depth6-v1-seed-56140"
+        "seed_start": 281000,
+        "selected_attempt_id": "kraft-adaptive-tiebreak-half-depth6-v2-seed-286375",
+        "selection": "selected nondominated minimum-XOR2 trial",
+        "winning_attempt_id": "kraft-adaptive-tiebreak-half-depth6-v2-seed-288438"
       },
-      "seed": 56140,
-      "structural_sha256": "b8edf279b361938883063e4218885c6dfe222e0449ee4d21c20d0d7d62fda312",
+      "seed": 286375,
+      "structural_sha256": "900a2989cbc11166c9350513438e889fcbbbef0a24ce605a5354fc1376b1d34b",
       "verification": {
         "exact_vectors": 97,
         "formal_equivalence": "passed",
