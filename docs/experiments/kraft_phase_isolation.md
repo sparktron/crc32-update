@@ -83,10 +83,12 @@ python3 -B -m optimizer.phase_isolation --stage stage2 --workers 16
 
 ## Observed
 
-Code: `7dcc2fb009a1cd9a50860d738674a586355539d4`. The tracked tree was
-clean before the budget. An unrelated untracked `docs/reviews/` directory was
-present, was not read, and was not part of this experiment. Environment and
-commands are captured in `results/phase_isolation/run_manifest.json`.
+Code: `7dcc2fb009a1cd9a50860d738674a586355539d4`. The tree was clean before
+the budget. An unrelated architecture review was committed in the shared
+checkout at `ae66dba`, between the recorded base and preregistration. It was
+not read or used by this experiment and is excluded from the experiment PR's
+diff, with the local file preserved. Environment and commands are captured in
+`results/phase_isolation/run_manifest.json`.
 
 All eight 1,000-seed budgets completed: 8,000 unique attempt IDs, every trial
 verified and within its depth cap, and 52 retained-incumbent acceptances.
