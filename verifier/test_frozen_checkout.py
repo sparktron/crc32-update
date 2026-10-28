@@ -48,6 +48,14 @@ class FrozenCheckoutTests(unittest.TestCase):
             run_frozen(self.commit, ["evidence"], command, ["out.txt"])
         self.assertEqual(Path("evidence/in.txt").read_text(), "data")
 
+    def test_live_log_growing_during_the_command_is_not_a_change(self):
+        # The audit's own progress log sits in the evidence tree and keeps growing.
+        log = Path("evidence/progress.log").resolve()
+        log.write_text("start\n")
+        command = ["python3", "-B", "-c", f"open({str(log)!r}, 'a').write('more\\n')"]
+        run_frozen(self.commit, ["evidence"], command, ["out.txt"])
+        self.assertEqual(log.read_text(), "start\nmore\n")
+
 
 if __name__ == "__main__":
     unittest.main()

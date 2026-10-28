@@ -39,22 +39,25 @@ def run_frozen(commit: str, evidence, command, outputs) -> None:
     """Run ``command`` at ``commit`` on a copy of ``evidence``; copy back ``outputs``.
 
     ``outputs`` are glob patterns relative to the repository root. Every other
-    copied evidence file must be byte-identical after the command.
+    copied evidence file must be byte-identical to what was copied in; files
+    still growing in the live tree (such as the audit's own log) are compared
+    against their snapshot, not their current bytes.
     """
     with tempfile.TemporaryDirectory(prefix="frozen-checkout-") as parent:
         checkout = Path(parent) / "checkout"
         subprocess.run(["git", "worktree", "add", "--detach", str(checkout), commit],
                        check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
-            copied = list(_files(evidence))
-            for path in copied:
+            snapshot = {}
+            for path in _files(evidence):
                 (checkout / path).parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(path, checkout / path)
+                snapshot[path] = _sha256(checkout / path)
             subprocess.run(command, cwd=checkout, check=True)
             produced = {path.relative_to(checkout) for pattern in outputs
                         for path in checkout.glob(pattern) if path.is_file()}
-            for path in copied:
-                if path not in produced and _sha256(checkout / path) != _sha256(path):
+            for path, digest in snapshot.items():
+                if path not in produced and _sha256(checkout / path) != digest:
                     raise ValueError(f"frozen command changed evidence: {path}")
             for path in sorted(produced):
                 path.parent.mkdir(parents=True, exist_ok=True)

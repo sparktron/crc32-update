@@ -727,3 +727,47 @@ and updated comparison evidence.
   experiment, preregister a residual feasible-opportunity score and a one-step
   shortlist control to isolate future information. Treat integration of the
   438 witness, including its fanout tradeoff and provenance, as separate work.
+
+### Elite-prefix restart experiment (2026-10-28)
+
+- Completed the preregistered heritability test: 20 elite and 20 median
+  recorded parents per cap; their first 25/50/75/100% of sharing decisions
+  are replayed exactly, then each child continues on a fresh seed. With 2,000
+  fresh control trials per cap, that is **20,000 independently checked
+  trials** and 124 fully verified incumbents. Code/protocol/parent table were
+  committed before collection at `5bacbb2`. This was chosen ahead of the
+  lookahead record's proposed residual-opportunity score. Protocol:
+  `docs/experiments/elite_prefix_restart.md`; full observations:
+  `docs/experiments/elite_prefix_restart_results.md`.
+- **H8 confirmed at both caps.** At f = 50, elite children beat fresh trials
+  by 9.16 gates at depth 7 (z −15.9) and 13.20 at depth 6 (z −18.3), and beat
+  median-parent children by 8.70 (z −11.8) and 13.61 (z −16.4). Median
+  prefixes change nothing. Heritability slopes are 0.17/0.25 at f = 25,
+  0.64/0.82 at f = 50 and about 1 from f = 75. Redrawing only finishing never
+  changed a gate count (4,000 of 4,000 f = 100 children equal their parent).
+- **Both existence targets met.** Depth 7: seed **502021**, a verified
+  **437-XOR2** circuit (maximum fanout 5, total fanout 906, excess 2), from
+  the 438's prefix at f = 75. It is no worse than A/B (439, depth 8) and B7
+  (440) on every objective. Depth 6: seed **522004**, a verified **460-XOR2**
+  circuit (fanout 6, excess 19), from the 462's prefix, no worse than C (465)
+  on every objective. 4 children reached 437 and 13 reached <=461 (three at
+  460); seeds 522005 and 522032 are 461/depth 6 with maximum fanout 5 but
+  were only structurally and exactly checked. Fresh and median arms' bests
+  were 442/443 and 469/469.
+- The submitted frontier, metrics and report are unchanged. Adopting the 437
+  and 460 leaves two distinct Pareto circuits against the three `SPEC.md`
+  requires, so integration needs a third fully verified nondominated circuit
+  (for example a fanout-5 depth-6 circuit) or an owner decision.
+- Validation: the post-collection audit (`scripts/audit_elite_prefix.py`)
+  ran in a detached checkout of `5bacbb2`. It passed frozen-source identity,
+  coverage, phase sums, depth bounds and every child's prefix digest. All 124
+  incumbents replayed byte for byte, with formal-proof traces. The completed
+  replay preserved 182 evidence files with no new trials. All 18 best
+  artifacts, including the 437 and 460, were rechecked and formally proved
+  again. All 111 regression tests passed, and the submitted-result
+  provenance check passed. Full clean-clone rebuild was not repeated.
+- Next: per the frozen rule, preregister an iterated elite-restart search at
+  each cap against fresh seeds at matched compute, including the cost of
+  building the elite pool, with tail-rate and best-of-N endpoints on new
+  seeds. State the replay fraction or schedule (f = 50 explores, f = 75
+  produced both bests) and the pool-refresh rule before results.
