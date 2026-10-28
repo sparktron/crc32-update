@@ -9,6 +9,7 @@ from optimizer.optimize import independently_check
 from optimizer.sharing_lookahead import (
     CHECKPOINTS, LOG, ROOT, SEEDS, algorithm_name, build_trial,
 )
+from scripts.frozen_checkout import run_frozen, sources_match
 from verifier.run_formal import run as run_formal
 from verifier.verify_network import verification_report, DEFAULT_RANDOM_TESTS, DEFAULT_RANDOM_SEED
 
@@ -36,6 +37,15 @@ def evidence_hashes():
 
 def main():
     manifest = json.loads((ROOT / 'run_manifest.json').read_text())
+    if not sources_match(manifest):
+        # Later commits change the frozen sources; audit at the preregistration
+        # commit, which carries this script's audited version unchanged.
+        run_frozen(manifest['code_commit'], [LOG, ROOT, CHECKPOINTS],
+                   ['python3', '-B', '-m', 'scripts.audit_sharing_lookahead'],
+                   [str(ROOT / 'validation_summary.json'),
+                    str(ROOT / 'stage*_completed_replay.log'),
+                    str(ROOT / 'stage*_verification.json')])
+        return
     for path, digest in manifest['source_sha256'].items():
         if hashlib.sha256(Path(path).read_bytes()).hexdigest() != digest:
             raise ValueError(f'frozen source differs: {path}')
