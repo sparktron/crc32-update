@@ -5,8 +5,8 @@ combinational XOR2 networks implementing a 64-bit parallel reflected IEEE
 CRC-32 state update.
 
 The experiment is complete through gate G6. The verified Pareto frontier has
-three distinct circuits: 439 XOR2 at depth 8 (A/B), 441 at depth 7 (B7), and
-470 at depth 6 (C). Depth 6 is proven minimal; gate counts are best found for
+three distinct circuits: 439 XOR2 at depth 8 (A/B), 440 at depth 7 (B7), and
+465 at depth 6 (C). Depth 6 is proven minimal; gate counts are best found for
 the recorded budgets. The [final report](report.md) documents methodology,
 results, comparisons, limitations, and reproduction.
 
@@ -397,10 +397,17 @@ default to the recorded budget for the requested `--depth-cap`. A checkpoint
 from a different cap or seed range is rejected.
 
 Both budgets have completed. The depth-7 budget's best trial (seed 40,505) has
-441 XOR2 and the depth-6 budget's (seed 56,140) has 470 XOR2. They are
-submitted as B7 and Candidate C in `verifier/build_results.py`, which checks each
-against its completed checkpoint, full logged seed range, accepted incumbent,
-and a replay from its seed before regenerating the result files.
+441 XOR2 and the depth-6 budget's (seed 56,140) has 470 XOR2. They were
+submitted as B7 and Candidate C until 2026-10-27, when verified circuits from
+the follow-up experiments replaced them (see
+[docs/experiments/](docs/experiments)):
+- B7: 440 XOR2, seed 160,832 of the ablation `rewrite` arm.
+- C: 465 XOR2, seed 286,375 of the Kraft-adaptive v2 rerun.
+
+`verifier/build_results.py` checks every bounded submission before
+regenerating the result files: against its completed checkpoint and full
+logged seed range, against its accepted incumbent or the selected-trial rule,
+and by a replay from its seed.
 
 ## Clean-Checkout Rebuild
 

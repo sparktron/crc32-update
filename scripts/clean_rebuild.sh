@@ -136,7 +136,10 @@ done
 same results/phase4/candidate_b_refined.v "${output}/phase4/candidate_b_depth8.v"
 same results/phase4/candidate_c_refined.v "${output}/phase4/candidate_c_min_depth.v"
 
-step "Depth-bounded B7 and Candidate C replays"
+# These are the original Kraft-bounded B7 and C, superseded on 2026-10-27.
+# They are replayed for provenance. build_results --check below replays the
+# current B7 and C from their recorded seeds.
+step "Superseded Kraft-bounded B7 and C replays"
 for cap in 7 6; do
   best="$(checkpoint_seed "results/checkpoints/depth${cap}_bounded_search.json")"
   python3 -m optimizer.depth_bounded --depth-cap "${cap}" \
