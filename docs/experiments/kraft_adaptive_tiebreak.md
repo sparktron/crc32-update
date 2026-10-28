@@ -242,6 +242,34 @@ at depth ≤ 6:
   statistics, however, cover only 3,862 seeds.
 - **H3 at cap 7 not tested**, because stage 2 was not triggered there.
 
+**Stage 2 rerun under v2 (recorded before it starts).**
+- **The fix:** commit `d37e628` adds `_BoundedBuilder._merge_fresh`, a
+  fresh-gate fallback, to the finishing passes.
+  - Cause of the v1 failure, now diagnosed: at seed 284,862 the row's Kraft
+    sum was exactly 64 = 2^6. The only merge that fit (two depth-1 signals
+    into a depth-2 gate) had an XOR that already existed as a depth-3 signal.
+    Deduplication reused that signal, which made the sum 68, so no pair fit.
+    The Kraft invariant held throughout.
+  - The fallback is reached only where v1 raised. 1,600 of 1,600 sampled
+    logged seeds across every affected family replay with their logged
+    metrics. B7, C, and the 440, 467, 468, 469 and 466 networks replay
+    byte for byte.
+- **Configuration:** the same stage-2 seeds, 281,000–290,999, under algorithm
+  `kraft-adaptive-tiebreak-half-depth6-v2`.
+  - Run name `stage2_rerun_depth6`.
+  - Log `results/search_logs/kraft_adaptive_tiebreak.jsonl`.
+  - Checkpoint, incumbents and artifact under the `stage2_rerun_depth6` names
+    in `results/checkpoints/kraft_adaptive/` and `results/kraft_adaptive/`.
+  - Command:
+    `python3 -m optimizer.kraft_adaptive --stage stage2_rerun --depth-cap 6 --workers 16`
+- **Determinism check, decided now:** every seed in 281,000–284,861 must give
+  exactly v1's logged final metrics, 3,862 of 3,862. If any differ, the v2
+  results are not used.
+- **What it settles:** H3 is already confirmed (the 466). The rerun completes
+  the pre-registered 10,000-seed stage-2 budget, so the cap-6 distribution
+  and best-of-10,000 can be reported in full. It adds no new hypothesis.
+- **Results:** not run yet.
+
 ## Interpretation
 
 Everything below is inference.
