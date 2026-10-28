@@ -128,6 +128,12 @@ def main() -> int:
     if (args.stage, cap) not in STAGES:
         parser.error(f"stage {args.stage} is not registered at cap {cap}")
     seed_start, seed_count, version = STAGES[(args.stage, cap)]
+    if version == "v1":
+        parser.error(
+            "v1 stages are frozen: this runner uses the v2 finishing algorithm; "
+            "use the recorded v1 commit for historical reproduction, or "
+            "--stage stage2_rerun --depth-cap 6 for the registered v2 rerun"
+        )
     args.search_log = args.search_log or log_file_for(algorithm_name(cap, version))
     run = f"{args.stage}_depth{cap}"
     checkpoints = Path("results/checkpoints/kraft_adaptive")

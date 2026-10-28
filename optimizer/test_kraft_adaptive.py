@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 import unittest
+from contextlib import redirect_stderr
+from io import StringIO
+from unittest.mock import patch
 
 from optimizer.depth_bounded import search_seed_bounded
 from optimizer.kraft_adaptive import STAGES, THETA, _AdaptiveBuilder, search_seed_adaptive
@@ -56,6 +59,36 @@ class TightRowTests(unittest.TestCase):
 
 
 class StageTests(unittest.TestCase):
+    def test_v1_stages_cannot_run_with_v2_code(self) -> None:
+        for (stage, cap), (_, _, version) in STAGES.items():
+            if version != "v1":
+                continue
+            with self.subTest(stage=stage, cap=cap):
+                with patch("sys.argv", ["kraft_adaptive", "--stage", stage,
+                                        "--depth-cap", str(cap)]), \
+                     patch("optimizer.kraft_adaptive.run_bounded_search") as run, \
+                     patch("optimizer.kraft_adaptive._exclusive_search_lock") as lock, \
+                     redirect_stderr(StringIO()) as errors:
+                    from optimizer.kraft_adaptive import main
+                    with self.assertRaises(SystemExit) as raised:
+                        main()
+                    self.assertEqual(raised.exception.code, 2)
+                    self.assertIn("v1 stages are frozen", errors.getvalue())
+                    run.assert_not_called()
+                    lock.assert_not_called()
+
+    def test_v2_rerun_keeps_its_versioned_algorithm(self) -> None:
+        with patch("sys.argv", ["kraft_adaptive", "--stage", "stage2_rerun",
+                                "--depth-cap", "6"]), \
+             patch("optimizer.kraft_adaptive.run_bounded_search",
+                   return_value=(286375, {})) as run, \
+             patch("optimizer.kraft_adaptive._exclusive_search_lock"), \
+             patch("builtins.print"):
+            from optimizer.kraft_adaptive import main
+            self.assertEqual(main(), 0)
+            self.assertEqual(run.call_args.kwargs["algorithm"],
+                             "kraft-adaptive-tiebreak-half-depth6-v2")
+
     def test_stage_ranges_are_disjoint(self) -> None:
         # The v2 rerun deliberately repeats stage 2's seeds under a new name.
         ranges = sorted(

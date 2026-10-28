@@ -645,3 +645,16 @@ limitations below remain in effect.
 Next: review and commit the final documentation on `phase6-final-results`.
 New optimization or stronger publication claims require a separate experiment
 and updated comparison evidence.
+
+
+### PR #11 review fixes (2026-10-27)
+
+- Integrated master’s corrected Campobello input-factoring comparison while
+  preserving the verified 465/440-gate frontier.
+- The current adaptive runner rejects historical v1 stages before locking or
+  writing logs. Its v2 finishing fallback must not continue the aborted v1
+  experiment; the registered `stage2_rerun` retains its v2 algorithm name.
+- Regression validation: `python3 -m unittest optimizer.test_kraft_adaptive
+  optimizer.test_depth_bounded verifier.test_search_logs`: 21 tests passed
+  in 29.596 seconds. `git diff --check` passed. Full clean rebuild remains
+  a CI check.
