@@ -1,0 +1,137 @@
+Starting/resuming stage1_control_depth7: 400000..400999
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400000.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400001.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400013.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400033.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400035.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400046.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400088.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400165.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth7_incumbents/seed_400800.v (module candidate_lookahead_control_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Completed stage1_control_depth7
+Starting/resuming stage1_candidate_depth7: 400000..400999
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400000.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400001.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400010.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400018.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400085.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400088.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400104.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400433.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400516.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth7_incumbents/seed_400628.v (module candidate_lookahead_candidate_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Completed stage1_candidate_depth7
+Starting/resuming stage1_control_depth6: 420000..420999
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth6_incumbents/seed_420000.v (module candidate_lookahead_control_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth6_incumbents/seed_420001.v (module candidate_lookahead_control_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth6_incumbents/seed_420007.v (module candidate_lookahead_control_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth6_incumbents/seed_420043.v (module candidate_lookahead_control_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth6_incumbents/seed_420062.v (module candidate_lookahead_control_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_control_depth6_incumbents/seed_420247.v (module candidate_lookahead_control_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Completed stage1_control_depth6
+Starting/resuming stage1_candidate_depth6: 420000..420999
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth6_incumbents/seed_420000.v (module candidate_lookahead_candidate_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth6_incumbents/seed_420001.v (module candidate_lookahead_candidate_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth6_incumbents/seed_420003.v (module candidate_lookahead_candidate_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth6_incumbents/seed_420033.v (module candidate_lookahead_candidate_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth6_incumbents/seed_420062.v (module candidate_lookahead_candidate_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth6_incumbents/seed_420247.v (module candidate_lookahead_candidate_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/sharing_lookahead/stage1_candidate_depth6_incumbents/seed_420316.v (module candidate_lookahead_candidate_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Completed stage1_candidate_depth6
+{"caps": {"6": {"arms": {"candidate": {"accepted_incumbents": 7, "best_gates": 468, "best_seed_by_gates": 420316, "lookahead_totals": {"changed_proposals": 2526, "probes": 491237, "proposal_future_reward": 887098, "reward_gain_vs_proposal": 2537, "selected_future_reward": 887290, "sharing_decisions": 164594, "tied_best_decisions": 162399}, "mean": 485.845, "mean_finishing_retained": 321.251, "mean_sharing_retained": 164.594, "mean_worker_seconds": 17.324482538, "n": 1000, "sd": 5.3411143502552445, "targets_met": 0, "total_worker_seconds": 17324.482538000015}, "control": {"accepted_incumbents": 6, "best_gates": 471, "best_seed_by_gates": 420247, "lookahead_totals": {}, "mean": 485.18, "mean_finishing_retained": 320.145, "mean_sharing_retained": 165.035, "mean_worker_seconds": 3.653476734, "n": 1000, "sd": 5.334609456938535, "targets_met": 0, "total_worker_seconds": 3653.4767340000026}}, "paired_candidate_minus_control": {"ci95_normal_approximation": [0.3065384339509543, 1.0234615660490458], "mean": 0.665, "n": 1000, "standard_error": 0.18288855410665597, "z_normal_approximation": 3.636094140763937}, "passes_frozen_rule": false, "runtime_ratio": 4.741916754737982}, "7": {"arms": {"candidate": {"accepted_incumbents": 10, "best_gates": 442, "best_seed_by_gates": 400628, "lookahead_totals": {"changed_proposals": 2435, "probes": 543854, "proposal_future_reward": 917079, "reward_gain_vs_proposal": 2457, "selected_future_reward": 917218, "sharing_decisions": 182152, "tied_best_decisions": 180629}, "mean": 455.881, "mean_finishing_retained": 273.729, "mean_sharing_retained": 182.152, "mean_worker_seconds": 18.184008037, "n": 1000, "sd": 4.122114849301367, "targets_met": 0, "total_worker_seconds": 18184.008037000003}, "control": {"accepted_incumbents": 9, "best_gates": 438, "best_seed_by_gates": 400800, "lookahead_totals": {}, "mean": 456.035, "mean_finishing_retained": 273.833, "mean_sharing_retained": 182.202, "mean_worker_seconds": 3.126063449, "n": 1000, "sd": 4.093718790236273, "targets_met": 1, "total_worker_seconds": 3126.063449000002}}, "paired_candidate_minus_control": {"ci95_normal_approximation": [-0.4478088689367049, 0.13980886893670494], "mean": -0.154, "n": 1000, "standard_error": 0.14990248415138008, "z_normal_approximation": -1.0273345426649636}, "passes_frozen_rule": false, "runtime_ratio": 5.816903058323049}}, "stage": "stage1"}
