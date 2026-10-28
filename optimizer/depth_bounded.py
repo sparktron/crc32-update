@@ -129,6 +129,41 @@ class _BoundedBuilder:
         self.operations.append(Operation(output, pair[0], pair[1]))
         return output
 
+    def _merge_fresh(self, expression: set[int]) -> tuple[tuple[int, int], int]:
+        """Take one finishing step for ``expression`` with a fresh, non-reused gate.
+
+        This runs only when no pair of ``expression`` fits as ``_target`` resolves
+        it. That happens when every merge that would fit has an XOR that already
+        exists as a signal too deep for this row; reusing that signal would break
+        the cap. Example: seed 284,862 of the Kraft-adaptive search, where the
+        row's Kraft sum is exactly 2**cap.
+
+        A Kraft-feasible row always has a pair that fits as a fresh gate at depth
+        1 + max(input depths). The two shallowest signals are one such pair. The
+        new gate repeats an existing vector at a lower depth, and the vector now
+        maps to it.
+
+        Every trial that completed before this method existed never reaches it,
+        so its result is unchanged.
+        """
+        kraft = _kraft(expression, self.depths)
+        options = []
+        for pair in combinations(sorted(expression), 2):
+            depth = 1 + max(self.depths[pair[0]], self.depths[pair[1]])
+            increase = (1 << depth) - (1 << self.depths[pair[0]]) - (1 << self.depths[pair[1]])
+            if kraft + increase <= self.limit:
+                options.append((depth, pair))
+        if not options:
+            raise RuntimeError("no depth-feasible pair even as a fresh gate")
+        depth, pair = min(options)
+        output = len(self.vectors)
+        self.vectors.append(self.vectors[pair[0]] ^ self.vectors[pair[1]])
+        self.depths.append(depth)
+        self.vector_to_signal[self.vectors[output]] = output
+        self.operations.append(Operation(output, pair[0], pair[1]))
+        _replace_pair(expression, pair, output)
+        return pair, output
+
     def _apply(self, pair: tuple[int, int]) -> None:
         """Replace ``pair`` in every expression where the result stays within the cap."""
         targets = [
@@ -202,7 +237,8 @@ class _BoundedBuilder:
                     if self._fits(expression, pair)
                 ]
                 if not pairs:
-                    raise RuntimeError("no depth-feasible pair; Kraft invariant broken")
+                    self._merge_fresh(expression)
+                    continue
                 known = []
                 for pair in pairs:
                     replacement, depth = self._target(pair)

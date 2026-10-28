@@ -115,7 +115,8 @@ class _SlackBuilder(_BoundedBuilder):
                     if self._fits(expression, pair)
                 ]
                 if not pairs:
-                    raise RuntimeError("no depth-feasible pair; Kraft invariant broken")
+                    self._merge_fresh(expression)
+                    continue
                 known = []
                 for pair in pairs:
                     replacement, depth = self._target(pair)

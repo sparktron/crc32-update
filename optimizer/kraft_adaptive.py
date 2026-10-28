@@ -30,18 +30,22 @@ from verifier.verify_network import DEFAULT_RANDOM_SEED, DEFAULT_RANDOM_TESTS
 from verifier.search_logs import log_file_for
 
 THETA = 0.5
-ALGORITHM_VERSION = "v1"
-# Pre-registered (stage, cap) -> (seed start, seed count); disjoint from every logged range.
+# v1 raised "no depth-feasible pair" on seed 284,862, which stopped stage 2.
+# v2 adds the shared finishing fallback (``_BoundedBuilder._merge_fresh``). It
+# matches v1 on every trial v1 completed, and also completes v1's failing
+# trials. ``stage2_rerun`` repeats stage 2's seeds under v2.
+# Pre-registered (stage, cap) -> (seed start, seed count, version).
 STAGES = {
-    ("stage1", 7): (260_000, 1_000),
-    ("stage1", 6): (280_000, 1_000),
-    ("stage2", 7): (261_000, 10_000),
-    ("stage2", 6): (281_000, 10_000),
+    ("stage1", 7): (260_000, 1_000, "v1"),
+    ("stage1", 6): (280_000, 1_000, "v1"),
+    ("stage2", 7): (261_000, 10_000, "v1"),
+    ("stage2", 6): (281_000, 10_000, "v1"),
+    ("stage2_rerun", 6): (281_000, 10_000, "v2"),
 }
 
 
-def algorithm_name(depth_cap: int) -> str:
-    return f"kraft-adaptive-tiebreak-half-depth{depth_cap}-{ALGORITHM_VERSION}"
+def algorithm_name(depth_cap: int, version: str = "v1") -> str:
+    return f"kraft-adaptive-tiebreak-half-depth{depth_cap}-{version}"
 
 
 def module_name(depth_cap: int) -> str:
@@ -105,7 +109,9 @@ def search_seed_adaptive(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--stage", choices=["stage1", "stage2"], required=True)
+    parser.add_argument(
+        "--stage", choices=sorted({stage for stage, _ in STAGES}), required=True
+    )
     parser.add_argument("--depth-cap", type=int, choices=[6, 7], required=True)
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument(
@@ -119,8 +125,10 @@ def main() -> int:
     )
     args = parser.parse_args()
     cap = args.depth_cap
-    args.search_log = args.search_log or log_file_for(algorithm_name(cap))
-    seed_start, seed_count = STAGES[(args.stage, cap)]
+    if (args.stage, cap) not in STAGES:
+        parser.error(f"stage {args.stage} is not registered at cap {cap}")
+    seed_start, seed_count, version = STAGES[(args.stage, cap)]
+    args.search_log = args.search_log or log_file_for(algorithm_name(cap, version))
     run = f"{args.stage}_depth{cap}"
     checkpoints = Path("results/checkpoints/kraft_adaptive")
     try:
@@ -137,7 +145,7 @@ def main() -> int:
                 args.random_tests,
                 args.random_seed,
                 trial=partial(search_seed_adaptive, theta=THETA),
-                algorithm=algorithm_name(cap),
+                algorithm=algorithm_name(cap, version),
                 module_name=module_name(cap),
             )
     except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as error:

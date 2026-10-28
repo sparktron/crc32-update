@@ -57,9 +57,36 @@ class TightRowTests(unittest.TestCase):
 
 class StageTests(unittest.TestCase):
     def test_stage_ranges_are_disjoint(self) -> None:
-        ranges = sorted((start, start + count) for start, count in STAGES.values())
+        # The v2 rerun deliberately repeats stage 2's seeds under a new name.
+        ranges = sorted(
+            (start, start + count)
+            for (stage, _), (start, count, _) in STAGES.items()
+            if stage != "stage2_rerun"
+        )
         for (_, end), (start, _) in zip(ranges, ranges[1:]):
             self.assertLessEqual(end, start)
+
+    def test_rerun_repeats_stage_two_under_v2(self) -> None:
+        self.assertEqual(STAGES[("stage2_rerun", 6)], (281_000, 10_000, "v2"))
+        self.assertEqual(STAGES[("stage2", 6)][:2], STAGES[("stage2_rerun", 6)][:2])
+
+
+class FinishingFallbackTests(unittest.TestCase):
+    def test_seed_that_stopped_v1_now_completes_within_cap(self) -> None:
+        # v1 raised "no depth-feasible pair" here: the only merge that fit had an
+        # XOR that already existed as a deeper signal.
+        for search in (search_seed_adaptive, search_seed_slack):
+            with self.subTest(search=search.__name__):
+                candidate = search(284862, 6)
+                self.assertLessEqual(independently_check(candidate).maximum_depth, 6)
+
+    def test_fallback_leaves_the_466_network_unchanged(self) -> None:
+        incumbents = ROOT / "results/checkpoints/kraft_adaptive/stage2_depth6_incumbents"
+        recorded = incumbents / "seed_281125.v"
+        self.assertEqual(
+            search_seed_adaptive(281125, 6).render("candidate_depth6_kraft_adaptive"),
+            recorded.read_text(),
+        )
 
 
 if __name__ == "__main__":

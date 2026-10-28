@@ -101,6 +101,14 @@ class _AblatedBuilder(_BoundedBuilder):
             self.children[pair[1]].append(output)
         return output
 
+    def _merge_fresh(self, expression: set[int]) -> tuple[tuple[int, int], int]:
+        pair, output = super()._merge_fresh(expression)
+        self.parents.append(pair)
+        self.children.append([])
+        self.children[pair[0]].append(output)
+        self.children[pair[1]].append(output)
+        return pair, output
+
     def free_rewrites(self) -> None:
         if "rewrite" not in self.components:
             super().free_rewrites()
@@ -214,7 +222,8 @@ class _AblatedBuilder(_BoundedBuilder):
                     if self._fits(expression, pair)
                 ]
                 if not pairs:
-                    raise RuntimeError("no depth-feasible pair; Kraft invariant broken")
+                    self._merge_fresh(expression)
+                    continue
                 known = []
                 for pair in pairs:
                     replacement, depth = self._target(pair)
