@@ -30,6 +30,7 @@ EXPERIMENT_LOGS: tuple[tuple[str, str], ...] = (
     ("ablation-", "ablation_toward_dclo.jsonl"),
     ("kraft-slack-tiebreak-", "kraft_slack_tiebreak.jsonl"),
     ("kraft-adaptive-tiebreak-", "kraft_adaptive_tiebreak.jsonl"),
+    ("kraft-phase-isolation-", "kraft_phase_isolation.jsonl"),
 )
 
 

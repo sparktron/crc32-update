@@ -1,0 +1,4 @@
+Formal target: /home/mythos/repos/crc32-update/results/checkpoints/phase_isolation/stage1_both_depth6_incumbents/seed_320099.v (module candidate_phase_both_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
