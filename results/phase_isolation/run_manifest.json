@@ -1,0 +1,21 @@
+{
+  "branch": "codex/kraft-phase-isolation",
+  "cpu": "Intel Core i9-10900K",
+  "first_record_utc": "2026-10-28T14:02:35.003174Z",
+  "last_record_utc": "2026-10-28T14:32:37.628071Z",
+  "logical_cpus": 20,
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "pre_run_validation": "7 tests passed: optimizer.test_phase_isolation verifier.test_search_logs; fresh ranges checked against 127904 historical records",
+  "python": "3.10.12",
+  "random_vectors": 100000,
+  "registered_code_commit": "7dcc2fb009a1cd9a50860d738674a586355539d4",
+  "screening_completion_observed_utc": "2026-10-28T14:33:45.698715+00:00",
+  "stage1_command": "python3 -B -m optimizer.phase_isolation --stage stage1 --workers 16",
+  "stage2_command": "python3 -B -m optimizer.phase_isolation --stage stage2 --workers 16",
+  "started_utc": "2026-10-28T14:02:22.558923+00:00",
+  "status_before_budget": [],
+  "verification_seed": 3274333933,
+  "workers": 16,
+  "yosys": "Yosys 0.9 (git sha1 1979e0b)",
+  "z3": "Z3 version 4.8.12 - 64 bit"
+}

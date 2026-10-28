@@ -1,6 +1,6 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-10-24
+Last updated: 2026-10-28
 
 Current phase: Phase 6 — Final verification, comparison, and reporting complete
 
@@ -9,7 +9,7 @@ Current gate: G6 passed locally on 2026-10-24. The final report is in
 the three-circuit frontier agree. The recorded fresh-clone rebuild passed;
 it was not repeated for this documentation-only closeout.
 
-## Current Best Results
+## Current Submitted Results
 
 Candidate A is the best network found by the recorded 20,000-seed search. It is
 not a claim of global optimality. The generated 1,390-XOR structural network
@@ -55,7 +55,7 @@ replacement has been accepted or integrated.
 | B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
 | C0 — Phase 4 minimum-depth starting point | 1,390 | 6 | Passed | Balanced-tree baseline; dominated by C |
 | B7 — bounded depth at most 7 | 440 | 7 | Passed | Best found; seed 160,832, ablation `rewrite` arm (adopted 2026-10-27; was 441) |
-| C — minimum-depth search (depth 6) | 465 | 6 | Passed | Best found; seed 286,375, Kraft-adaptive v2 (adopted 2026-10-27; was 470) |
+| C — minimum-depth search (depth 6) | 465 | 6 | Passed | Submitted; seed 286,375 (adopted 2026-10-27). Research 462-gate witnesses have higher excess fanout; see below. |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector
@@ -658,3 +658,34 @@ and updated comparison evidence.
   optimizer.test_depth_bounded verifier.test_search_logs`: 21 tests passed
   in 29.596 seconds. `git diff --check` passed. Full clean rebuild remains
   a CI check.
+
+### Kraft phase-isolation experiment (2026-10-28)
+
+- Completed the preregistered four-arm comparison at caps 6 and 7: 1,000
+  matched seeds per arm/cap, 8,000 unique verified trials, 52 fully verified
+  incumbent acceptances. Code/protocol were committed before the budget at
+  `7dcc2fb`; full results: `docs/experiments/kraft_phase_isolation.md`.
+- H1 refuted: the cap-7 penalty comes from sharing, rather than finishing
+  scoring. Sharing-only and both average 458.102 XOR2; baseline and
+  finishing-only average 456.125. Changing finishing leaves every paired
+  cap-7 gate count unchanged, although fanout can change.
+- H2 confirmed: sharing-only retains the full cap-6 gain (485.493 mean XOR2
+  versus baseline 490.305). Neither hybrid improves on its designated best
+  control enough to qualify for the frozen confirmation rule; H3 refuted.
+  The stage-2 command selected no runs and performed no additional trials.
+- Found two independently verified **462-XOR2, depth-6** witnesses at seed
+  320099, in the sharing-only and both arms. Both have maximum fanout 6,
+  total fanout 956 and excess fanout 22. They save three gates versus C but
+  have higher excess fanout (C: 19), so the submitted 439/440/465 frontier
+  and `report.md` remain unchanged. The witnesses and their separate exact,
+  randomized and formal evidence are retained under
+  `results/checkpoints/phase_isolation/` and `results/phase_isolation/`.
+- Validation: all 97 unit tests passed; completed-budget replay preserved 78
+  result files byte-for-byte with no new trials; `build_results --check
+  --require-spec-minimum` passed. All 8,000 diagnostic records have valid
+  phase gate sums and nonnegative remaining Kraft budgets. Full clean-clone
+  rebuild was not repeated in this session.
+- Next: preregister a sharing-phase scoring experiment that accounts for
+  residual completion cost. The finishing-phase gate-count explanation is
+  contradicted by this experiment. The 462 witnesses demonstrate existence,
+  rather than an improvement in the hybrid search distribution.
