@@ -329,6 +329,62 @@ class LifecycleTests(unittest.TestCase):
             next(self.root.glob("log.jsonl.damaged-*")).read_bytes(), damaged
         )
 
+    def test_truncated_literals_are_backed_up_and_recovered(self):
+        result = run_fixture(self.root)
+        records = self.records()
+        log = self.root / "log.jsonl"
+        checkpoint = self.root / "checkpoint.json"
+        valid = log.read_bytes()
+        saved_checkpoint = checkpoint.read_bytes()
+        for literal in ("true", "false", "null"):
+            field = "final_metrics" if literal == "null" else "accepted"
+            for length in range(1, len(literal)):
+                for prefix in (f'{{"{field}":', '{"label":"é","nested":[{"value":'):
+                    tail = (prefix + literal[:length]).encode()
+                    with self.subTest(tail=tail):
+                        damaged = valid + tail
+                        log.write_bytes(damaged)
+                        self.assertEqual(
+                            inspect_log(log), (records, damaged, len(valid))
+                        )
+                        self.assertEqual(log.read_bytes(), damaged)
+                        self.assertEqual(
+                            run_fixture(self.root, worker=self.fail), result
+                        )
+                        self.assertEqual(log.read_bytes(), valid)
+                        self.assertEqual(checkpoint.read_bytes(), saved_checkpoint)
+                        self.assertIn(
+                            damaged,
+                            [p.read_bytes() for p in self.root.glob("*.damaged-*")],
+                        )
+
+    def test_malformed_literals_and_nonfinal_prefixes_are_not_recovered(self):
+        run_fixture(self.root)
+        log = self.root / "log.jsonl"
+        checkpoint = self.root / "checkpoint.json"
+        valid = log.read_bytes()
+        saved_checkpoint = checkpoint.read_bytes()
+        tails = (
+            b'{"accepted":falsx',
+            b'{"accepted":False',
+            b'{"accepted":fal ',
+            b'{"accepted":fal}',
+            b'{"accepted" fal',
+            b'{"final_metrics":nux',
+            b'{"accepted":fal\n',
+            b'{"final_metrics":nu\n',
+            b'{"accepted":tr\n{}\n',
+        )
+        for tail in tails:
+            with self.subTest(tail=tail):
+                damaged = valid + tail
+                log.write_bytes(damaged)
+                with self.assertRaisesRegex(ValueError, "corrupt journal"):
+                    run_fixture(self.root, worker=self.fail)
+                self.assertEqual(log.read_bytes(), damaged)
+                self.assertEqual(checkpoint.read_bytes(), saved_checkpoint)
+                self.assertEqual(list(self.root.glob("*.damaged-*")), [])
+
     def test_interior_corruption_is_never_recovered(self):
         run_fixture(self.root)
         log = self.root / "log.jsonl"

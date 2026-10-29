@@ -65,6 +65,15 @@ def inspect_log(path):
                 and (
                     error.msg.startswith("Unterminated string")
                     or error.pos >= len(line.rstrip())
+                    or (
+                        error.msg == "Expecting value"
+                        # Literal errors point to the token's start, in characters.
+                        and any(
+                            error.doc[error.pos :] == literal[:length]
+                            for literal in ("true", "false", "null")
+                            for length in range(1, len(literal))
+                        )
+                    )
                 )
             ) or (
                 isinstance(error, UnicodeDecodeError)

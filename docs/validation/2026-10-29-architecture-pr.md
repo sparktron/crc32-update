@@ -23,6 +23,25 @@ The final full-suite and result-check output was saved locally to
 `/tmp/crc32-architecture-pr-results-2026-10-29.log`. Each corresponding
 `.status` file contains `0`.
 
+## PR #15 review follow-up: truncated journal literals
+
+The remaining P2 finding (`discussion_r4414619399`) is addressed by
+recognizing exact, nonempty proper prefixes of `true`, `false`, and `null`
+at the decoder's expected-value position. Only an unterminated final line
+can be recovered; malformed literals and newline-terminated or interior
+partial records still fail before persistent changes.
+
+- The new recovery regression failed on all **20 subcases** before the fix:
+  every literal prefix in both ordinary fields and nested values after
+  Unicode text.
+- `python3 -B -m unittest optimizer.test_search_lifecycle optimizer.test_runner_lifecycle`:
+  **32 tests passed** in **3.512 seconds** after the fix. Coverage includes
+  read-only inspection, byte-for-byte damaged backups and repaired logs,
+  checkpoint preservation, resume without seed dispatch, and nine corrupt
+  tails that must remain untouched without backups.
+- Black, Ruff and diff whitespace checks passed for the follow-up changes.
+- The full clean rebuild remains delegated to the PR CI gate.
+
 ## Preserved integration contracts
 
 The merge retains the per-experiment files in `results/search_logs/`, their
