@@ -69,15 +69,10 @@ checkpoint_seed() {
   python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["incumbent_seed"])' "$1"
 }
 
+# Discovery rather than a fixed module list, so the test modules each
+# experiment adds cannot be left out.
 step "Unit and rejection tests"
-python3 -m unittest \
-  verifier.test_verifier \
-  verifier.test_verify_candidate \
-  verifier.test_build_results \
-  generator.test_baseline_generator \
-  optimizer.test_optimize \
-  optimizer.test_phase5_exact \
-  optimizer.test_depth_bounded
+python3 -m unittest discover
 
 step "Phase 1 matrix, structural fixture, and formal check"
 python3 -m generator.build_matrix \
