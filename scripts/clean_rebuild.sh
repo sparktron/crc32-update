@@ -138,7 +138,7 @@ same results/phase4/candidate_c_refined.v "${output}/phase4/candidate_c_min_dept
 
 # These are the original Kraft-bounded B7 and C, superseded on 2026-10-27.
 # They are replayed for provenance. build_results --check below replays the
-# current B7 and C from their recorded seeds.
+# current bounded-budget circuits (A/B/B7, C, C2 and F4) from their seeds.
 step "Superseded Kraft-bounded B7 and C replays"
 for cap in 7 6; do
   best="$(checkpoint_seed "results/checkpoints/depth${cap}_bounded_search.json")"

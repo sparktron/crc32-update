@@ -2,18 +2,22 @@
 
 Date: 2026-10-24. Results and implementation baseline: `ec07920`.
 Updated 2026-10-27: B7 and C were replaced by verified circuits from later
-search experiments. See "Submitted candidates" and
-[docs/experiments/](docs/experiments).
+search experiments. Updated 2026-10-29: circuits from the elite-prefix restart
+experiment replaced A, B, B7 and C and added C2 and F4. See "Submitted
+candidates" and [docs/experiments/](docs/experiments).
 Experiment contract: [SPEC.md](SPEC.md). Development gates: [PLAN.md](PLAN.md).
 
 ## Outcome
 
-The completed experiment produced three distinct nondominated circuits for
-one raw reflected IEEE CRC-32 state update: 439 XOR2 gates at depth 8,
-440 at depth 7, and 465 at depth 6. All pass independent structural,
-exact-linear, randomized, and formal-equivalence checks. Candidate A and
-Candidate B share one circuit; B7 supplies a distinct bounded-depth point,
-and Candidate C supplies the minimum-depth point.
+The completed experiment produced four distinct nondominated circuits for
+one raw reflected IEEE CRC-32 state update:
+- 437 XOR2 gates at depth 7 (Candidates A and B, and B7);
+- 445 at depth 7 with every fanout at most four (F4);
+- 460 at depth 6 (Candidate C, the minimum-depth point);
+- 461 at depth 6 with lower excess fanout than C (C2).
+
+All pass independent structural, exact-linear, randomized, and
+formal-equivalence checks.
 
 Depth 6 is provably minimal for this function. The gate counts are best found
 under the recorded budgets; neither gate-count optimality nor research novelty
@@ -87,6 +91,22 @@ On 2026-10-27, four follow-up experiments, each pre-registered in
 - A variant of it that counts slack only in rows near their Kraft limit
   produced the 465-gate depth-6 circuit.
 
+On 2026-10-28, a pre-registered elite-prefix restart experiment
+([docs/experiments/elite_prefix_restart.md](docs/experiments/elite_prefix_restart.md))
+replayed the first quarter, half, three quarters, or all of the sharing
+decisions of the 20 best recorded seeds at each depth cap, then continued
+each child on a fresh random seed.
+- At half the decisions, elite children averaged 9.2 gates fewer than fresh
+  seeds at depth 7 and 13.2 fewer at depth 6. Children of median parents
+  matched fresh seeds.
+- Its elite arms produced all four current frontier circuits.
+- Parents were selected on outcome from about 25,000 earlier trials, so these
+  circuits are verified tail draws from a sampler seeded with the best earlier
+  results. The experiment does not show a better method at matched compute.
+
+Two other experiments that day, phase isolation and bounded sharing
+lookahead, did not change the frontier.
+
 Recorded stochastic budgets are:
 
 | Budget | Seeds (inclusive) | Attempts | Outcome |
@@ -97,17 +117,23 @@ Recorded stochastic budgets are:
 | Phase 4 C refinement | 30,000–39,999 | 10,000 | No improvement over the balanced depth-6 starting point |
 | Depth-7 bounded | 40,000–49,999 | 10,000 | Seed 40,505: 441 gates, 6 accepted incumbents |
 | Depth-6 bounded | 50,000–59,999 | 10,000 | Seed 56,140: 470 gates, 10 accepted incumbents |
-| Ablation `rewrite` arm, depth 7 | 160,000–160,999 | 1,000 | Seed 160,832: 440 gates (now B7) |
-| Kraft-adaptive stage-2 rerun (v2), depth 6 | 281,000–290,999 | 10,000 | Seed 286,375: 465 gates (now C); incumbent seed 288,438: 465 gates, max fanout 5 |
+| Ablation `rewrite` arm, depth 7 | 160,000–160,999 | 1,000 | Seed 160,832: 440 gates (B7 from 2026-10-27 to 2026-10-29) |
+| Kraft-adaptive stage-2 rerun (v2), depth 6 | 281,000–290,999 | 10,000 | Seed 286,375: 465 gates (C from 2026-10-27 to 2026-10-29); incumbent seed 288,438: 465 gates, max fanout 5 |
+| Elite-prefix elite arm, f = 25, depth 7 | 500,000–500,999 | 1,000 | Seed 500,413: 445 gates, max fanout 4 (now F4); incumbent seed 500,505: 440 gates |
+| Elite-prefix elite arm, f = 75, depth 7 | 502,000–502,999 | 1,000 | Seed 502,021: 437 gates (now A, B, B7) |
+| Elite-prefix elite arm, f = 50, depth 6 | 521,000–521,999 | 1,000 | Seed 521,005: 461 gates (now C2) |
+| Elite-prefix elite arm, f = 75, depth 6 | 522,000–522,999 | 1,000 | Seed 522,004: 460 gates (now C) |
 
-The table lists only the budgets that produced submitted circuits. Every
-other budget (DCLO, the other ablation arms, the Kraft-slack variant, and the
-remaining Kraft-adaptive stages) is recorded in its experiment record.
+The table lists only the budgets that produced current or earlier submitted
+circuits. Every other budget (DCLO, the other ablation arms, the Kraft-slack
+variant, the remaining Kraft-adaptive stages, and the other elite-prefix arms)
+is recorded in its experiment record.
 
 The append-only search log originally had 60,042 unique attempt IDs: 60,000
 seeded trials, two verified starting points, and 40 exact-study records
 across v1 and v2.
-- With the 2026-10-27 experiments it holds 127,904 records.
+- With the 2026-10-27 experiments it held 127,904 records; with the
+  2026-10-28 experiments it holds 159,904.
 - It is now split, without changing any record, into one file per experiment
   under `results/search_logs/`, to stay under GitHub's file-size limit.
 
@@ -152,62 +178,81 @@ full incumbent acceptance.
 The final result builder checks completed checkpoints, seed ranges,
 accepted incumbents, bounded-seed replay, class objectives, and Phase 5
 records before comparing regenerated CSV and JSON with committed results.
-A submission may be a logged trial other than its budget's incumbent; C is
+A submission may be a logged trial other than its budget's incumbent; F4 is
 one. Such a trial is accepted only if:
-- it reaches the budget's minimum XOR2 count;
+- it reaches the budget's minimum XOR2 count, or for F4 the minimum among
+  the budget's trials with every fanout at most four;
 - no trial in the budget dominates it;
 - its logged metrics equal the independent measurement;
 - the artifact replays byte for byte from its seed.
-Structural fingerprints deduplicate the A/B circuit independently of module
-and wire names.
+Structural fingerprints deduplicate the A/B/B7 and A0/B0 circuits
+independently of module and wire names.
 
 ## Results
 
 ### Submitted candidates
 
 The following values are transcribed directly from `results/metrics.csv`.
-`C0` preserves the dominated Phase 4 starting point for provenance.
+`A0`, `B0` and `C0` preserve the dominated Phase 4 circuits for provenance:
+the Candidate A search and the Phase 5 exact study are checked against A0
+and B0.
 
 | Class | Circuit ID | Seed | XOR2 | Depth | Max fanout | Total fanout | Excess >4 | Frontier |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | true |
-| B | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | true |
+| A0 | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | false |
+| B0 | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | false |
 | C0 | 0c80bfcc8e2b |  | 1390 | 6 | 20 | 2812 | 1038 | false |
-| B7 | ed4ed2ba71db | 160832 | 440 | 7 | 5 | 912 | 3 | true |
-| C | 900a2989cbc1 | 286375 | 465 | 6 | 6 | 962 | 19 | true |
+| A | aa77c6d02bb6 | 502021 | 437 | 7 | 5 | 906 | 2 | true |
+| B | aa77c6d02bb6 | 502021 | 437 | 7 | 5 | 906 | 2 | true |
+| B7 | aa77c6d02bb6 | 502021 | 437 | 7 | 5 | 906 | 2 | true |
+| C | d48641ffe21f | 522004 | 460 | 6 | 6 | 952 | 19 | true |
+| C2 | 546dcc441532 | 521005 | 461 | 6 | 6 | 954 | 17 | true |
+| F4 | 2773dcc0ddb0 | 500413 | 445 | 7 | 4 | 922 | 0 | true |
 
 Every row has 32 direct output aliases; its intermediate count equals its
 XOR2 count. Ordered per-output depths and verification evidence remain in the
 CSV and JSON rather than being replaced by only these summaries.
 
-The three frontier IDs are `1472a09886a8`, `ed4ed2ba71db`, and `900a2989cbc1`.
-- A/B minimizes the found gate count and satisfies B's depth-at-most-8
-  bound.
-- B7 spends one additional gate to remove one depth level, with the same
-  maximum fanout and lower excess fanout (3 against 5).
-- C spends another 25 gates to reach depth 6, with maximum fanout 6 and
+The four frontier IDs are `aa77c6d02bb6`, `2773dcc0ddb0`, `d48641ffe21f`, and
+`546dcc441532`.
+- A/B/B7 has the fewest gates found, at depth 7. It satisfies B's
+  depth-at-most-8 bound, with maximum fanout 5 and excess fanout 2.
+- F4 spends 8 more gates at the same depth to keep every fanout at most four,
+  so it has no excess fanout. It is the fewest-gate circuit of the four
+  logged trials that meet that bound; the others have 449, 455 and 457 gates
+  at depths 8 to 9.
+- C spends 23 gates over A to reach depth 6, with maximum fanout 6 and
   excess 19.
+- C2 spends one more gate than C for excess 17.
 - No one point dominates another across the four objectives.
-- C0 is structurally the balanced baseline and is dominated by C.
+- A0/B0 is dominated by A. C0 is structurally the balanced baseline and is
+  dominated by C and C2.
 - The superseded Phase 3 A circuit is also dominated and is not submitted.
+
+All four frontier circuits come from the elite arms of the elite-prefix
+experiment, whose children replay prefixes of parents selected on outcome.
+They are verified tail draws, not evidence of a better method at matched
+compute.
+
+Superseded submissions, adopted 2026-10-29:
+- The 2026-10-27 B7 (`ed4ed2ba71db`, seed 160,832, 440 XOR2, maximum fanout 5,
+  excess 3) and the Phase 4 A/B (`1472a09886a8`, 439 XOR2 at depth 8) are
+  dominated by A/B/B7. The 440 remains in `results/ablation/`.
+- The 2026-10-27 C (`900a2989cbc1`, seed 286,375, 465 XOR2, maximum fanout 6,
+  excess 19) is dominated by C. It remains in `results/kraft_adaptive/notable/`.
 
 Superseded submissions, adopted 2026-10-27:
 - The original B7 (`b65a4c2b615e`, seed 40,505, 441 XOR2, maximum fanout 5,
-  excess 5) is dominated by the current B7.
-- The original C (`b8edf279b361`, seed 56,140, 470 XOR2, maximum fanout 6,
-  excess 20) is dominated by the current C.
-- Both remain in `results/phase6/` for provenance.
-- The current B7 is a tail draw from a search whose per-seed distribution
-  matches the original budget's.
-- The current C comes from a search family whose depth-6 mean is about
-  5 gates lower than the original budget's. It is a tail draw within that
-  family.
+  excess 5) and the original C (`b8edf279b361`, seed 56,140, 470 XOR2,
+  maximum fanout 6, excess 20) remain in `results/phase6/` for provenance.
 
-Artifacts are `results/phase4/candidate_a_extended.v`,
-`results/phase4/candidate_b_refined.v`,
+Artifacts are `results/phase4/candidate_a_extended.v` (A0),
+`results/phase4/candidate_b_refined.v` (B0),
 `results/phase4/candidate_c_refined.v` (C0),
-`results/ablation/rewrite_depth7.v` (B7), and
-`results/kraft_adaptive/notable/seed_286375_depth6.v` (C).
+`results/elite_prefix/stage1_elite_f75_depth7.v` (A, B, B7),
+`results/elite_prefix/stage1_elite_f75_depth6.v` (C),
+`results/elite_prefix/stage1_elite_f50_depth6.v` (C2), and
+`results/elite_prefix/notable/seed_500413_depth7.v` (F4).
 
 ### Local baseline comparison
 
@@ -218,10 +263,10 @@ Artifacts are `results/phase4/candidate_a_extended.v`,
 | greedy_cse | 454 | 9 | 6 | 940 | 11 |
 | yosys_abc | 1123 | 7 | 15 | 2278 | 536 |
 
-A/B reduces gate count by 68.4% from unshared expansion and 3.3% from greedy
-CSE, while improving greedy CSE's depth and fanout. B7 reduces the recorded
-Yosys/ABC count by 60.8% at the same depth 7. C reduces the balanced baseline
-by 66.5% at the same depth 6. Each local baseline is dominated by at least
+A/B/B7 reduces gate count by 68.6% from unshared expansion and 3.7% from
+greedy CSE, while improving greedy CSE's depth and fanout. It also reduces the
+recorded Yosys/ABC count by 61.1% at the same depth 7. C reduces the balanced
+baseline by 66.9% at the same depth 6. Each local baseline is dominated by at least
 one frontier circuit, as recorded in `baseline_comparison` in the JSON.
 Recorded baseline generation/verification/formal totals are about 3.9–6.3
 seconds on the original host; these are not search runtimes or portable
@@ -231,8 +276,8 @@ performance guarantees.
 
 The heaviest matrix row has 52 independent input dependencies. A depth-d
 network of two-input gates can depend on at most 2**d inputs, even with
-sharing. Since 32 < 52 <= 64, depth is at least 6. Candidate C attains 6,
-so its depth is optimal. This argument does not bound the minimum number
+sharing. Since 32 < 52 <= 64, depth is at least 6. Candidate C and C2 attain
+6, so their depth is optimal. This argument does not bound the minimum number
 of gates at that depth or the global minimum gate count.
 
 ## Published methods, generators, and publishability
@@ -252,7 +297,8 @@ random vectors, and formal equivalence. Chained as written, the netlist has
 `independent_per_output`. As balanced trees, it has 1,390 XOR2 at depth 6 and
 is structurally identical to `balanced_per_output` (C0). The record is
 `results/external/crczero_comparison.json`. Against this directly comparable
-generator, A/B, B7, and C use 31.6%, 31.7%, and 33.5% of the gates.
+generator, A/B/B7, F4, C, and C2 use 31.4%, 32.0%, 33.1%, and 33.2% of the
+gates.
 XAPP209's cancellation within output equations and the OpenCores/CRC generator
 inventory provide context for equation generation; a missing resource count
 is not evidence of a competitive optimized circuit.
@@ -375,14 +421,19 @@ python3 -B -m optimizer.depth_bounded --depth-cap 6 --replay-seed 56140 --artifa
 ```
 
 The two `depth_bounded` commands replay the superseded original B7 and C.
-`build_results --check` replays the current B7 (seed 160,832, ablation
-`rewrite` arm) and C (seed 286,375, Kraft-adaptive v2) from their seeds. To
-replay them directly:
+`build_results --check` replays the four current frontier circuits from their
+seeds and the committed elite-prefix parent table. To replay them directly:
 
 ```bash
-python3 -B -c "from optimizer.ablation import search_seed_ablated as s; print(s(160832, 7, 'rewrite').render('candidate_depth7_ablation_rewrite'), end='')" > /tmp/b7.v
-python3 -B -c "from optimizer.kraft_adaptive import search_seed_adaptive as s; print(s(286375, 6).render('candidate_depth6_kraft_adaptive'), end='')" > /tmp/c.v
+python3 -B -c "from optimizer.elite_prefix import replay_trial as r; print(r(502021, 7, group='elite', fraction=75).render('candidate_elite_f75_depth7'), end='')" > /tmp/a.v
+python3 -B -c "from optimizer.elite_prefix import replay_trial as r; print(r(500413, 7, group='elite', fraction=25).render('candidate_elite_f25_depth7'), end='')" > /tmp/f4.v
+python3 -B -c "from optimizer.elite_prefix import replay_trial as r; print(r(522004, 6, group='elite', fraction=75).render('candidate_elite_f75_depth6'), end='')" > /tmp/c.v
+python3 -B -c "from optimizer.elite_prefix import replay_trial as r; print(r(521005, 6, group='elite', fraction=50).render('candidate_elite_f50_depth6'), end='')" > /tmp/c2.v
 ```
+
+The 2026-10-27 B7 and C replay with
+`optimizer.ablation.search_seed_ablated(160832, 7, 'rewrite')` and
+`optimizer.kraft_adaptive.search_seed_adaptive(286375, 6)`.
 
 [README.md](README.md) contains the full resumable search commands, checkpoint
 paths, locks, and seed ranges. Run budgets sequentially because they share the

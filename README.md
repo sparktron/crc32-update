@@ -5,9 +5,10 @@ combinational XOR2 networks implementing a 64-bit parallel reflected IEEE
 CRC-32 state update.
 
 The experiment is complete through gate G6. The verified Pareto frontier has
-three distinct circuits: 439 XOR2 at depth 8 (A/B), 440 at depth 7 (B7), and
-465 at depth 6 (C). Depth 6 is proven minimal; gate counts are best found for
-the recorded budgets. The [final report](report.md) documents methodology,
+four distinct circuits: 437 XOR2 at depth 7 (A/B/B7), 445 at depth 7 with
+every fanout at most four (F4), 460 at depth 6 (C), and 461 at depth 6 with
+lower excess fanout (C2). Depth 6 is proven minimal; gate counts are best
+found for the recorded budgets. The [final report](report.md) documents methodology,
 results, comparisons, limitations, and reproduction.
 
 Experiment control documents:
@@ -311,11 +312,11 @@ Its Phase 4 records now live in `results/search_logs/phase4_refinement.jsonl`.
 ## Phase 6 Final Results
 
 `results/metrics.csv` and `results/pareto_frontier.json` are generated only by
-re-verifying the submitted Phase 4 candidates — A
-(`results/phase4/candidate_a_extended.v`), B
-(`results/phase4/candidate_b_refined.v`), and C
-(`results/phase4/candidate_c_refined.v`) — with the restricted parser, 97 exact
-vectors, 100,000 seeded random vectors, and formal equivalence. The command
+re-verifying the candidates listed in `SUBMISSIONS` in
+`verifier/build_results.py` with the restricted parser, 97 exact vectors,
+100,000 seeded random vectors, and formal equivalence. They are the four
+elite-prefix frontier circuits (A/B/B7, C, C2 and F4) and the dominated
+Phase 4 circuits A0, B0 and C0, kept for provenance. The command
 then cross-checks each candidate against its completed checkpoints and
 search-log records, confirms the Phase 5 v2 study integrated no replacement,
 and computes the nondominated set over distinct circuits. Circuits are
@@ -404,10 +405,18 @@ the follow-up experiments replaced them (see
 - B7: 440 XOR2, seed 160,832 of the ablation `rewrite` arm.
 - C: 465 XOR2, seed 286,375 of the Kraft-adaptive v2 rerun.
 
+On 2026-10-29 the elite-prefix restart experiment's elite arms replaced those
+and the Phase 4 A/B, and added two more frontier points:
+- A, B and B7: 437 XOR2 at depth 7, seed 502,021.
+- C: 460 XOR2 at depth 6, seed 522,004.
+- C2: 461 XOR2 at depth 6 with excess fanout 17, seed 521,005.
+- F4: 445 XOR2 at depth 7 with every fanout at most four, seed 500,413.
+
 `verifier/build_results.py` checks every bounded submission before
 regenerating the result files: against its completed checkpoint and full
 logged seed range, against its accepted incumbent or the selected-trial rule,
-and by a replay from its seed.
+and by a replay from its seed. F4 is a selected trial: it must have the
+fewest XOR2 among its budget's trials with every fanout at most four.
 
 ## Clean-Checkout Rebuild
 
@@ -428,9 +437,10 @@ is how CI runs it. The script:
   them byte-for-byte with the committed files (the Yosys/ABC baseline is only
   reported if it differs, since it depends on the toolchain release);
 - regenerates every submitted candidate from its recorded seed or construction
-  (Phase 3 and Phase 4 Candidate A, the B and C0 starting points and their
-  unimproved refinements, B7, and Candidate C) and compares each with the
-  committed artifact;
+  (Phase 3 and Phase 4 Candidate A, the B0 and C0 starting points and their
+  unimproved refinements, and, through `build_results --check`, the four
+  elite-prefix frontier circuits) and compares each with the committed
+  artifact;
 - re-verifies every candidate and requires the committed frontier and metrics
   to match regeneration and to meet the `SPEC.md` minimum;
 - fails if the checkout was modified.

@@ -182,9 +182,29 @@ while keeping most of their quality, and f = 75 gives the lowest means and
 produced both bests; f = 25 keeps too little. That protocol must state its
 fraction (or schedule) and the pool-refresh rule before results.
 
-Integrating the 437 and 460 into the submitted frontier is separate work.
-Together they leave two distinct Pareto circuits against the three that
-`SPEC.md` Section 4 requires, so integration needs a third fully verified
-nondominated circuit (for example a fanout-5 depth-6 circuit such as 522005
-after full verification) or an owner decision, plus `build_results`,
-provenance and `report.md` updates.
+## Frontier integration (2026-10-29)
+
+At the project owner's request, four elite-arm circuits became the submitted
+frontier in `verifier/build_results.py`:
+
+| Class | Seed | Arm | XOR2 | Depth | Max fanout | Excess >4 | Selection |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | --- |
+| A, B, B7 | 502021 | elite f = 75, depth 7 | 437 | 7 | 5 | 2 | budget incumbent |
+| F4 | 500413 | elite f = 25, depth 7 | 445 | 7 | 4 | 0 | fewest XOR2 with fanout at most 4 |
+| C | 522004 | elite f = 75, depth 6 | 460 | 6 | 6 | 19 | budget incumbent |
+| C2 | 521005 | elite f = 50, depth 6 | 461 | 6 | 6 | 17 | budget incumbent |
+
+- F4 is a new optional class, the fanout counterpart of Candidate B's depth
+  bound. It is the fewest-gate trial with every fanout at most four in any
+  log; the other three such trials have 449, 455 and 457 gates at depths 8–9.
+- The Phase 4 A/B circuit (439, depth 8) stays submitted as A0 and B0,
+  dominated, so the Candidate A search and Phase 5 study keep their checks.
+- Each submission replays byte for byte through
+  `optimizer.elite_prefix.replay_trial`, which rebuilds a logged trial from
+  its arm and the committed parent table.
+- Seeds 522005, 522032, 500413 and 521606 were fully verified before the
+  choice (97 exact vectors, 100,000 random vectors, formal proof). Their
+  netlists and reports are in `results/elite_prefix/notable/`. 522005
+  (461/6/5/20) is dominated by 522032 (461/6/5/19). Neither 522032 nor 521606
+  (463/6/5/14) reaches its budget's minimum gate count, so they would need a
+  looser selection rule and were not submitted.

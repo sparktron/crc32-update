@@ -159,6 +159,15 @@ def search_seed(seed, depth_cap, *, start=0, parents=(), fraction=0, spool=None)
     return candidate
 
 
+def replay_trial(seed, depth_cap, *, group, fraction):
+    """Rebuild one logged stage-1 trial from its arm and the committed parent table."""
+    start = next(row[2] for row in arms(depth_cap) if row[:2] == (group, fraction))
+    parents = () if group == "fresh" else tuple(
+        (p["seed"], p["sharing_decisions"])
+        for p in json.loads(PARENTS.read_text())["caps"][str(depth_cap)][group])
+    return search_seed(seed, depth_cap, start=start, parents=parents, fraction=fraction)
+
+
 def replay_parent(seed, cap):
     """Rebuild a recorded parent, keeping the state digest after every decision."""
     rows = tuple(build_transformation_matrix())

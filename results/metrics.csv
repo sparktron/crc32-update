@@ -1,6 +1,10 @@
 candidate_class,artifact,circuit_id,on_pareto_frontier,seed,xor2_count,maximum_depth,output_depths,maximum_fanout,total_fanout,total_excess_fanout_above_4,intermediate_node_count,direct_output_alias_count,exact_vectors_checked,random_vectors_checked,random_seed,formal_equivalence,verification_status
-A,results/phase4/candidate_a_extended.v,1472a09886a8,true,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
-B,results/phase4/candidate_b_refined.v,1472a09886a8,true,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
+A0,results/phase4/candidate_a_extended.v,1472a09886a8,false,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
+B0,results/phase4/candidate_b_refined.v,1472a09886a8,false,16564,439,8,"[8,8,8,7,8,8,8,8,7,8,7,7,6,7,8,7,8,7,7,7,7,8,8,8,8,7,8,8,8,8,7,8]",5,910,5,439,32,97,100000,3274333933,passed,passed
 C0,results/phase4/candidate_c_refined.v,0c80bfcc8e2b,false,,1390,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",20,2812,1038,1390,32,97,100000,3274333933,passed,passed
-B7,results/ablation/rewrite_depth7.v,ed4ed2ba71db,true,160832,440,7,"[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]",5,912,3,440,32,97,100000,3274333933,passed,passed
-C,results/kraft_adaptive/notable/seed_286375_depth6.v,900a2989cbc1,true,286375,465,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",6,962,19,465,32,97,100000,3274333933,passed,passed
+A,results/elite_prefix/stage1_elite_f75_depth7.v,aa77c6d02bb6,true,502021,437,7,"[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]",5,906,2,437,32,97,100000,3274333933,passed,passed
+B,results/elite_prefix/stage1_elite_f75_depth7.v,aa77c6d02bb6,true,502021,437,7,"[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]",5,906,2,437,32,97,100000,3274333933,passed,passed
+B7,results/elite_prefix/stage1_elite_f75_depth7.v,aa77c6d02bb6,true,502021,437,7,"[7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]",5,906,2,437,32,97,100000,3274333933,passed,passed
+C,results/elite_prefix/stage1_elite_f75_depth6.v,d48641ffe21f,true,522004,460,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",6,952,19,460,32,97,100000,3274333933,passed,passed
+C2,results/elite_prefix/stage1_elite_f50_depth6.v,546dcc441532,true,521005,461,6,"[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]",6,954,17,461,32,97,100000,3274333933,passed,passed
+F4,results/elite_prefix/notable/seed_500413_depth7.v,2773dcc0ddb0,true,500413,445,7,"[7,7,7,7,7,7,7,7,7,7,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7]",4,922,0,445,32,97,100000,3274333933,passed,passed

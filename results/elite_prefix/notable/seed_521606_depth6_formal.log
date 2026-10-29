@@ -1,0 +1,4 @@
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/elite_prefix/notable/seed_521606_depth6.v (module candidate_elite_f50_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.

@@ -9,7 +9,7 @@ from optimizer import elite_prefix
 from optimizer.depth_bounded import search_seed_bounded
 from optimizer.elite_prefix import (BASE, CHILDREN, FRACTIONS, PARENTS, arms, build_trial,
                                     child_spec, difference, passes_screen, prefix_decisions,
-                                    replay_parent, select_parents)
+                                    replay_parent, replay_trial, select_parents)
 from optimizer.kraft_slack import search_seed_slack
 from optimizer.optimize import independently_check
 from verifier.search_logs import read_records
@@ -55,6 +55,12 @@ class ElitePrefixTests(unittest.TestCase):
         candidate, diagnostics = build_trial(390024, 6, 320099, quarter["decisions"])
         self.assertEqual(diagnostics["prefix_state_sha256"], quarter["state_sha256"])
         self.assertLessEqual(independently_check(candidate).maximum_depth, 6)
+
+    def test_replay_trial_rebuilds_a_logged_child_from_its_seed(self):
+        # Seed 500413 is the submitted F4 circuit: an f = 25 child of parent 48922.
+        metrics = independently_check(replay_trial(500413, 7, group="elite", fraction=25))
+        self.assertEqual((metrics.xor2_count, metrics.maximum_depth, metrics.maximum_fanout,
+                          metrics.total_excess_fanout_above_4), (445, 7, 4, 0))
 
     def test_selection_rule_reproduces_committed_parents(self):
         table = json.loads(PARENTS.read_text())
