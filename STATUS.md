@@ -827,5 +827,11 @@ and updated comparison evidence.
   submitted classes, and every local baseline dominated
   (`results/elite_prefix/frontier_integration_check.log`). The CI search-log
   validation passed on 159,904 records in 11 logs. The four replay commands
-  in `report.md` reproduce the committed artifacts byte for byte. Full
-  clean-clone rebuild was not repeated.
+  in `report.md` reproduce the committed artifacts byte for byte.
+- Clean rebuild: `scripts/clean_rebuild.sh` passed from a fresh clone of
+  `1918092` in 1 m 56 s, but its test step named seven fixed modules (68
+  tests), so the nine test modules added by later experiments, including
+  `optimizer.test_elite_prefix`, never ran there or in CI. The step now runs
+  `python3 -m unittest discover`. The fresh-clone rebuild of `796631c` passed
+  all 117 tests, every byte-for-byte replay and the four-circuit frontier
+  check in 5 m 43 s.
