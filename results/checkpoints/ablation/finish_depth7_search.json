@@ -48,7 +48,7 @@
   "incumbent_seed": 140106,
   "random_seed": 3274333933,
   "random_tests": 100000,
-  "search_log_path": "results/search_log.jsonl",
+  "search_log_path": "results/search_logs/ablation_toward_dclo.jsonl",
   "seed_count": 1000,
   "seed_start": 140000,
   "status": "completed"

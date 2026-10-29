@@ -21,6 +21,7 @@ from optimizer.search_lifecycle import (
     write_checkpoint,
 )
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import log_file_for
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -190,9 +191,7 @@ def main() -> int:
     parser.add_argument("--seed-count", type=int, default=10000)
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--output-dir", type=Path, default=Path("results/phase4"))
-    parser.add_argument(
-        "--search-log", type=Path, default=Path("results/search_log.jsonl")
-    )
+    parser.add_argument("--search-log", type=Path, default=log_file_for("phase4-"))
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(
@@ -203,7 +202,7 @@ def main() -> int:
         f"results/checkpoints/candidate_{args.candidate_class.lower()}_refinement.json"
     )
     try:
-        # B and C have separate checkpoints but append to one canonical log.
+        # B and C have separate checkpoints but append to one experiment log.
         # Lock the log, rather than only the selected checkpoint, to prevent
         # overlapping manual budgets from creating duplicate or interleaved rows.
         with _exclusive_search_lock(args.search_log):

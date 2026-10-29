@@ -44,6 +44,7 @@ from optimizer.optimize import (
     independently_check,
 )
 from verifier.verify_network import DEFAULT_RANDOM_SEED, DEFAULT_RANDOM_TESTS
+from verifier.search_logs import log_file_for
 
 ALGORITHM_PREFIX = "dclo-kraft"
 ALGORITHM_VERSION = "v1"
@@ -235,13 +236,18 @@ def main() -> int:
         type=Path,
         help="defaults to results/checkpoints/depth<cap>_dclo_incumbents",
     )
-    parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
+    parser.add_argument(
+        "--search-log",
+        type=Path,
+        help="defaults to this algorithm's file under results/search_logs/",
+    )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(
         "--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED
     )
     args = parser.parse_args()
     cap = args.depth_cap
+    args.search_log = args.search_log or log_file_for(algorithm_name(cap))
     if args.seed_start is None:
         if cap not in RECORDED_SEED_STARTS:
             parser.error(f"--seed-start is required for unrecorded depth cap {cap}")
@@ -261,7 +267,7 @@ def main() -> int:
             parser.exit(1, f"DCLO replay failed: {error}\n")
         return 0
     try:
-        # Every search appends to one canonical log, so lock the log itself.
+        # Each experiment appends to its own log; lock that log.
         with _exclusive_search_lock(args.search_log):
             seed, metrics = run_bounded_search(
                 cap,

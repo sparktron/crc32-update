@@ -1,5 +1,8 @@
 # Architecture fix validation — 2026-10-27
 
+For the subsequent merge with current master and PR validation, see
+[`2026-10-29-architecture-pr.md`](2026-10-29-architecture-pr.md).
+
 Validated locally in the isolated managed worktree
 `/home/mythos/.codex/worktrees/architecture-fixes/crc32-update`, branch
 `codex/architecture-fixes`, based on `890d136`. This records local validation before integration with later experiment

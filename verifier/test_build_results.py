@@ -387,5 +387,99 @@ class BoundedBudgetTests(unittest.TestCase):
             self._check()
 
 
+class SelectedTrialTests(unittest.TestCase):
+    """A submission may be a logged trial other than the budget's incumbent."""
+
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        root = Path(self.directory.name)
+        self.root = root
+        # Seed 11 wins on maximum fanout. Seed 12 ties its XOR2 count and has
+        # lower excess fanout, so it is nondominated.
+        self.incumbent_metrics = {**_point(465, 6, 5, 21), "output_depths": [6]}
+        self.selected_metrics = {**_point(465, 6, 6, 19), "output_depths": [6]}
+        self.records = [
+            self._record(10, {**_point(480, 6, 6, 30), "output_depths": [6]}, True),
+            self._record(11, self.incumbent_metrics, True),
+            self._record(12, self.selected_metrics, False),
+            self._record(13, {**_point(466, 6, 6, 19), "output_depths": [6]}, False),
+        ]
+        self.checkpoint = {
+            "algorithm": "test-algorithm-depth6-v1",
+            "depth_cap": 6,
+            "seed_start": 10,
+            "seed_count": 4,
+            "completed_seeds": 4,
+            "random_tests": 100_000,
+            "random_seed": 0xC32A5EED,
+            "incumbent_seed": 11,
+            "incumbent_metrics": self.incumbent_metrics,
+            "status": "completed",
+        }
+
+    def tearDown(self) -> None:
+        self.directory.cleanup()
+
+    def _record(self, seed, metrics, accepted):
+        return {
+            "algorithm": "test-algorithm-depth6-v1",
+            "attempt_id": f"test-seed-{seed}",
+            "seed": seed,
+            "final_metrics": metrics,
+            "verification_passed": True,
+            "accepted": accepted,
+            "artifact": str(self.root / f"seed_{seed}.v") if accepted else None,
+        }
+
+    def _check(self, selected_seed, measured, source="module selected;\n"):
+        budget = BoundedBudget(
+            6,
+            self.root / "checkpoint.json",
+            self.root,
+            logged_algorithm="test-algorithm-depth6-v1",
+            selected_seed=selected_seed,
+        )
+        budget.checkpoint.write_text(json.dumps(self.checkpoint))
+        artifact = self.root / "candidate.v"
+        artifact.write_text("module selected;\n")
+        submission = Submission("C", artifact, bounded=budget)
+        with mock.patch.object(BoundedBudget, "regenerate_source", return_value=source):
+            return check_bounded_search(
+                submission,
+                {**measured, "unreachable_nodes": []},
+                self.records,
+                100_000,
+                0xC32A5EED,
+            )
+
+    def test_nondominated_minimum_trial_is_accepted(self) -> None:
+        provenance = self._check(12, self.selected_metrics)
+        self.assertEqual(provenance["seed"], 12)
+        self.assertEqual(provenance["winning_attempt_id"], "test-seed-11")
+        self.assertEqual(
+            provenance["selection"], "selected nondominated minimum-XOR2 trial"
+        )
+
+    def test_trial_above_the_budget_minimum_is_rejected(self) -> None:
+        with self.assertRaisesRegex(ValueError, "minimum XOR2 count"):
+            self._check(13, self.records[3]["final_metrics"])
+
+    def test_dominated_trial_is_rejected(self) -> None:
+        self.records[2]["final_metrics"] = {
+            **_point(465, 6, 6, 22),
+            "output_depths": [6],
+        }
+        with self.assertRaisesRegex(ValueError, "dominated within its budget"):
+            self._check(12, self.records[2]["final_metrics"])
+
+    def test_measurement_must_match_the_selected_record(self) -> None:
+        with self.assertRaisesRegex(ValueError, "do not match measurement"):
+            self._check(12, self.incumbent_metrics)
+
+    def test_artifact_must_replay_from_the_selected_seed(self) -> None:
+        with self.assertRaisesRegex(ValueError, "does not replay"):
+            self._check(12, self.selected_metrics, source="module other;\n")
+
+
 if __name__ == "__main__":
     unittest.main()

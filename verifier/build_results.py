@@ -2,9 +2,10 @@
 
 Every submitted candidate is re-run through the restricted parser, the 97 exact
 vectors, the seeded randomized check, and formal equivalence. Its measured
-metrics are then cross-checked against the completed Phase 4 checkpoints, the
-append-only search log, and the Phase 5 exact-study records before any result
-file is written. Nothing here searches or changes a candidate.
+metrics are then cross-checked against the completed search checkpoints, the
+append-only per-experiment search logs, and the Phase 5 exact-study records
+before any result file is written. Nothing here searches or changes a
+candidate; trial functions are re-run only to confirm that artifacts replay.
 """
 
 from __future__ import annotations
@@ -12,6 +13,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import importlib
 import io
 import json
 import sys
@@ -19,6 +21,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from verifier.run_formal import run as run_formal
+from verifier.search_logs import SEARCH_LOG_DIR, read_records
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
@@ -89,17 +92,45 @@ class Refinement:
 
 @dataclass(frozen=True)
 class BoundedBudget:
+    """A completed, seeded, depth-capped search budget that a submission comes from.
+
+    The defaults describe the recorded Kraft-bounded budgets. Later experiments
+    give their own logged algorithm, rendered module name and trial function,
+    as ``(module, function, keyword arguments)``. The trial is called as
+    ``function(seed, depth_cap, **kwargs)``.
+
+    Without ``selected_seed``, the submission must be the budget's best trial
+    and last accepted incumbent. With ``selected_seed``, it is that logged
+    trial instead, which may differ from the incumbent when the incumbent wins
+    only on a later objective. The trial must reach the budget's minimum XOR2
+    count and be nondominated within the budget.
+    """
+
     depth_cap: int
     checkpoint: Path
     incumbent_dir: Path
+    logged_algorithm: str | None = None
+    rendered_module: str | None = None
+    trial: tuple[str, str, tuple[tuple[str, object], ...]] = (
+        "optimizer.depth_bounded",
+        "search_seed_bounded",
+        (),
+    )
+    selected_seed: int | None = None
 
     @property
     def algorithm(self) -> str:
-        return f"kraft-bounded-bp-cse-depth{self.depth_cap}-v1"
+        return self.logged_algorithm or f"kraft-bounded-bp-cse-depth{self.depth_cap}-v1"
 
     @property
     def module_name(self) -> str:
-        return f"candidate_depth{self.depth_cap}_bounded"
+        return self.rendered_module or f"candidate_depth{self.depth_cap}_bounded"
+
+    def regenerate_source(self, seed: int) -> str:
+        """Re-run the recorded trial for ``seed`` and render it as submitted."""
+        module, function, keywords = self.trial
+        search = getattr(importlib.import_module(module), function)
+        return search(seed, self.depth_cap, **dict(keywords)).render(self.module_name)
 
 
 @dataclass(frozen=True)
@@ -135,26 +166,44 @@ SUBMISSIONS = (
             Path("results/checkpoints/candidate_c_refinement.json"),
         ),
     ),
-    # Separately recorded Kraft-bounded budgets: B7 is a bounded-depth
-    # (Candidate B family) search at depth 7, and C is the minimum-depth search
-    # at depth 6, the lowest depth any XOR2 network for the widest output row
-    # can reach.
+    # B7 is a bounded-depth (Candidate B family) circuit at depth 7. Adopted
+    # 2026-10-27, replacing the 441-gate Kraft-bounded incumbent
+    # (results/phase6/candidate_depth7_bounded.v). It is the incumbent of the
+    # ablation `rewrite` arm's 1,000-seed budget
+    # (docs/experiments/ablation_toward_dclo.md). That arm's distribution
+    # matches the baseline's, so this circuit is a verified tail draw, not
+    # evidence of a better method.
     Submission(
         "B7",
-        Path("results/phase6/candidate_depth7_bounded.v"),
+        Path("results/ablation/rewrite_depth7.v"),
         bounded=BoundedBudget(
             7,
-            Path("results/checkpoints/depth7_bounded_search.json"),
-            Path("results/checkpoints/depth7_bounded_incumbents"),
+            Path("results/checkpoints/ablation/rewrite_depth7_search.json"),
+            Path("results/checkpoints/ablation/rewrite_depth7_incumbents"),
+            logged_algorithm="ablation-rewrite-depth7-v1",
+            rendered_module="candidate_depth7_ablation_rewrite",
+            trial=("optimizer.ablation", "search_seed_ablated", (("arm", "rewrite"),)),
         ),
     ),
+    # C minimizes depth, then XOR2 count. Depth 6 is the lowest any XOR2
+    # network for the widest output row can reach. Adopted 2026-10-27,
+    # replacing the 470-gate Kraft-bounded incumbent
+    # (results/phase6/candidate_depth6_bounded.v). It is seed 286,375 of the
+    # Kraft-adaptive stage-2 rerun (docs/experiments/kraft_adaptive_tiebreak.md).
+    # It ties that budget's minimum of 465 XOR2 and has lower excess fanout
+    # than the budget incumbent, seed 288,438, which wins only on maximum
+    # fanout. It dominates the previous C.
     Submission(
         "C",
-        Path("results/phase6/candidate_depth6_bounded.v"),
+        Path("results/kraft_adaptive/notable/seed_286375_depth6.v"),
         bounded=BoundedBudget(
             6,
-            Path("results/checkpoints/depth6_bounded_search.json"),
-            Path("results/checkpoints/depth6_bounded_incumbents"),
+            Path("results/checkpoints/kraft_adaptive/stage2_rerun_depth6_search.json"),
+            Path("results/checkpoints/kraft_adaptive/stage2_rerun_depth6_incumbents"),
+            logged_algorithm="kraft-adaptive-tiebreak-half-depth6-v2",
+            rendered_module="candidate_depth6_kraft_adaptive",
+            trial=("optimizer.kraft_adaptive", "search_seed_adaptive", ()),
+            selected_seed=286375,
         ),
     ),
 )
@@ -305,7 +354,8 @@ def register_circuit(circuits, identities, fingerprint, metrics):
 
 
 def _log_records(search_log: Path) -> list[dict[str, object]]:
-    return [json.loads(line) for line in search_log.read_text().splitlines() if line]
+    """Read every per-experiment log in a directory, or one log file."""
+    return read_records(search_log)
 
 
 def _check_completed_checkpoint(checkpoint: dict[str, object], name: Path) -> None:
@@ -503,23 +553,53 @@ def check_bounded_search(
     if checkpoint.get("incumbent_seed") != winner["seed"]:
         raise ValueError("checkpoint incumbent seed is not the best logged trial")
     measured_metrics = _without_unreachable(measured)
-    if (
-        winner["final_metrics"] != measured_metrics
-        or checkpoint.get("incumbent_metrics") != measured_metrics
-    ):
-        raise ValueError("bounded incumbent metrics do not match measurement")
-    incumbent = budget.incumbent_dir / f"seed_{winner['seed']}.v"
-    if Path(str(winner.get("artifact"))) != incumbent:
-        raise ValueError("winning log record names a different incumbent artifact")
-    if incumbent.read_bytes() != submission.artifact.read_bytes():
-        raise ValueError(f"{submission.artifact} differs from its accepted incumbent")
+    if budget.selected_seed is None:
+        chosen = winner
+        selection = "budget incumbent"
+        if (
+            winner["final_metrics"] != measured_metrics
+            or checkpoint.get("incumbent_metrics") != measured_metrics
+        ):
+            raise ValueError("bounded incumbent metrics do not match measurement")
+        incumbent = budget.incumbent_dir / f"seed_{winner['seed']}.v"
+        if Path(str(winner.get("artifact"))) != incumbent:
+            raise ValueError("winning log record names a different incumbent artifact")
+        if incumbent.read_bytes() != submission.artifact.read_bytes():
+            raise ValueError(
+                f"{submission.artifact} differs from its accepted incumbent"
+            )
+    else:
+        selected = [
+            attempt for attempt in attempts if attempt["seed"] == budget.selected_seed
+        ]
+        if not selected:
+            raise ValueError(
+                f"selected seed {budget.selected_seed} is not in the budget"
+            )
+        chosen = selected[0]
+        selection = "selected nondominated minimum-XOR2 trial"
+        minimum = min(
+            int(attempt["final_metrics"]["xor2_count"]) for attempt in attempts
+        )
+        if int(chosen["final_metrics"]["xor2_count"]) != minimum:
+            raise ValueError(
+                "selected trial does not reach the budget's minimum XOR2 count"
+            )
+        if any(
+            dominates(attempt["final_metrics"], chosen["final_metrics"])
+            for attempt in attempts
+        ):
+            raise ValueError("selected trial is dominated within its budget")
+        if chosen["final_metrics"] != measured_metrics:
+            raise ValueError("selected trial metrics do not match measurement")
+        if not replay:
+            raise ValueError(
+                "a selected trial is linked to its log record only by replay"
+            )
     if replay:
         # Reproducibility only: the metrics above come from the independent
         # verifier, never from optimizer code.
-        from optimizer.depth_bounded import search_seed_bounded
-
-        regenerated = search_seed_bounded(winner["seed"], budget.depth_cap)
-        if regenerated.render(budget.module_name) != submission.artifact.read_text():
+        if budget.regenerate_source(chosen["seed"]) != submission.artifact.read_text():
             raise ValueError(f"{submission.artifact} does not replay from its seed")
     return {
         "algorithm": budget.algorithm,
@@ -530,7 +610,9 @@ def check_bounded_search(
         "logged_attempts": len(attempts),
         "accepted_incumbents": len(accepted),
         "winning_attempt_id": winner["attempt_id"],
-        "seed": winner["seed"],
+        "selection": selection,
+        "selected_attempt_id": chosen["attempt_id"],
+        "seed": chosen["seed"],
         "replayed_from_seed": replay,
     }
 
@@ -680,7 +762,7 @@ def _baseline_comparison(
 def build_results(
     random_tests: int = DEFAULT_RANDOM_TESTS,
     random_seed: int = DEFAULT_RANDOM_SEED,
-    search_log: Path = Path("results/search_log.jsonl"),
+    search_log: Path = SEARCH_LOG_DIR,
 ) -> tuple[dict[str, object], str]:
     records = _log_records(search_log)
     submitted = []
@@ -825,7 +907,10 @@ def main() -> int:
     )
     parser.add_argument("--metrics", type=Path, default=Path("results/metrics.csv"))
     parser.add_argument(
-        "--search-log", type=Path, default=Path("results/search_log.jsonl")
+        "--search-log",
+        type=Path,
+        default=SEARCH_LOG_DIR,
+        help="directory of per-experiment logs, or one log file",
     )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(

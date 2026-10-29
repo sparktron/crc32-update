@@ -40,6 +40,7 @@ from optimizer.optimize import (
     independently_check,
 )
 from verifier.verify_network import DEFAULT_RANDOM_SEED, DEFAULT_RANDOM_TESTS
+from verifier.search_logs import log_file_for
 
 COMPONENTS = ("tiebreak", "second_best", "finish", "rewrite")
 ARMS = ("none", *COMPONENTS, "all")
@@ -99,6 +100,14 @@ class _AblatedBuilder(_BoundedBuilder):
             self.children[pair[0]].append(output)
             self.children[pair[1]].append(output)
         return output
+
+    def _merge_fresh(self, expression: set[int]) -> tuple[tuple[int, int], int]:
+        pair, output = super()._merge_fresh(expression)
+        self.parents.append(pair)
+        self.children.append([])
+        self.children[pair[0]].append(output)
+        self.children[pair[1]].append(output)
+        return pair, output
 
     def free_rewrites(self) -> None:
         if "rewrite" not in self.components:
@@ -213,7 +222,8 @@ class _AblatedBuilder(_BoundedBuilder):
                     if self._fits(expression, pair)
                 ]
                 if not pairs:
-                    raise RuntimeError("no depth-feasible pair; Kraft invariant broken")
+                    self._merge_fresh(expression)
+                    continue
                 known = []
                 for pair in pairs:
                     replacement, depth = self._target(pair)
@@ -278,13 +288,18 @@ def main() -> int:
         "defaults to <arm>_depth<cap>",
     )
     parser.add_argument("--workers", type=int, default=1)
-    parser.add_argument("--search-log", type=Path, default=Path("results/search_log.jsonl"))
+    parser.add_argument(
+        "--search-log",
+        type=Path,
+        help="defaults to this algorithm's file under results/search_logs/",
+    )
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(
         "--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED
     )
     args = parser.parse_args()
     arm, cap = args.arm, args.depth_cap
+    args.search_log = args.search_log or log_file_for(algorithm_name(arm, cap))
     if args.seed_start is None:
         if (arm, cap) not in RECORDED_SEED_STARTS:
             parser.error(f"--seed-start is required for unrecorded arm/cap {arm}/{cap}")

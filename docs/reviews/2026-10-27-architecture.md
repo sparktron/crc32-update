@@ -272,3 +272,19 @@ power-loss or destroyed-journal recovery. The validation document gives the
 exact manual clean-clone command to run after committing this branch. These
 checks support the stated fixes and current results; they do not establish
 that the system is bug-free.
+
+## 13. PR integration — 2026-10-29
+
+The patch was committed as `b87659c` and reconciled with master `4221a33`.
+The combined tree passed **136 discovered tests in 237.961 seconds** and
+`python3 -B -m verifier.build_results --check --require-spec-minimum`.
+All five submissions and four committed baselines were proved, and three
+distinct Pareto circuits matched publication data. The current 440-gate B7
+and 465-gate C, split experiment logs, fresh-gate fallback and selected-trial
+provenance were preserved. Only C0's derived identity metadata differs from
+master; no numerical history, checkpoint or circuit was changed.
+
+See [current validation](../validation/2026-10-29-architecture-pr.md).
+The full clean-clone gate was not run locally; the PR's CI executes the
+existing rebuild workflow. The lifecycle and hardware-validation limits above
+remain in effect.

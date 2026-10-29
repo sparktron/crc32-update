@@ -1,13 +1,16 @@
 # Final report: 64-bit parallel IEEE CRC-32 XOR2 optimization
 
 Date: 2026-10-24. Results and implementation baseline: `ec07920`.
+Updated 2026-10-27: B7 and C were replaced by verified circuits from later
+search experiments. See "Submitted candidates" and
+[docs/experiments/](docs/experiments).
 Experiment contract: [SPEC.md](SPEC.md). Development gates: [PLAN.md](PLAN.md).
 
 ## Outcome
 
 The completed experiment produced three distinct nondominated circuits for
 one raw reflected IEEE CRC-32 state update: 439 XOR2 gates at depth 8,
-441 at depth 7, and 470 at depth 6. All pass independent structural,
+440 at depth 7, and 465 at depth 6. All pass independent structural,
 exact-linear, randomized, and formal-equivalence checks. Candidate A and
 Candidate B share one circuit; B7 supplies a distinct bounded-depth point,
 and Candidate C supplies the minimum-depth point.
@@ -69,7 +72,20 @@ For the current terms, this is the feasibility condition for finishing an
 XOR2 tree within the cap. It makes the depth constraint exact, but does not
 make greedy sharing choices optimal. Post-filtering the earlier search had
 not produced a depth-7 circuit; enforcing the constraint during construction
-produced the two additional frontier points.
+produced the two additional frontier points. The original Kraft-bounded
+budgets found 441 at depth 7 and 470 at depth 6.
+
+On 2026-10-27, four follow-up experiments, each pre-registered in
+[docs/experiments/](docs/experiments), varied the depth-capped search:
+- DCLO (Boyar, Find and Peralta) did worse than the Kraft-bounded search.
+- An ablation toward DCLO showed that the baseline's depth-aware tie-break
+  carries its advantage. One ablation seed gave the 440-gate depth-7
+  circuit, but that arm's distribution matches the baseline's, so the circuit
+  is a tail draw.
+- A tie-break that prefers the merge using the least Kraft slack lowered the
+  mean depth-6 gate count by about 5. It was worse at depth 7.
+- A variant of it that counts slack only in rows near their Kraft limit
+  produced the 465-gate depth-6 circuit.
 
 Recorded stochastic budgets are:
 
@@ -81,10 +97,21 @@ Recorded stochastic budgets are:
 | Phase 4 C refinement | 30,000–39,999 | 10,000 | No improvement over the balanced depth-6 starting point |
 | Depth-7 bounded | 40,000–49,999 | 10,000 | Seed 40,505: 441 gates, 6 accepted incumbents |
 | Depth-6 bounded | 50,000–59,999 | 10,000 | Seed 56,140: 470 gates, 10 accepted incumbents |
+| Ablation `rewrite` arm, depth 7 | 160,000–160,999 | 1,000 | Seed 160,832: 440 gates (now B7) |
+| Kraft-adaptive stage-2 rerun (v2), depth 6 | 281,000–290,999 | 10,000 | Seed 286,375: 465 gates (now C); incumbent seed 288,438: 465 gates, max fanout 5 |
 
-The canonical append-only log has 60,042 unique attempt IDs: 60,000 seeded
-trials, two verified starting points, and 40 exact-study records across v1
-and v2. Checkpoints record the completed budgets. A historical overlapping
+The table lists only the budgets that produced submitted circuits. Every
+other budget (DCLO, the other ablation arms, the Kraft-slack variant, and the
+remaining Kraft-adaptive stages) is recorded in its experiment record.
+
+The append-only search log originally had 60,042 unique attempt IDs: 60,000
+seeded trials, two verified starting points, and 40 exact-study records
+across v1 and v2.
+- With the 2026-10-27 experiments it holds 127,904 records.
+- It is now split, without changing any record, into one file per experiment
+  under `results/search_logs/`, to stay under GitHub's file-size limit.
+
+Checkpoints record the completed budgets. A historical overlapping
 A continuation produced 7,125 identical duplicate records; these were removed
 after a recovery copy was saved. Exclusive checkpoint/search-log locks now
 reject overlapping invocations. The reproducible compute budget is the seed
@@ -125,6 +152,12 @@ full incumbent acceptance.
 The final result builder checks completed checkpoints, seed ranges,
 accepted incumbents, bounded-seed replay, class objectives, and Phase 5
 records before comparing regenerated CSV and JSON with committed results.
+A submission may be a logged trial other than its budget's incumbent; C is
+one. Such a trial is accepted only if:
+- it reaches the budget's minimum XOR2 count;
+- no trial in the budget dominates it;
+- its logged metrics equal the independent measurement;
+- the artifact replays byte for byte from its seed.
 Structural fingerprints deduplicate the A/B circuit independently of module
 and wire names.
 
@@ -140,26 +173,41 @@ The following values are transcribed directly from `results/metrics.csv`.
 | A | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | true |
 | B | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | true |
 | C0 | 103832014152 |  | 1390 | 6 | 20 | 2812 | 1038 | false |
-| B7 | b65a4c2b615e | 40505 | 441 | 7 | 5 | 914 | 5 | true |
-| C | b8edf279b361 | 56140 | 470 | 6 | 6 | 972 | 20 | true |
+| B7 | ed4ed2ba71db | 160832 | 440 | 7 | 5 | 912 | 3 | true |
+| C | 900a2989cbc1 | 286375 | 465 | 6 | 6 | 962 | 19 | true |
 
 Every row has 32 direct output aliases; its intermediate count equals its
 XOR2 count. Ordered per-output depths and verification evidence remain in the
 CSV and JSON rather than being replaced by only these summaries.
 
-The three frontier IDs are `1472a09886a8`, `b65a4c2b615e`, and `b8edf279b361`.
-A/B minimizes the found gate count and satisfies B's depth-at-most-8 bound.
-B7 spends two additional gates to remove one depth level with unchanged
-maximum and excess fanout. C spends another 29 gates to reach depth 6, with
-maximum fanout 6 and excess 20. No one point dominates another across the
-four objectives. C0 is structurally the balanced baseline and is dominated
-by C. The superseded Phase 3 A circuit is also dominated and is not submitted.
+The three frontier IDs are `1472a09886a8`, `ed4ed2ba71db`, and `900a2989cbc1`.
+- A/B minimizes the found gate count and satisfies B's depth-at-most-8
+  bound.
+- B7 spends one additional gate to remove one depth level, with the same
+  maximum fanout and lower excess fanout (3 against 5).
+- C spends another 25 gates to reach depth 6, with maximum fanout 6 and
+  excess 19.
+- No one point dominates another across the four objectives.
+- C0 is structurally the balanced baseline and is dominated by C.
+- The superseded Phase 3 A circuit is also dominated and is not submitted.
+
+Superseded submissions, adopted 2026-10-27:
+- The original B7 (`b65a4c2b615e`, seed 40,505, 441 XOR2, maximum fanout 5,
+  excess 5) is dominated by the current B7.
+- The original C (`b8edf279b361`, seed 56,140, 470 XOR2, maximum fanout 6,
+  excess 20) is dominated by the current C.
+- Both remain in `results/phase6/` for provenance.
+- The current B7 is a tail draw from a search whose per-seed distribution
+  matches the original budget's.
+- The current C comes from a search family whose depth-6 mean is about
+  5 gates lower than the original budget's. It is a tail draw within that
+  family.
 
 Artifacts are `results/phase4/candidate_a_extended.v`,
 `results/phase4/candidate_b_refined.v`,
 `results/phase4/candidate_c_refined.v` (C0),
-`results/phase6/candidate_depth7_bounded.v`, and
-`results/phase6/candidate_depth6_bounded.v`.
+`results/ablation/rewrite_depth7.v` (B7), and
+`results/kraft_adaptive/notable/seed_286375_depth6.v` (C).
 
 ### Local baseline comparison
 
@@ -172,8 +220,8 @@ Artifacts are `results/phase4/candidate_a_extended.v`,
 
 A/B reduces gate count by 68.4% from unshared expansion and 3.3% from greedy
 CSE, while improving greedy CSE's depth and fanout. B7 reduces the recorded
-Yosys/ABC count by 60.7% at the same depth 7. C reduces the balanced baseline
-by 66.2% at the same depth 6. Each local baseline is dominated by at least
+Yosys/ABC count by 60.8% at the same depth 7. C reduces the balanced baseline
+by 66.5% at the same depth 6. Each local baseline is dominated by at least
 one frontier circuit, as recorded in `baseline_comparison` in the JSON.
 Recorded baseline generation/verification/formal totals are about 3.9–6.3
 seconds on the original host; these are not search runtimes or portable
@@ -204,7 +252,7 @@ random vectors, and formal equivalence. Chained as written, the netlist has
 `independent_per_output`. As balanced trees, it has 1,390 XOR2 at depth 6 and
 is structurally identical to `balanced_per_output` (C0). The record is
 `results/external/crczero_comparison.json`. Against this directly comparable
-generator, A/B, B7, and C use 31.6%, 31.7%, and 33.8% of the gates.
+generator, A/B, B7, and C use 31.6%, 31.7%, and 33.5% of the gates.
 XAPP209's cancellation within output equations and the OpenCores/CRC generator
 inventory provide context for equation generation; a missing resource count
 is not evidence of a competitive optimized circuit.
@@ -324,6 +372,16 @@ For focused replay without adding optimization attempts:
 python3 -B -m optimizer.phase4_candidates --replay-dir /tmp/phase4_replay
 python3 -B -m optimizer.depth_bounded --depth-cap 7 --replay-seed 40505 --artifact /tmp/depth7.v
 python3 -B -m optimizer.depth_bounded --depth-cap 6 --replay-seed 56140 --artifact /tmp/depth6.v
+```
+
+The two `depth_bounded` commands replay the superseded original B7 and C.
+`build_results --check` replays the current B7 (seed 160,832, ablation
+`rewrite` arm) and C (seed 286,375, Kraft-adaptive v2) from their seeds. To
+replay them directly:
+
+```bash
+python3 -B -c "from optimizer.ablation import search_seed_ablated as s; print(s(160832, 7, 'rewrite').render('candidate_depth7_ablation_rewrite'), end='')" > /tmp/b7.v
+python3 -B -c "from optimizer.kraft_adaptive import search_seed_adaptive as s; print(s(286375, 6).render('candidate_depth6_kraft_adaptive'), end='')" > /tmp/c.v
 ```
 
 [README.md](README.md) contains the full resumable search commands, checkpoint

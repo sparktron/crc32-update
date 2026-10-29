@@ -1,0 +1,168 @@
+{
+  "accepted_incumbents": 52,
+  "all_trials_verified_and_within_cap": true,
+  "completed_budget_replay": {
+    "new_trials": 0,
+    "passed": true,
+    "unchanged_files": 78
+  },
+  "frontier_target": {
+    "depth6": "met: 462 XOR2",
+    "depth7": "not met: best 443 XOR2"
+  },
+  "full_unit_suite": {
+    "command": "python3 -B -m unittest discover",
+    "passed": true,
+    "seconds": 208.384,
+    "tests": 97
+  },
+  "hypotheses": {
+    "H1": "refuted",
+    "H2": "confirmed",
+    "H3": "refuted"
+  },
+  "hypotheses_recomputed_from_summary": true,
+  "pairs": {
+    "depth6_baseline_vs_finishing": {
+      "complete_metric_changes": 5,
+      "gate_count_changes": 5,
+      "maximum_difference": 1,
+      "minimum_difference": -1,
+      "seeds": 1000,
+      "sum_gate_difference": -1
+    },
+    "depth6_sharing_vs_both": {
+      "complete_metric_changes": 0,
+      "gate_count_changes": 0,
+      "maximum_difference": 0,
+      "minimum_difference": 0,
+      "seeds": 1000,
+      "sum_gate_difference": 0
+    },
+    "depth7_baseline_vs_finishing": {
+      "complete_metric_changes": 500,
+      "gate_count_changes": 0,
+      "maximum_difference": 0,
+      "minimum_difference": 0,
+      "seeds": 1000,
+      "sum_gate_difference": 0
+    },
+    "depth7_sharing_vs_both": {
+      "complete_metric_changes": 757,
+      "gate_count_changes": 0,
+      "maximum_difference": 0,
+      "minimum_difference": 0,
+      "seeds": 1000,
+      "sum_gate_difference": 0
+    }
+  },
+  "registered_algorithm_source_unchanged": true,
+  "seed_320099_sharing_byte_replay": true,
+  "stage2": "not triggered at either cap under the preregistered rule",
+  "submitted_frontier_validation": {
+    "command": "python3 -B -m verifier.build_results --check --require-spec-minimum",
+    "passed": true
+  },
+  "trials": 8000,
+  "unique_attempt_ids": 8000,
+  "witnesses": {
+    "both": {
+      "exact_vectors": 97,
+      "formal_passed": true,
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 462,
+        "maximum_depth": 6,
+        "maximum_fanout": 6,
+        "output_depths": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "total_excess_fanout_above_4": 22,
+        "total_fanout": 956,
+        "unreachable_nodes": [],
+        "xor2_count": 462
+      },
+      "random_vectors": 100000
+    },
+    "sharing": {
+      "exact_vectors": 97,
+      "formal_passed": true,
+      "metrics": {
+        "direct_output_alias_count": 32,
+        "intermediate_node_count": 462,
+        "maximum_depth": 6,
+        "maximum_fanout": 6,
+        "output_depths": [
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6
+        ],
+        "total_excess_fanout_above_4": 22,
+        "total_fanout": 956,
+        "unreachable_nodes": [],
+        "xor2_count": 462
+      },
+      "random_vectors": 100000
+    }
+  }
+}

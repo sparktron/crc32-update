@@ -1,7 +1,15 @@
 # Experiment: ablating the Kraft-bounded baseline toward DCLO
 
 **Status:** pre-registered 2026-10-27, before any ablation code was written or
-run.
+run. Completed 2026-10-27.
+- **H1 confirmed. H2 confirmed.**
+- The consistency check passed.
+- The follow-up found the 440 to be a tail draw.
+
+**Log location.** The `results/search_log.jsonl` records cited below moved unchanged into
+`results/search_logs/ablation_toward_dclo.jsonl` on 2026-10-27, when the log was split into one file
+per experiment (`scripts/split_search_log.py`).
+
 
 **Background.** In `docs/experiments/dclo_depth_bounded.md`, DCLO did worse
 than the Kraft-bounded baseline (`kraft-bounded-bp-cse` v1) over 10,000 seeds
@@ -195,12 +203,105 @@ significant shift (+0.18, z = 1.1). The follow-up reports the arm's best of
 
 ## Observed
 
-Not run yet.
+**Stage 1.**
+- Runs: 10 arm/cap runs of 1,000 seeds each, 2026-10-27, 17:57–18:31 UTC,
+  at code `a07cf1a`. All completed with contiguous seed ranges, and every
+  record has `verification_passed: true`.
+- My summary pipe in the run script failed to parse each run's printed
+  output, because the formal tool writes progress lines to stdout. The
+  searches themselves were unaffected; the checkpoints and the log are
+  complete.
+- Raw records:
+  - `results/search_log.jsonl`, under algorithms
+    `ablation-<arm>-depth<cap>-v1`.
+  - `results/checkpoints/ablation/`.
+  - `results/ablation/<arm>_depth<cap>.v`.
+
+Shift is each arm's mean minus the baseline's 10,000-seed mean. z is the
+tie-corrected Mann–Whitney statistic against those 10,000 seeds. The last
+column counts seeds that beat the incumbent: 440 or fewer at cap 7, 469 or
+fewer at cap 6.
+
+| Cap | Arm | Mean | Shift | z | SD | Median | p1 | Best | Beat incumbent |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 7 | `tiebreak` | 460.86 | **+4.81** | 29.7 | 4.43 | 461 | 450 | 445 | 0 |
+| 7 | `second_best` | 456.39 | +0.35 | 2.3 | 4.09 | 456 | 447 | 445 | 0 |
+| 7 | `finish` | 456.23 | +0.19 | 1.3 | 4.07 | 456 | 446 | 444 | 0 |
+| 7 | `rewrite` | 456.23 | +0.18 | 1.1 | 4.29 | 456 | 446 | **440** | 1 |
+| 7 | `all` | 460.83 | +4.78 | 29.1 | 4.48 | 461 | 451 | 444 | 0 |
+| 6 | `tiebreak` | 498.44 | **+8.01** | 37.8 | 5.12 | 498 | 487 | 483 | 0 |
+| 6 | `second_best` | 490.54 | +0.11 | 1.1 | 5.15 | 491 | 478 | 472 | 0 |
+| 6 | `finish` | 490.77 | +0.34 | 2.0 | 5.45 | 491 | 478 | 474 | 0 |
+| 6 | `rewrite` | 490.40 | −0.03 | −0.1 | 5.15 | 491 | 478 | 470 | 0 |
+| 6 | `all` | 498.44 | +8.01 | 37.1 | 5.36 | 499 | 487 | 483 | 0 |
+
+**Hypothesis outcomes.**
+- **H1 confirmed.** The `tiebreak` shift is +4.81 against a threshold of
+  +2.69 at cap 7, and +8.01 against +4.24 at cap 6.
+- **H2 confirmed.** `tiebreak` has the largest shift at both caps. The next
+  largest single-component shift is +0.35.
+- **Consistency check passed.** The `all` arm's mean is 460.83 against
+  DCLO's 461.42 (−0.60) at cap 7, and 498.44 against 498.90 (−0.47) at cap 6.
+  Both are within ±1.0.
+
+**Finishing fallbacks.** Replaying all 4,000 seeds of the `finish` and `all`
+arms gave **zero** fallbacks (`results/ablation/finish_fallbacks.json`).
+
+**The 440 circuit.** The improvement rule fired once: `rewrite` at cap 7,
+seed 160,832.
+- Metrics: 440 XOR2, depth 7, maximum fanout 5, excess fanout 3, total
+  fanout 912.
+- It was re-verified separately. It replays byte for byte, passes 97 exact
+  vectors and 100,000 random vectors, and Yosys/SMTBMC/Z3 proves it
+  equivalent. It contains only two-input XOR assignments.
+- **It dominates B7** (441, depth 7, maximum fanout 5, excess 5) on every
+  recorded objective. It does not dominate A/B (439, depth 8).
+
+**Follow-up.**
+- Run: `rewrite` at cap 7, seeds 200,000–209,999, 2026-10-27 to 19:15:20
+  UTC, at code `6df4743`. It completed with a contiguous range and all
+  records verified.
+- Results: mean **456.05**, SD 4.28, median 456, p1 446, p10 450, best
+  **441** (seed 204,143).
+- Of the 10,000 seeds, 0 reached 440 or fewer and 2 reached 441.
+- Against the baseline's 10,000 seeds (mean 456.05, best 441, one seed at
+  441 or fewer): z = −0.07.
 
 ## Interpretation
 
-Not run yet.
+Everything below is inference.
+
+- **The depth-aware tie-break carries essentially all of the baseline's
+  advantage over DCLO.**
+  - The other three components each move the mean by at most 0.35 gates,
+    and the two at cap 7 with z ≈ 2 are small next to the tie-break's
+    z ≈ 30.
+  - The `all` arm reproduces DCLO's deficit, so nothing important is missing
+    from the four-component decomposition.
+  - The tie-break effect is larger at cap 6 than at cap 7, which fits the
+    view that it matters most when depth slack is scarce.
+- **The 440 circuit is real, but it says nothing about the `rewrite` arm.**
+  - 11,000 seeds of that arm produced one 440 and two 441s.
+  - The baseline's 10,000 seeds produced one 441.
+  - The arm's distribution is indistinguishable from the baseline's.
+  - The 440 is best read as a rare tail draw from essentially the same
+    distribution. A larger baseline budget would plausibly find 440s too.
+- **What a frontier change would claim.** Adopting the 440 circuit would mean
+  "a verified 440-gate depth-7 network exists". It would not mean "the
+  rewrite change improves the search".
 
 ## Next decision
 
-Not run yet.
+- **Established:** the tie-break is the component that matters. A stronger
+  depth-aware tie-break is the most promising direction. It is pre-registered
+  as `docs/experiments/kraft_slack_tiebreak.md` (Kraft-slack key), which runs
+  next.
+- **Ruled out as levers:** the second-best rate, the finishing rule and the
+  rewrite scope. None changes the mean by more than 0.35 gates.
+- **Needs a decision by the project owner, not taken here:** whether to adopt
+  the verified 440-gate circuit (`results/ablation/rewrite_depth7.v`) in place
+  of B7 on the frontier. That changes `report.md`, `STATUS.md` and the
+  `build_results` submission set.
+- **Open:** the baseline's best-of-N curve. 440s appear about once in 10,000
+  seeds, so larger baseline budgets may be enough to move B7 without any
+  algorithm change.

@@ -1,6 +1,6 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-10-27
+Last updated: 2026-10-29
 
 Current phase: Phase 6 — Final verification, comparison, and reporting complete
 
@@ -10,6 +10,16 @@ the three-circuit frontier agree. The historical fresh-clone rebuild evidence
 below is retained. The architecture-fix validation is recorded separately in
 `docs/validation/2026-10-27-architecture-fixes.md`; a fresh-clone CI run for
 these fixes has not been performed.
+
+## Architecture PR Integration — 2026-10-29
+
+The architecture patch `b87659c` was reconciled with master `4221a33` before
+opening its PR. The combined tree passed 136 discovered tests in 237.961
+seconds and the full publication check. The current 440-gate B7 and 465-gate C,
+per-experiment logs, fresh-gate fallback and selected-trial provenance were
+preserved. Only C0 identity metadata differs from master's publication data.
+See `docs/validation/2026-10-29-architecture-pr.md` for current evidence and
+limits. The earlier 109-test result below describes the pre-integration tree.
 
 ## Architecture Review Follow-up — 2026-10-27
 
@@ -26,7 +36,7 @@ submissions and four committed baselines were proved and three frontier
 circuits confirmed. Historical replay and fresh baseline regeneration were
 byte-identical on this host.
 
-The corrected identity changes only C0's derived hash from `0c80bfcc8e2b` to
+The corrected identity changes only C0's derived hash from `103832014152` to
 `103832014152`. No circuit, metric value, frontier membership, seed, checkpoint,
 or historical attempt record was changed. All three frontier IDs are stable.
 
@@ -39,13 +49,14 @@ workers may finish their bounded cohort after cancellation, and a stuck worker
 can still delay shutdown. Tool versions are recorded; cross-version portability
 and physical hardware performance are not established.
 
-Continuation: review this isolated branch, commit it, then run
-`scripts/clean_rebuild.sh` manually for a clean-clone gate. Do not restart an
+Continuation: review the PR from this isolated branch. CI runs
+`scripts/clean_rebuild.sh --in-place`; the complete clean-clone gate was not
+run locally. Do not restart an
 old unfinished budget using the changed implementation or rewrite its history.
 See `docs/search_lifecycle.md` for the full policy and the review follow-up for
 the demonstrated regression cases.
 
-## Current Best Results
+## Current Submitted Results
 
 Candidate A is the best network found by the recorded 20,000-seed search. It is
 not a claim of global optimality. The generated 1,390-XOR structural network
@@ -90,8 +101,8 @@ replacement has been accepted or integrated.
 | A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
 | B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
 | C0 — Phase 4 minimum-depth starting point | 1,390 | 6 | Passed | Balanced-tree baseline; dominated by C |
-| B7 — bounded depth at most 7 | 441 | 7 | Passed | Best found; seed 40,505 of 40,000–49,999 |
-| C — minimum-depth search (depth-6 budget) | 470 | 6 | Passed | Best found; seed 56,140 of 50,000–59,999 |
+| B7 — bounded depth at most 7 | 440 | 7 | Passed | Best found; seed 160,832, ablation `rewrite` arm (adopted 2026-10-27; was 441) |
+| C — minimum-depth search (depth 6) | 465 | 6 | Passed | Submitted; seed 286,375 (adopted 2026-10-27). Research 462-gate witnesses have higher excess fanout; see below. |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector
@@ -390,8 +401,8 @@ nondominated circuits, meeting the `SPEC.md` Section 4 minimum;
 | Circuit | Classes | XOR2 | Depth | Max fanout | Excess fanout >4 |
 | --- | --- | ---: | ---: | ---: | ---: |
 | `1472a09886a8` | A, B | 439 | 8 | 5 | 5 |
-| `b65a4c2b615e` | B7 | 441 | 7 | 5 | 5 |
-| `b8edf279b361` | C | 470 | 6 | 6 | 20 |
+| `ed4ed2ba71db` | B7 | 440 | 7 | 5 | 3 |
+| `900a2989cbc1` | C | 465 | 6 | 6 | 19 |
 
 Submitted but dominated: C0 (`103832014152`, 1,390 XOR2, depth 6, maximum
 fanout 20, excess 1,038), the Phase 4 minimum-depth starting point, which
@@ -401,14 +412,29 @@ Candidate C dominates on every objective.
   seed-16,564 Candidate A already satisfies the depth-8 bound, and B's
   refinement found nothing better. The frontier lists that circuit once with
   both class labels.
-- B7 is the best trial of the completed depth-7 Kraft-bounded budget (seeds
-  40,000–49,999, 10,000 logged attempts, 6 accepted incumbents, best seed
-  40,505). Candidate C is the best trial of the completed depth-6 budget (seeds
-  50,000–59,999, 10,000 logged attempts, 10 accepted incumbents, best seed
-  56,140). Both passed the restricted parser, 97 exact vectors, 100,000 random
-  vectors, and formal equivalence, and each replays byte-for-byte from its seed.
+- **B7 and C were replaced on 2026-10-27** by circuits from the follow-up
+  experiments.
+  - B7 is now the incumbent of the ablation `rewrite` arm's completed depth-7
+    budget (seeds 160,000–160,999, seed 160,832): 440 XOR2, maximum fanout 5,
+    excess 3.
+  - C is now seed 286,375 of the completed Kraft-adaptive stage-2 rerun (v2,
+    seeds 281,000–290,999): 465 XOR2, maximum fanout 6, excess 19.
+  - That C is not its budget's incumbent. The incumbent, seed 288,438, also
+    has 465 gates but wins only on maximum fanout. `build_results` accepts a
+    selected trial only if it reaches the budget's minimum XOR2 count, is
+    nondominated within the budget, matches its logged metrics, and replays
+    byte for byte.
+  - Both passed the restricted parser, 97 exact vectors, 100,000 random
+    vectors, and formal equivalence.
+  - Each dominates the circuit it replaced: the original B7 (`b65a4c2b615e`,
+    441 XOR2, seed 40,505 of the depth-7 Kraft-bounded budget) and the
+    original C (`b8edf279b361`, 470 XOR2, seed 56,140 of the depth-6 budget).
+    Both originals stay in `results/phase6/` for provenance.
+  - The 440 is a tail draw from a baseline-equivalent distribution. The 465
+    is a tail draw from a search family whose depth-6 mean is about 5 gates
+    lower than the original budget's.
 - `SPEC.md` Section 4 defines Candidate C as minimum depth first, then
-  minimum XOR2 count, so the depth-6 budget's 470-gate circuit is Candidate C.
+  minimum XOR2 count, so the 465-gate depth-6 circuit is Candidate C.
   The Phase 4 balanced-tree starting point, which has the same depth but 1,390
   gates, is reported as C0 for provenance and is not on the frontier. B7 is a
   bounded-depth (Candidate B family) search at depth 7; Candidate B remains
@@ -431,11 +457,49 @@ limitations below remain in effect.
   Find and Peralta, 2019) was run with 10,000 seeds per cap.
   - Seeds 70,000–79,999 at depth 7 and 80,000–89,999 at depth 6.
   - Algorithms `dclo-kraft-depth{7,6}-v1`, implemented in `optimizer/dclo.py`.
-  - Best results: 445 XOR2 at depth 7 and 477 at depth 6. B7 and Candidate C
-    dominate both, so the frontier is unchanged.
+  - Best results: 445 XOR2 at depth 7 and 477 at depth 6. The original B7 and
+    Candidate C dominate both, so DCLO did not change the frontier.
   - Per-seed medians were 462 and 499, against the baseline's 456 and 490.
   - The pre-registered record, raw-result paths and the open ablation are in
     `docs/experiments/dclo_depth_bounded.md`.
+- **Ablation toward DCLO (2026-10-27).** Record:
+  `docs/experiments/ablation_toward_dclo.md`.
+  - The depth-aware tie-break accounts for 90–95% of DCLO's deficit. The
+    other components each move the mean by at most 0.35 gates.
+  - One ablation seed (160,832) gave a verified **440-gate depth-7 network**
+    that dominates the original B7, and is now B7. A 10,000-seed follow-up
+    showed it is a tail draw (mean 456.05, the same as the baseline).
+- **Kraft-slack tie-break (2026-10-27).** Record:
+  `docs/experiments/kraft_slack_tiebreak.md`.
+  - Cap 6: the mean is 5 gates lower, and 17 of 10,000 seeds beat 470. The
+    best is a verified **467-gate depth-6 network**. Seeds 249,452 (468) and
+    248,720 (469) give verified networks that dominate the original
+    Candidate C.
+  - Cap 7: the mean is 2.3 gates worse.
+- **Cap-adaptive tie-break (2026-10-27).** Record:
+  `docs/experiments/kraft_adaptive_tiebreak.md`.
+  - With θ = 1/2 it matches the slack variant at both caps, so it does not
+    recover cap 7.
+  - Stage 2 at cap 6 first stopped at 3,862 of 10,000 seeds because of a
+    slack-family finishing bug on seed 284,862. It is now fixed with a
+    fresh-gate fallback (`d37e628`), which leaves every recorded result
+    unchanged.
+  - The v1 run had already found a verified **466-gate depth-6 network**
+    (seed 281,125, fanout 6, excess 20).
+  - A full v2 rerun reproduced v1 exactly on those 3,862 seeds. Its best is
+    **465**. Seed 286,375 gives a verified **465-gate depth-6 network**
+    (fanout 6, excess 19), which is now Candidate C.
+- **Search logs split (2026-10-27).** The single 81 MB
+  `results/search_log.jsonl` is now one file per experiment under
+  `results/search_logs/`. Every record is unchanged.
+- **Frontier updated (2026-10-27, at the project owner's request).** The 440
+  (seed 160,832) replaced B7 and the 465 (seed 286,375) replaced C.
+  - `verifier/build_results.py` submits them.
+  - `results/pareto_frontier.json` and `results/metrics.csv` are regenerated.
+  - `report.md` is updated.
+  - `python3 -m verifier.build_results --check --require-spec-minimum`
+    passes with 3 distinct Pareto circuits: 439/depth 8, 440/depth 7,
+    465/depth 6.
 
 ## Semantic Ambiguities or Discrepancies
 
@@ -628,3 +692,85 @@ limitations below remain in effect.
 Next: review and commit the final documentation on `phase6-final-results`.
 New optimization or stronger publication claims require a separate experiment
 and updated comparison evidence.
+
+
+### PR #11 review fixes (2026-10-27)
+
+- Integrated master’s corrected Campobello input-factoring comparison while
+  preserving the verified 465/440-gate frontier.
+- The current adaptive runner rejects historical v1 stages before locking or
+  writing logs. Its v2 finishing fallback must not continue the aborted v1
+  experiment; the registered `stage2_rerun` retains its v2 algorithm name.
+- Regression validation: `python3 -m unittest optimizer.test_kraft_adaptive
+  optimizer.test_depth_bounded verifier.test_search_logs`: 21 tests passed
+  in 29.596 seconds. `git diff --check` passed. Full clean rebuild remains
+  a CI check.
+
+### Kraft phase-isolation experiment (2026-10-28)
+
+- Completed the preregistered four-arm comparison at caps 6 and 7: 1,000
+  matched seeds per arm/cap, 8,000 unique verified trials, 52 fully verified
+  incumbent acceptances. Code/protocol were committed before the budget at
+  `7dcc2fb`; full results: `docs/experiments/kraft_phase_isolation.md`.
+- H1 refuted: the cap-7 penalty comes from sharing, rather than finishing
+  scoring. Sharing-only and both average 458.102 XOR2; baseline and
+  finishing-only average 456.125. Changing finishing leaves every paired
+  cap-7 gate count unchanged, although fanout can change.
+- H2 confirmed: sharing-only retains the full cap-6 gain (485.493 mean XOR2
+  versus baseline 490.305). Neither hybrid improves on its designated best
+  control enough to qualify for the frozen confirmation rule; H3 refuted.
+  The stage-2 command selected no runs and performed no additional trials.
+- Found two independently verified **462-XOR2, depth-6** witnesses at seed
+  320099, in the sharing-only and both arms. Both have maximum fanout 6,
+  total fanout 956 and excess fanout 22. They save three gates versus C but
+  have higher excess fanout (C: 19), so the submitted 439/440/465 frontier
+  and `report.md` remain unchanged. The witnesses and their separate exact,
+  randomized and formal evidence are retained under
+  `results/checkpoints/phase_isolation/` and `results/phase_isolation/`.
+- Validation: all 97 unit tests passed; completed-budget replay preserved 78
+  result files byte-for-byte with no new trials; `build_results --check
+  --require-spec-minimum` passed. All 8,000 diagnostic records have valid
+  phase gate sums and nonnegative remaining Kraft budgets. Full clean-clone
+  rebuild was not repeated in this session.
+- Next: preregister a sharing-phase scoring experiment that accounts for
+  residual completion cost. The finishing-phase gate-count explanation is
+  contradicted by this experiment. The 462 witnesses demonstrate existence,
+  rather than an improvement in the hybrid search distribution.
+
+### Bounded sharing-lookahead experiment (2026-10-28)
+
+- Completed the preregistered three-root, two-move lookahead comparison against
+  the best existing control at each cap: 1,000 matched seeds per arm/cap,
+  **4,000 independently checked trials**, 32 fully verified incumbents.
+  Code/protocol were committed before collection at `29704bf`.
+  Protocol: `docs/experiments/sharing_lookahead.md`; full observations,
+  refutations, runtime and interpretation:
+  `docs/experiments/sharing_lookahead_results.md`.
+- **Both method hypotheses refuted under the frozen rule.** At depth 7,
+  candidate-minus-baseline mean is -0.154 gates (approximate 95% interval
+  [-0.448, +0.140]); at depth 6, candidate-minus-both-phases-slack is +0.665
+  [+0.307, +1.023]. Neither screens at mean <=-0.5 and paired z<=-3.
+  The extension command selected zero runs; no 10,000-seed budget was opened.
+- Worker elapsed overhead was 5.817x at cap 7 and 4.742x at cap 6. Most probe
+  scores tied. Runtime includes process scheduling and some concurrent
+  regression work; separate timing pilots also showed roughly 5x overhead.
+- The unchanged **baseline control found a verified 438-XOR2, depth-7
+  circuit**, seed **400800**, meeting the <=439 target. Maximum fanout 5,
+  total fanout 908, excess fanout 6. This is the lowest recorded gate count
+  here, but has higher excess fanout than submitted B7 (440, excess 3) and
+  A/B (439/depth 8, excess 5). It demonstrates circuit existence, not a better
+  lookahead search. Artifact: `results/sharing_lookahead/stage1_control_depth7.v`.
+  Submitted artifacts/frontier/report remain unchanged.
+- Candidate bests: 442/depth 7 and 468/depth 6; cap-6 control best 471.
+  Neither cap-6 arm met <=461 or improved on the earlier 462-gate witnesses.
+- Validation: all 101 regression tests passed; submitted-result provenance
+  and formal checks passed; every accepted artifact matched its completed
+  formal-proof trace. All 32 incumbents replayed byte for byte; completed
+  budgets preserved 48 evidence files with no new trials; all four best
+  artifacts were independently rechecked and formally proved. Frozen-source
+  and raw-provenance audits passed. Full clean-clone rebuild was not repeated
+  locally.
+- Next: do not extend or tune this frozen variant. Before another large
+  experiment, preregister a residual feasible-opportunity score and a one-step
+  shortlist control to isolate future information. Treat integration of the
+  438 witness, including its fanout tradeoff and provenance, as separate work.

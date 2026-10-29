@@ -1,7 +1,15 @@
 # Experiment: a Kraft-slack tie-break in the Kraft-bounded search
 
 **Status:** pre-registered 2026-10-27, before any code for this variant was
-written or run.
+written or run. Completed 2026-10-27.
+- **H1 refuted:** cap 6 improved but cap 7 got worse.
+- **H2 confirmed at cap 6:** 467 XOR2 at depth 6. H2 was not tested at
+  cap 7.
+
+**Log location.** The `results/search_log.jsonl` records cited below moved unchanged into
+`results/search_logs/kraft_slack_tiebreak.jsonl` on 2026-10-27, when the log was split into one file
+per experiment (`scripts/split_search_log.py`).
+
 
 **Motivation.** In `docs/experiments/ablation_toward_dclo.md`, replacing the
 baseline's depth-aware tie-break with a uniform choice explained about 90–95%
@@ -136,12 +144,113 @@ These come from the recorded logs:
 
 ## Observed
 
-Not run yet.
+**Stage 1.**
+- Run: 2026-10-27, 19:16:14–19:24:58 UTC, at code `a1e0493`, with a clean
+  tree apart from the untracked `docs/reviews/`.
+- Both caps completed 1,000 contiguous seeds. Every record has
+  `verification_passed: true`, and every trial met its cap.
+- Raw records:
+  - `results/search_log.jsonl`, algorithm `kraft-slack-tiebreak-depth<cap>-v1`.
+  - `results/checkpoints/kraft_slack/stage1_depth<cap>_*`.
+  - `results/kraft_slack/stage1_depth<cap>.v`.
+
+Shift is the stage-1 mean minus the baseline's 10,000-seed mean. z is against
+those 10,000 seeds.
+
+| Cap | Mean | Shift | z | SD | Median | p1 | p10 | Best (seed) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 7 | 458.36 | **+2.31** | +15.04 | 4.32 | 458 | 449 | 453 | 445 (220,445) |
+| 6 | 485.38 | **−5.05** | −26.20 | 5.35 | 485 | 474 | 478 | 470 (240,289) |
+
+- **Cap-6 best (seed 240,289):** 470 XOR2, maximum fanout 6, excess fanout
+  24. Candidate C (470, fanout 6, excess 20) still dominates it on excess
+  fanout.
+- **H1 refuted.** It required z ≤ −3 at both caps. Cap 7 moved the wrong way,
+  z = +15.0.
+- **Stage-2 rule, as pre-registered:**
+  - Triggered at cap 6 (z = −26.2): seeds 241,000–250,999.
+  - Not triggered at cap 7, so H2 at cap 7 is **not tested**.
+- The cap-6 stage-2 command and code are recorded below before it starts.
+
+**Stage 2 (cap 6).**
+- Command:
+  `python3 -m optimizer.kraft_slack --stage stage2 --depth-cap 6 --workers 16`
+- Code: the commit that records these stage-1 results. It changes no code
+  after `3281250`.
+- Run: 2026-10-27, 19:25:35–20:06:09 UTC, at `6e7bf3d`. It completed
+  10,000 contiguous seeds, every record verified, and every trial at
+  depth ≤ 6.
+- Raw records:
+  - `results/search_log.jsonl`.
+  - `results/checkpoints/kraft_slack/stage2_depth6_*`.
+  - `results/kraft_slack/stage2_depth6.v`, the best network.
+  - `results/kraft_slack/notable/`: two non-incumbent networks that
+    dominate C, saved after the run by replaying their seeds.
+
+| Run | Seeds | Mean | SD | Median | p1 | p10 | Best |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Kraft-slack, stage 2 | 241,000–250,999 | 485.50 | 5.28 | 486 | 473 | 479 | **467** |
+| baseline cap 6 | 50,000–59,999 | 490.43 | 5.24 | 490 | 478 | 484 | 470 |
+
+**Low tail, by XOR2 value.**
+- Kraft-slack: 467 ×1, 468 ×4, 469 ×12, 470 ×10, 471 ×21, 472 ×34. That is
+  **17 seeds at 469 or fewer**.
+- Baseline: 470 ×1, 472 ×4. That is 0 seeds at 469 or fewer.
+
+**Networks re-verified separately.** Each replays byte for byte from its
+seed, passes 97 exact vectors and 100,000 random vectors, and is proved
+equivalent by Yosys/SMTBMC/Z3.
+
+| Seed | XOR2 | Depth | Max fanout | Excess > 4 | Total fanout | Compared with C (470, 6, 6, 20, 972) |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 246,653 | **467** | 6 | 7 | 20 | 966 | fewer gates, higher maximum fanout; neither dominates |
+| 249,452 | 468 | 6 | 6 | 20 | 968 | **dominates C** |
+| 248,720 | 469 | 6 | 5 | 17 | 970 | **dominates C** |
+
+**Hypothesis outcomes.**
+- **H1 refuted**, because cap 7 got worse. This was settled at stage 1.
+- **H2 confirmed at cap 6.** The best is 467, which is ≤ 469.
+- **H2 at cap 7 not tested**, because stage 2 was not triggered there.
 
 ## Interpretation
 
-Not run yet.
+Everything below is inference.
+
+- **At cap 6, the slack key is a real improvement, not a tail draw.**
+  - The whole distribution moved about 5 gates lower. The stage-1 and
+    stage-2 means agree (485.38 and 485.50).
+  - 17 of 10,000 seeds beat 470, against none of the baseline's 10,000.
+- **At cap 7, the same key hurts by about 2.3 gates.**
+  - A plausible but untested reason is the depth budget. With one more
+    level of slack, it rarely binds early at cap 7. Preferring zero-cost
+    merges then builds deeper gates (for example 2+2 → 3) earlier than the
+    baseline's shallow-first rule would. That may close off sharing
+    opportunities that only fit while gates stay shallow.
+  - At cap 6 the budget binds from the start, so spending it carefully pays.
+- **The best tie-break seems to depend on how tight the cap is.** A rule
+  that switches on how much slack is left, such as the slack key only once
+  rows are near their Kraft limit, might keep the cap-6 gain without the
+  cap-7 loss. This is untested.
+- **What the circuits show.** The 467, 468 and 469 networks show that
+  verified depth-6 circuits below 470 gates exist. Unlike the 440 in the
+  ablation, they come from a method whose whole distribution is lower.
 
 ## Next decision
 
-Not run yet.
+- **Needs a decision by the project owner, not taken here.** These are
+  frontier changes, which touch `report.md`, `STATUS.md` and the
+  `build_results` submission set.
+  - `SPEC.md` Section 4 defines Candidate C as minimum depth, then minimum
+    XOR2. By that definition the 467-gate network
+    (`results/kraft_slack/stage2_depth6.v`) would become Candidate C.
+  - On the Pareto frontier:
+    - The 468 (seed 249,452) and 469 (seed 248,720) networks each dominate
+      the current C.
+    - The 467 and the 469/fanout-5 networks are both non-dominated.
+- **Not tested:**
+  - H2 at cap 7.
+  - A cap-adaptive tie-break.
+- **Recommended next experiment:** a tie-break that switches from depth-first
+  to slack-first as rows approach their Kraft limit, run at both caps.
+- **Ruled out:** the slack key as a drop-in replacement at cap 7. Its mean is
+  worse there (z = +15.0).
