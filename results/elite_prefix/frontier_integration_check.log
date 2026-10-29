@@ -1,0 +1,41 @@
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/phase4/candidate_a_extended.v (module candidate_a_min_area).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/phase4/candidate_b_refined.v (module candidate_b_depth8).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/phase4/candidate_c_refined.v (module candidate_c_min_depth).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/elite_prefix/stage1_elite_f75_depth7.v (module candidate_elite_f75_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/elite_prefix/stage1_elite_f75_depth7.v (module candidate_elite_f75_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/elite_prefix/stage1_elite_f75_depth7.v (module candidate_elite_f75_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/elite_prefix/stage1_elite_f75_depth6.v (module candidate_elite_f75_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/elite_prefix/stage1_elite_f50_depth6.v (module candidate_elite_f50_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /home/mythos/repos/crc32-update/.claude/worktrees/elite-prefix-restart/results/elite_prefix/notable/seed_500413_depth7.v (module candidate_elite_f25_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+4 distinct Pareto candidate(s) from 9 submitted candidate classes.
+
+real	0m47.425s
+user	0m46.717s
+sys	0m0.730s

@@ -22,6 +22,7 @@ LEGACY_SEARCH_LOG = Path("results/search_log.jsonl")
 # (algorithm-name prefix, file name). No prefix is a prefix of another, so the
 # order does not matter, and each algorithm maps to exactly one file.
 EXPERIMENT_LOGS: tuple[tuple[str, str], ...] = (
+    ("elite-prefix-", "elite_prefix.jsonl"),
     ("sharing-lookahead-", "sharing_lookahead.jsonl"),
     ("gf2-bp-cse-depth-stochastic-", "candidate_a.jsonl"),
     ("phase4-", "phase4_refinement.jsonl"),

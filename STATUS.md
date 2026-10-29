@@ -1,12 +1,12 @@
 # CRC32 Superoptimization Status
 
-Last updated: 2026-10-28
+Last updated: 2026-10-29
 
 Current phase: Phase 6 — Final verification, comparison, and reporting complete
 
 Current gate: G6 passed locally on 2026-10-24. The final report is in
 `report.md`; all submitted artifacts, final metrics, provenance records, and
-the three-circuit frontier agree. The recorded fresh-clone rebuild passed;
+the four-circuit frontier agree. The recorded fresh-clone rebuild passed;
 it was not repeated for this documentation-only closeout.
 
 ## Current Submitted Results
@@ -51,11 +51,13 @@ replacement has been accepted or integrated.
 
 | Candidate class | XOR2 count | Maximum depth | Verification | Status |
 | --- | ---: | ---: | --- | --- |
-| A — minimum gate-count search | 439 | 8 | Passed | Best found; seed 16,564 |
-| B — depth at most 8 | 439 | 8 | Passed | Best found; no refinement improvement |
+| A0 — Phase 4 Candidate A search | 439 | 8 | Passed | Seed 16,564; kept for provenance, dominated by A |
+| B0 — Phase 4 Candidate B refinement | 439 | 8 | Passed | Same circuit as A0; kept for provenance, dominated by A |
 | C0 — Phase 4 minimum-depth starting point | 1,390 | 6 | Passed | Balanced-tree baseline; dominated by C |
-| B7 — bounded depth at most 7 | 440 | 7 | Passed | Best found; seed 160,832, ablation `rewrite` arm (adopted 2026-10-27; was 441) |
-| C — minimum-depth search (depth 6) | 465 | 6 | Passed | Submitted; seed 286,375 (adopted 2026-10-27). Research 462-gate witnesses have higher excess fanout; see below. |
+| A, B and B7 — fewest gates; depth at most 8; depth at most 7 | 437 | 7 | Passed | Best found; seed 502,021, elite-prefix f = 75 (adopted 2026-10-29; was 439 for A/B and 440 for B7) |
+| C — minimum-depth search (depth 6) | 460 | 6 | Passed | Best found; seed 522,004, elite-prefix f = 75 (adopted 2026-10-29; was 465) |
+| C2 — second depth-6 point | 461 | 6 | Passed | Seed 521,005, elite-prefix f = 50; excess fanout 17 against C's 19 (added 2026-10-29) |
+| F4 — fewest gates with every fanout at most 4 | 445 | 7 | Passed | Seed 500,413, elite-prefix f = 25; maximum fanout 4, excess 0 (added 2026-10-29) |
 
 Deterministic baseline metrics below were recomputed by the independent Phase 1
 verifier. Runtime is the observed sum of generation, 100,000-vector
@@ -347,24 +349,46 @@ Tool versions used locally:
 
 ## Phase 6 Progress
 
-The regenerated frontier (`schema_version` 2) has three distinct
-nondominated circuits, meeting the `SPEC.md` Section 4 minimum;
+The regenerated frontier (`schema_version` 2) has four distinct
+nondominated circuits, meeting the `SPEC.md` Section 4 minimum of three;
 `python3 -m verifier.build_results --check --require-spec-minimum` passes.
 
-| Circuit | Classes | XOR2 | Depth | Max fanout | Excess fanout >4 |
-| --- | --- | ---: | ---: | ---: | ---: |
-| `1472a09886a8` | A, B | 439 | 8 | 5 | 5 |
-| `ed4ed2ba71db` | B7 | 440 | 7 | 5 | 3 |
-| `900a2989cbc1` | C | 465 | 6 | 6 | 19 |
+| Circuit | Classes | Seed | XOR2 | Depth | Max fanout | Excess fanout >4 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `aa77c6d02bb6` | A, B, B7 | 502,021 | 437 | 7 | 5 | 2 |
+| `2773dcc0ddb0` | F4 | 500,413 | 445 | 7 | 4 | 0 |
+| `d48641ffe21f` | C | 522,004 | 460 | 6 | 6 | 19 |
+| `546dcc441532` | C2 | 521,005 | 461 | 6 | 6 | 17 |
 
-Submitted but dominated: C0 (`0c80bfcc8e2b`, 1,390 XOR2, depth 6, maximum
-fanout 20, excess 1,038), the Phase 4 minimum-depth starting point, which
-Candidate C dominates on every objective.
+Submitted but dominated, kept for provenance: A0 and B0 (`1472a09886a8`, the
+Phase 4 Candidate A and B circuit, 439 XOR2 at depth 8), which A dominates;
+and C0 (`0c80bfcc8e2b`, 1,390 XOR2, depth 6, maximum fanout 20, excess
+1,038), the Phase 4 minimum-depth starting point, which C dominates.
 
-- Candidates A and B are the same netlist apart from the module name: the
-  seed-16,564 Candidate A already satisfies the depth-8 bound, and B's
-  refinement found nothing better. The frontier lists that circuit once with
-  both class labels.
+- **The frontier was replaced on 2026-10-29** by circuits from the
+  elite-prefix restart experiment's elite arms
+  (`docs/experiments/elite_prefix_restart_results.md`). Each is the incumbent
+  of its 1,000-seed budget except F4.
+  - A, B and B7: seed 502,021 (f = 75, depth 7). It dominates the Phase 4
+    A/B (439, depth 8) and the 2026-10-27 B7 (440, seed 160,832).
+  - C: seed 522,004 (f = 75, depth 6). It dominates the 2026-10-27 C (465,
+    seed 286,375).
+  - C2: seed 521,005 (f = 50, depth 6), a new point with one more gate than C
+    and two fewer units of excess fanout.
+  - F4: seed 500,413 (f = 25, depth 7), a new class: fewest XOR2 with every
+    fanout at most four. Its budget's incumbent (seed 500,505, 440 XOR2) has
+    fanout 5, so `build_results` accepts F4 only as the budget's fewest-gate
+    trial within the fanout bound, nondominated in the budget, matching its
+    logged metrics and replaying byte for byte. It is the fewest-gate circuit
+    with that bound in any log; the other three have 449–457 gates at
+    depths 8–9.
+  - The elite arms replay prefixes of parents selected on outcome, so all four
+    are verified tail draws, not evidence of a better method at matched
+    compute.
+- A0 and B0 are the same netlist apart from the module name: the
+  seed-16,564 Phase 4 Candidate A already satisfies the depth-8 bound, and
+  B's refinement found nothing better. They stay submitted because the
+  Candidate A search and the Phase 5 exact study are checked against them.
 - **B7 and C were replaced on 2026-10-27** by circuits from the follow-up
   experiments.
   - B7 is now the incumbent of the ablation `rewrite` arm's completed depth-7
@@ -387,12 +411,12 @@ Candidate C dominates on every objective.
     is a tail draw from a search family whose depth-6 mean is about 5 gates
     lower than the original budget's.
 - `SPEC.md` Section 4 defines Candidate C as minimum depth first, then
-  minimum XOR2 count, so the 465-gate depth-6 circuit is Candidate C.
+  minimum XOR2 count, so the 460-gate depth-6 circuit is Candidate C.
   The Phase 4 balanced-tree starting point, which has the same depth but 1,390
   gates, is reported as C0 for provenance and is not on the frontier. B7 is a
-  bounded-depth (Candidate B family) search at depth 7; Candidate B remains
-  the depth-8 circuit because it has fewer gates. `build_results` now rejects
-  any submission set in which A, B, or C does not win its class objective.
+  bounded-depth (Candidate B family) label at depth 7; since 2026-10-29 the
+  437 holds A, B and B7 together. `build_results` rejects any submission set
+  in which A, B, C, or a submitted F4 does not win its class objective.
 - Every recorded baseline is now dominated by a frontier circuit, including
   Yosys/ABC (1,123 XOR2, depth 7) and `balanced_per_output`, which is
   structurally identical to C0. This comparison reads the recorded
@@ -453,6 +477,9 @@ limitations below remain in effect.
   - `python3 -m verifier.build_results --check --require-spec-minimum`
     passes with 3 distinct Pareto circuits: 439/depth 8, 440/depth 7,
     465/depth 6.
+- **Frontier updated (2026-10-29, at the project owner's request).** Four
+  elite-prefix circuits replaced A, B, B7 and C and added C2 and F4; see
+  "Phase 6 Progress" and the 2026-10-29 entry below.
 
 ## Semantic Ambiguities or Discrepancies
 
@@ -528,9 +555,10 @@ limitations below remain in effect.
   so a lower published standard-function count cannot be ruled out. Depth 6
   is provably minimal (maximum row weight 52). No novelty or gate-count
   optimality claim is supported.
-- B7 and Candidate C are best found for their recorded 10,000-seed budgets,
-  not optimal circuits. The Kraft check makes the depth cap exact, but the
-  sharing choices remain greedy and seeded.
+- The four frontier circuits are best found for their recorded 1,000-seed
+  elite-prefix budgets, not optimal circuits. The Kraft check makes the depth
+  cap exact, but the sharing choices remain greedy and seeded, and the elite
+  parents were selected on outcome from earlier budgets.
 - Seven v2 cones timed out as `unknown`. A larger timeout would be a new,
   separately recorded budget, not a continuation of the completed one.
 - Dedicated simulated annealing, output-subset resynthesis, and separately
@@ -727,3 +755,83 @@ and updated comparison evidence.
   experiment, preregister a residual feasible-opportunity score and a one-step
   shortlist control to isolate future information. Treat integration of the
   438 witness, including its fanout tradeoff and provenance, as separate work.
+
+### Elite-prefix restart experiment (2026-10-28)
+
+- Completed the preregistered heritability test: 20 elite and 20 median
+  recorded parents per cap; their first 25/50/75/100% of sharing decisions
+  are replayed exactly, then each child continues on a fresh seed. With 2,000
+  fresh control trials per cap, that is **20,000 independently checked
+  trials** and 124 fully verified incumbents. Code/protocol/parent table were
+  committed before collection at `5bacbb2`. This was chosen ahead of the
+  lookahead record's proposed residual-opportunity score. Protocol:
+  `docs/experiments/elite_prefix_restart.md`; full observations:
+  `docs/experiments/elite_prefix_restart_results.md`.
+- **H8 confirmed at both caps.** At f = 50, elite children beat fresh trials
+  by 9.16 gates at depth 7 (z −15.9) and 13.20 at depth 6 (z −18.3), and beat
+  median-parent children by 8.70 (z −11.8) and 13.61 (z −16.4). Median
+  prefixes change nothing. Heritability slopes are 0.17/0.25 at f = 25,
+  0.64/0.82 at f = 50 and about 1 from f = 75. Redrawing only finishing never
+  changed a gate count (4,000 of 4,000 f = 100 children equal their parent).
+- **Both existence targets met.** Depth 7: seed **502021**, a verified
+  **437-XOR2** circuit (maximum fanout 5, total fanout 906, excess 2), from
+  the 438's prefix at f = 75. It is no worse than A/B (439, depth 8) and B7
+  (440) on every objective. Depth 6: seed **522004**, a verified **460-XOR2**
+  circuit (fanout 6, excess 19), from the 462's prefix, no worse than C (465)
+  on every objective. 4 children reached 437 and 13 reached <=461 (three at
+  460); seeds 522005 and 522032 are 461/depth 6 with maximum fanout 5 but
+  were only structurally and exactly checked. Fresh and median arms' bests
+  were 442/443 and 469/469.
+- At collection the submitted frontier, metrics and report were unchanged.
+  The 437 and 460 alone would give two distinct Pareto circuits against the
+  three `SPEC.md` requires; the 2026-10-29 entry below records the
+  four-circuit integration.
+- Validation: the post-collection audit (`scripts/audit_elite_prefix.py`)
+  ran in a detached checkout of `5bacbb2`. It passed frozen-source identity,
+  coverage, phase sums, depth bounds and every child's prefix digest. All 124
+  incumbents replayed byte for byte, with formal-proof traces. The completed
+  replay preserved 182 evidence files with no new trials. All 18 best
+  artifacts, including the 437 and 460, were rechecked and formally proved
+  again. All 111 regression tests passed, and the submitted-result
+  provenance check passed. Full clean-clone rebuild was not repeated.
+- Next: per the frozen rule, preregister an iterated elite-restart search at
+  each cap against fresh seeds at matched compute, including the cost of
+  building the elite pool, with tail-rate and best-of-N endpoints on new
+  seeds. State the replay fraction or schedule (f = 50 explores, f = 75
+  produced both bests) and the pool-refresh rule before results.
+
+### Four-circuit frontier from the elite-prefix experiment (2026-10-29)
+
+- At the project owner's request, the submitted frontier is now four
+  elite-prefix circuits: the 437 (seed 502,021) as A, B and B7; the 460
+  (522,004) as C; the 461 with excess 17 (521,005) as C2; and the 445 with
+  every fanout at most four (500,413) as the new class F4. The Phase 4 A/B
+  stays submitted as dominated A0/B0 for its provenance checks. The
+  2026-10-27 B7 (440) and C (465) were dropped; both are dominated.
+- `verifier/build_results.py`: elite-prefix budgets, an optional F4 class
+  objective, and a `fanout_bound` on the selected-trial rule. A selected trial
+  under the bound must have the fewest XOR2 among its budget's trials with
+  every fanout at most four. `optimizer/elite_prefix.replay_trial` replays a
+  logged trial from its arm and the committed parent table.
+- Before choosing, seeds 522005, 522032, 500413 and 521606 passed 97 exact
+  vectors, 100,000 random vectors and the formal proof
+  (`results/elite_prefix/notable/`). 522032 and 521606 do not reach their
+  budget's minimum gate count, so the existing rule rejects them; 521005 is
+  its budget's incumbent and needs no rule change.
+- Validation: `python3 -B -m unittest discover` passed 117 tests in 183.5 s,
+  including six new tests for the F4 objective, the fanout-bounded selection
+  and replay (`results/elite_prefix/frontier_integration_tests.log`).
+  `python3 -B -m verifier.build_results --check --require-spec-minimum`
+  passed in 47.4 s: every submission formally proved, every bounded
+  submission replayed from its seed, 4 distinct Pareto circuits from 9
+  submitted classes, and every local baseline dominated
+  (`results/elite_prefix/frontier_integration_check.log`). The CI search-log
+  validation passed on 159,904 records in 11 logs. The four replay commands
+  in `report.md` reproduce the committed artifacts byte for byte.
+- Clean rebuild: `scripts/clean_rebuild.sh` passed from a fresh clone of
+  `1918092` in 1 m 56 s, but its test step named seven fixed modules (68
+  tests), so the nine test modules added by later experiments, including
+  `optimizer.test_elite_prefix`, never ran there or in CI. The step now runs
+  `python3 -m unittest discover`. The fresh-clone rebuild of `796631c` passed
+  all 117 tests, every byte-for-byte replay and the four-circuit frontier
+  check in 5 m 43 s.

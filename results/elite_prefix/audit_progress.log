@@ -1,0 +1,73 @@
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f25_depth7.v (module candidate_elite_f25_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f50_depth7.v (module candidate_elite_f50_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f75_depth7.v (module candidate_elite_f75_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f100_depth7.v (module candidate_elite_f100_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f25_depth7.v (module candidate_median_f25_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f50_depth7.v (module candidate_median_f50_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f75_depth7.v (module candidate_median_f75_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f100_depth7.v (module candidate_median_f100_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_fresh_depth7.v (module candidate_fresh_depth7).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f25_depth6.v (module candidate_elite_f25_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f50_depth6.v (module candidate_elite_f50_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f75_depth6.v (module candidate_elite_f75_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_elite_f100_depth6.v (module candidate_elite_f100_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f25_depth6.v (module candidate_median_f25_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f50_depth6.v (module candidate_median_f50_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f75_depth6.v (module candidate_median_f75_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_median_f100_depth6.v (module candidate_median_f100_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+Formal target: /tmp/frozen-checkout-to5cw21m/checkout/results/elite_prefix/stage1_fresh_depth6.v (module candidate_fresh_depth6).
+Yosys generated a combined 96-input equivalence miter.
+Berkeley ABC synthesis completed on the submitted network.
+Yosys SMTBMC/Z3 proved all 32 output comparisons for every input.
+{"acceptance_formal_trace_passed": true, "best_artifact_verification_reports": {"results/elite_prefix/stage1_elite_f100_depth6.v": "results/elite_prefix/stage1_elite_f100_depth6_verification.json", "results/elite_prefix/stage1_elite_f100_depth7.v": "results/elite_prefix/stage1_elite_f100_depth7_verification.json", "results/elite_prefix/stage1_elite_f25_depth6.v": "results/elite_prefix/stage1_elite_f25_depth6_verification.json", "results/elite_prefix/stage1_elite_f25_depth7.v": "results/elite_prefix/stage1_elite_f25_depth7_verification.json", "results/elite_prefix/stage1_elite_f50_depth6.v": "results/elite_prefix/stage1_elite_f50_depth6_verification.json", "results/elite_prefix/stage1_elite_f50_depth7.v": "results/elite_prefix/stage1_elite_f50_depth7_verification.json", "results/elite_prefix/stage1_elite_f75_depth6.v": "results/elite_prefix/stage1_elite_f75_depth6_verification.json", "results/elite_prefix/stage1_elite_f75_depth7.v": "results/elite_prefix/stage1_elite_f75_depth7_verification.json", "results/elite_prefix/stage1_fresh_depth6.v": "results/elite_prefix/stage1_fresh_depth6_verification.json", "results/elite_prefix/stage1_fresh_depth7.v": "results/elite_prefix/stage1_fresh_depth7_verification.json", "results/elite_prefix/stage1_median_f100_depth6.v": "results/elite_prefix/stage1_median_f100_depth6_verification.json", "results/elite_prefix/stage1_median_f100_depth7.v": "results/elite_prefix/stage1_median_f100_depth7_verification.json", "results/elite_prefix/stage1_median_f25_depth6.v": "results/elite_prefix/stage1_median_f25_depth6_verification.json", "results/elite_prefix/stage1_median_f25_depth7.v": "results/elite_prefix/stage1_median_f25_depth7_verification.json", "results/elite_prefix/stage1_median_f50_depth6.v": "results/elite_prefix/stage1_median_f50_depth6_verification.json", "results/elite_prefix/stage1_median_f50_depth7.v": "results/elite_prefix/stage1_median_f50_depth7_verification.json", "results/elite_prefix/stage1_median_f75_depth6.v": "results/elite_prefix/stage1_median_f75_depth6_verification.json", "results/elite_prefix/stage1_median_f75_depth7.v": "results/elite_prefix/stage1_median_f75_depth7_verification.json"}, "code_commit": "5bacbb29f39276115aa14a5966fb726b0ccb4bbe", "completed_replay_unchanged_files": 182, "counts": {"stage1_elite_f100_depth6": 1000, "stage1_elite_f100_depth7": 1000, "stage1_elite_f25_depth6": 1000, "stage1_elite_f25_depth7": 1000, "stage1_elite_f50_depth6": 1000, "stage1_elite_f50_depth7": 1000, "stage1_elite_f75_depth6": 1000, "stage1_elite_f75_depth7": 1000, "stage1_fresh_depth6": 2000, "stage1_fresh_depth7": 2000, "stage1_median_f100_depth6": 1000, "stage1_median_f100_depth7": 1000, "stage1_median_f25_depth6": 1000, "stage1_median_f25_depth7": 1000, "stage1_median_f50_depth6": 1000, "stage1_median_f50_depth7": 1000, "stage1_median_f75_depth6": 1000, "stage1_median_f75_depth7": 1000}, "fully_verified_incumbent_acceptances": 124, "prefix_digests_passed": true, "raw_invariants_passed": true, "source_identity_passed": true, "unique_trials": 20000}

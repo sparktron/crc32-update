@@ -1,0 +1,182 @@
+{
+  "arms": {
+    "6": [
+      [
+        "elite",
+        25,
+        520000,
+        1000
+      ],
+      [
+        "elite",
+        50,
+        521000,
+        1000
+      ],
+      [
+        "elite",
+        75,
+        522000,
+        1000
+      ],
+      [
+        "elite",
+        100,
+        523000,
+        1000
+      ],
+      [
+        "median",
+        25,
+        524000,
+        1000
+      ],
+      [
+        "median",
+        50,
+        525000,
+        1000
+      ],
+      [
+        "median",
+        75,
+        526000,
+        1000
+      ],
+      [
+        "median",
+        100,
+        527000,
+        1000
+      ],
+      [
+        "fresh",
+        0,
+        528000,
+        2000
+      ]
+    ],
+    "7": [
+      [
+        "elite",
+        25,
+        500000,
+        1000
+      ],
+      [
+        "elite",
+        50,
+        501000,
+        1000
+      ],
+      [
+        "elite",
+        75,
+        502000,
+        1000
+      ],
+      [
+        "elite",
+        100,
+        503000,
+        1000
+      ],
+      [
+        "median",
+        25,
+        504000,
+        1000
+      ],
+      [
+        "median",
+        50,
+        505000,
+        1000
+      ],
+      [
+        "median",
+        75,
+        506000,
+        1000
+      ],
+      [
+        "median",
+        100,
+        507000,
+        1000
+      ],
+      [
+        "fresh",
+        0,
+        508000,
+        2000
+      ]
+    ]
+  },
+  "branch": "claude/elite-prefix-restart",
+  "children": 50,
+  "code_commit": "5bacbb29f39276115aa14a5966fb726b0ccb4bbe",
+  "fractions": [
+    25,
+    50,
+    75,
+    100
+  ],
+  "fresh_count": 2000,
+  "parent_count": 20,
+  "random_tests": 100000,
+  "source_sha256": {
+    "SPEC.md": "0f381cdee25f17791e36f2f9cdd821b095a570d9443a1968ec793ad4cbe374ab",
+    "docs/experiments/elite_prefix_restart.md": "c115ab8f478e1a2864ae201cd464f5c3e4e148eae52fbcb78cef546cd0cd00cb",
+    "generator/__init__.py": "c4b21f1183339af0825ef342504994553267810ec0c8a9264bff56b48a19fc19",
+    "generator/baseline_generator.py": "1eaa2d9452052fa7362d0f5d76e04904759af23037a788ea1c009517ba79b0ed",
+    "generator/build_matrix.py": "909528402328c3d14ebfb4c830a9496d3bb49b4b90f2b54b5aa83aab954c12fa",
+    "generator/test_baseline_generator.py": "356ce450d7c74616dd24e48061e29def07e22e708322cb4801ed7abcb62d3055",
+    "optimizer/__init__.py": "6027dc4dde0a1540953758d30902baae3ae34dad7b0b279d086e933e4206d3a6",
+    "optimizer/ablation.py": "9b03ae27f2a6c5066083f5ea7f5d3c943f6a830bda23f0f247c80367b78e91c9",
+    "optimizer/dclo.py": "91b36714b3fa01013d445a90014f49482b0342d0b5c68ffccc81ffcb477544d2",
+    "optimizer/depth_bounded.py": "fa8667e7b811901de19860dfe94c992299aba33d285b496826bca5938d77ffde",
+    "optimizer/elite_prefix.py": "7337f4961400770f91af7b7a2f6566e3ca0ab3cfcd09902939fdb10807800bed",
+    "optimizer/kraft_adaptive.py": "d930af6c1082b32c207ff5596e38d11a38b829142ea979a04affc66fb71c3b0c",
+    "optimizer/kraft_slack.py": "302114cad2dd9ad72e17e3c083732ec2c28b793ffa08d2fcebb31d13a9c631b2",
+    "optimizer/optimize.py": "6b21611bf2d655c2bd7fcac5ebeeac75a967a4e71dfb3de8b7d70416b15b73d7",
+    "optimizer/phase4_candidates.py": "e9b30bae870a6fc41bbfcff6c9db60a459c3bcc3111a3564dcf4b234646c4bdd",
+    "optimizer/phase5_exact.py": "2a91a7c26b7f0de9add187646e2a472b7767f57fe4c1c8a8ec55fda076fde2ff",
+    "optimizer/phase_isolation.py": "4facaa20ae1a4569b1546d30ebfb17b8acdaf43b05f193f3cec9aa039ddf41be",
+    "optimizer/refine_candidates.py": "be355f6f74a7d68cb670ae7c4c94704f6702f29ab0f3e8ef2841159364ad5dd0",
+    "optimizer/repair_search_log.py": "7ae54881b741896483d4f70856f99b92145198d8b841624b070c411e476fb92f",
+    "optimizer/sharing_lookahead.py": "ecd6c01ab0124cbbd8d3d1dc1569e5e2363d8248f407b78c1c5feb5b01412a52",
+    "optimizer/test_ablation.py": "5dcb42a809bf2b12ddce811460d239c31ececd4ca2d322854c56f063e22bb955",
+    "optimizer/test_dclo.py": "4d632fff4eb8415a84b05f9741285a4c18203f2cf1e2790d3c2e54de544b83be",
+    "optimizer/test_depth_bounded.py": "50fa76ed6f99a5492dcdc2d86639735e3a3f0727448f0904315e6f7a85baa959",
+    "optimizer/test_elite_prefix.py": "294ec868b2b775599b8311a078b035aff4dbad71fc0c4b24aa254cac393a247f",
+    "optimizer/test_kraft_adaptive.py": "32e05db8dad342950a73879c7f741e87c04c3c3c9bbb4211ba40f0028d35ad14",
+    "optimizer/test_kraft_slack.py": "78c50d256243165e744ef9c5aaf20145c3e7f1a7fc2d1156cc492eec6366b936",
+    "optimizer/test_optimize.py": "f8051ca40d67af31553eefb16e1ff682b6e785bd0d1b9532157eaf01a02d6d41",
+    "optimizer/test_phase5_exact.py": "82bffbbbfa88963a7c87fc6760619b9e06d556c5ebbf05e17435702f32262994",
+    "optimizer/test_phase_isolation.py": "fd699ebe2afe88bbdd5865c2364d67ba1d30f028ab163f4e7dcd07833330facd",
+    "optimizer/test_sharing_lookahead.py": "63955c43a1df61d597a30daa6c8695285de0a58b57747444f31b2bafced4ea81",
+    "reference/__init__.py": "1fef9f515c0fa3c6e4fc73789c39c8f2e8728ec0dfa4f77b3fdbb4aa5e8ae031",
+    "reference/crc32_reference.py": "217cab93704e9ea80aa0ee4e8c652eaa15fbcb62692c8cf3445bf6c63a08b6f0",
+    "reference/crc32_reference.v": "797a36208d733825d24f66d0d92d4478488c021012202f6babad1355ee752e99",
+    "results/elite_prefix/parents.json": "32f502a0a2f8f3a771e32b48f0e0abf8d49fe262c084febfb397d7133ec3a7d2",
+    "scripts/audit_sharing_lookahead.py": "4305e3e5db44ea08408c35bfb6f0ac80fcc5a1bdb1cc1af386d896fab116f470",
+    "scripts/compare_crczero.py": "6fb70ca646787bf07a99fb79b873d1746dbe46bc07deaf4a5ab3d9fc0a100597",
+    "scripts/split_search_log.py": "5a54ee5419855b595ec2338647f7d90caeb6008f6ed7ab8b74fdf5f12cc095b5",
+    "verifier/__init__.py": "2604572479b0315868083424a57b494ee59aafe1b3c3fdc72774d7a4bd51ecad",
+    "verifier/build_results.py": "417947045255ebedb919b50e13bacb74d84db8102fc218a74db4b0ee363d6c1d",
+    "verifier/run_formal.py": "bcd905e60317e99035ad5292c920e3342ee4a48476e642c31f2169be725edb53",
+    "verifier/search_logs.py": "e66f7b3819d3eb3a48b16703298db18fab92128d8989de6edde16574e52a85e7",
+    "verifier/test_build_results.py": "4163c51293dc099dadb1aadcefe3c7289a4ed9d577ea0c2718477e4fca5148ee",
+    "verifier/test_search_logs.py": "f9b5c3e87442bf7895d40de1e50199c16842e5cdbd8654d9f0ac7a14f3c1a23b",
+    "verifier/test_verifier.py": "f32ddbf90d0ff97a59010a58803dfde24f2fc0089e21ee94d8b6fe9a14e39ef4",
+    "verifier/test_verify_candidate.py": "5424c8e968d3da6259e2d0a1efe2b020c1385460edcc3738fe884e51039f7347",
+    "verifier/verify_baselines.py": "83176643fcdcfdbf149e2ac54b0eb2391e8616b5e6e9f9392f97db48deeb7cd4",
+    "verifier/verify_candidate.py": "bea90b664a318210f87f29af3c7853a07f7c019483660af8540818996b052e5c",
+    "verifier/verify_network.py": "7ff8ca81d6fe0475fc5d9b64f27560234bcec0b606ec7013876f4ec2e12ef40e"
+  },
+  "status_before_run": [
+    "?? results/elite_prefix/stage1_progress.log"
+  ],
+  "verification_seed": 3274333933
+}

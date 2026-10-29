@@ -1,0 +1,5360 @@
+{
+  "caps": {
+    "6": {
+      "elite": [
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 462,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 22,
+            "total_fanout": 956,
+            "xor2_count": 462
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 179,
+              "state_sha256": "66c065e7fba0f2e8dee8fff5a4f84faddbe1e07aa1e1d52318147c2b1ffee222"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "58a2335ac013b0f46bdbf17fec54a70317c84ba0f9939d33c57f35c49bf4d2ed"
+            },
+            "50": {
+              "decisions": 89,
+              "state_sha256": "11843e26cc667f9e410cb829c59ae80dff234a991b20dae9a2b75de4694c5cd6"
+            },
+            "75": {
+              "decisions": 134,
+              "state_sha256": "dc6f8b0d8c71182cf2f18ed6ae9ddc1f2ffcfd0a8e1292b8f964df804612d2e6"
+            }
+          },
+          "seed": 320099,
+          "sharing_decisions": 179,
+          "source_algorithm": "kraft-phase-isolation-both-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 467,
+            "maximum_depth": 6,
+            "maximum_fanout": 7,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 20,
+            "total_fanout": 966,
+            "xor2_count": 467
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 171,
+              "state_sha256": "5c94ff5359056e0a7c2f4a4d9a2596a06611555fd6675005aecff607fcb1de07"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "00427e51884a000bc9f740171281d886301ab7ae40e3f407c3570fd4bfa52964"
+            },
+            "50": {
+              "decisions": 85,
+              "state_sha256": "66aef6d3d466cafb4bbaab8ea6bf639297291e1859864901c71ae463376894d2"
+            },
+            "75": {
+              "decisions": 128,
+              "state_sha256": "c5770da218b124b54bc82e4659ef0717fcf21acb35b0e60bebb6bf3ea9df4a62"
+            }
+          },
+          "seed": 246653,
+          "sharing_decisions": 171,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 468,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 20,
+            "total_fanout": 968,
+            "xor2_count": 468
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 169,
+              "state_sha256": "9cb3961156ce153c591a6254cdd4c8b3b5537e6cac17937b79044270559628b3"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "c63da76811a8cb496afbca62837dca9e5695dbdde00d3d77a7c300dab2f68cee"
+            },
+            "50": {
+              "decisions": 84,
+              "state_sha256": "153ed53f097bb414ad87b38ae10e5d879bbbaafb60e67c8506946f8192771e10"
+            },
+            "75": {
+              "decisions": 126,
+              "state_sha256": "f9820a971e0bbfab5ec942db02091820617f6441a5794e30c5e298b7de9fdea1"
+            }
+          },
+          "seed": 249452,
+          "sharing_decisions": 169,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 468,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 21,
+            "total_fanout": 968,
+            "xor2_count": 468
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 172,
+              "state_sha256": "b6cb6290eb0babe230c35277b46eff5040b11954a5b9dbc06ffabd10dcf1324f"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "a37a6ab260185295f78578fc9c909fa3e19b9458feca302427d5748e876cf118"
+            },
+            "50": {
+              "decisions": 86,
+              "state_sha256": "4b7fa914e1d750e6d2f04a37a4ab7d47b1faaa6db6b23a3d60b7f452c4dac1f8"
+            },
+            "75": {
+              "decisions": 129,
+              "state_sha256": "afb4c7caf923317cda43501bae30740f1554a4d0dfd2345986bbe24dd625dc2a"
+            }
+          },
+          "seed": 248290,
+          "sharing_decisions": 172,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 468,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 22,
+            "total_fanout": 968,
+            "xor2_count": 468
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 167,
+              "state_sha256": "674d552c21cd62c6bc7af02030e63fb89fa32a6764f329156d6f677de89ef261"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "91cc7f36a10f33e1ab04c2a0a38717647e0730b92664842874d0a9d040a5b17e"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "00c390e738290930c025765d2961d399a7b427637944cff15241595b8bfe24be"
+            },
+            "75": {
+              "decisions": 125,
+              "state_sha256": "56e2f5a44bb1941024675d553aac097325fc31241016e09bcabf2d70ef944dda"
+            }
+          },
+          "seed": 244690,
+          "sharing_decisions": 167,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 468,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 28,
+            "total_fanout": 968,
+            "xor2_count": 468
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 170,
+              "state_sha256": "c99dc85fd830d885d7a6d762c56f9891a7732b430e9c056d90bbd6ceffbffd25"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "6e704b21c135f7b587ce24574d31358f254dd02cb16361535f041713cce26ef9"
+            },
+            "50": {
+              "decisions": 85,
+              "state_sha256": "7f604fc3e675d242e96b08e06dedf1b6552467822a15cb87bfa5884c7ea2082e"
+            },
+            "75": {
+              "decisions": 127,
+              "state_sha256": "96dc1e8d7bb1be379de1ab495228a67a3e8250675ce6813ca1d3438ed4484457"
+            }
+          },
+          "seed": 250593,
+          "sharing_decisions": 170,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 17,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 168,
+              "state_sha256": "0519de662b3c8e4eed3af72d95449f8039fc151ca3acc48ccc8773f4ddfe3096"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "4a0662e314b90656dc25d4e569ba21036af8915c862879ada150fab468639a18"
+            },
+            "50": {
+              "decisions": 84,
+              "state_sha256": "5760f410e6ad097ef212b0d3677b3f17a0ba0a690bc48673400dc5abf9d42325"
+            },
+            "75": {
+              "decisions": 126,
+              "state_sha256": "efa9fd8f7845d22d80023d099fd3e7ea717a7242433b09cead057e1dfa2945a6"
+            }
+          },
+          "seed": 242578,
+          "sharing_decisions": 168,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 5,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 17,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 172,
+              "state_sha256": "2d502dc9f5d11f3bc32a7de4a3e2c2c930bed1ad17e853cad7710c95d0524dad"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "240f14e548d53eddf5acdf92fc5fd3ddd9aaf65e04d702cb5f615b9f8022fed2"
+            },
+            "50": {
+              "decisions": 86,
+              "state_sha256": "4df8562c0cef85e066b4b55c87b6d7ce6c61b49c6af20046aec53bec1caaf8ab"
+            },
+            "75": {
+              "decisions": 129,
+              "state_sha256": "141dd8cbbd8595117e66251bc3de24a44c036158e7b1de26e29aed65fd8d392b"
+            }
+          },
+          "seed": 248720,
+          "sharing_decisions": 172,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 5,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 18,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 172,
+              "state_sha256": "e8a8167695c55681af042f9c0c6b91fc81d7a0db2c06fc6b6e0dcee2590a3f9f"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "89ce7ce56f44df5b26e215d74c4014e833f5db0d2b39f38ee6fef2bc531e5905"
+            },
+            "50": {
+              "decisions": 86,
+              "state_sha256": "813f9ac3e4016d10a014dace27a7d8deb9b3f3931b4be1245107cce7f1403b92"
+            },
+            "75": {
+              "decisions": 129,
+              "state_sha256": "57443023c66acfdab99a3c4d317d1d680d5e4acc71e7a9c97a917d824d0bff01"
+            }
+          },
+          "seed": 241534,
+          "sharing_decisions": 172,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 18,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 173,
+              "state_sha256": "44e49715bb9fecb3f59f8e6e60d308760ae5fe49b4edd0cef40e6da1611c2882"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "bd4bbb78ede63444d6259999ffc22348a0dc882ee08d3095841876d6d947733b"
+            },
+            "50": {
+              "decisions": 86,
+              "state_sha256": "1af14f465278a5fbb806dbce9aa0f9b090a51b389689892bc90701a0ccb5c700"
+            },
+            "75": {
+              "decisions": 129,
+              "state_sha256": "70d2d0e66ce85801e8442b30fa854d52b36115c2645623454f3b3e3cb064dda3"
+            }
+          },
+          "seed": 250658,
+          "sharing_decisions": 173,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 18,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 172,
+              "state_sha256": "0eb95dcd7c1763f32326fca12e33aab98c204fc891ec4451d14709fae901a3a9"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "9e6c6ee3653c497b05af6b4b865d2258f28a379efd2bc7ba24dc05b6e0e10db2"
+            },
+            "50": {
+              "decisions": 86,
+              "state_sha256": "2fefd1ea42873d45d6b2157c663e4f77fa0104c3d000aa3020e7262e76485465"
+            },
+            "75": {
+              "decisions": 129,
+              "state_sha256": "5bc9de277e3abfd54c96b94b5d0825772cf6b5844c1ab10b5f54ba599f7e66b8"
+            }
+          },
+          "seed": 320454,
+          "sharing_decisions": 172,
+          "source_algorithm": "kraft-phase-isolation-both-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 20,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 169,
+              "state_sha256": "f4f1ae5bb0c5b7ee18f10a6c2901c096a2bd8be16b92aec1c780587b7fec9afa"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "b4c582fb13d844c98b0f899c1d2965d7682e28a6e25833aba85846db10748e54"
+            },
+            "50": {
+              "decisions": 84,
+              "state_sha256": "d6099795050b92d25d35ae6b8546c7f93ca453be13efd36f121fdd4531f44309"
+            },
+            "75": {
+              "decisions": 126,
+              "state_sha256": "33c9e00f5d15da15eb3e8cff470e487da979cda41441e4b284cc805a885ac0a8"
+            }
+          },
+          "seed": 241203,
+          "sharing_decisions": 169,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 20,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 170,
+              "state_sha256": "71c855a0e382bbad7da51055eb2e204aed8954209df38d5dd2aa92dfafa07894"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "34a51859585d50374e0dfdc62fb1545c193d043a545397aaafb302f6bf59849c"
+            },
+            "50": {
+              "decisions": 85,
+              "state_sha256": "934b959d39b090c7cc0678cd19ae5bdc327c749c2822558b3dd559338ce6ad6b"
+            },
+            "75": {
+              "decisions": 127,
+              "state_sha256": "f8e97fc8d7d49a383fc4eb0f6137502178115a94ee86ba400f7096081501ca6c"
+            }
+          },
+          "seed": 247584,
+          "sharing_decisions": 170,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 20,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 174,
+              "state_sha256": "047b689f19bb4bdd000e2072f0cb48c36d72dd154b427819ddb3eeabef61ccae"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "62d057823e4a76a987f94fe3e717e218730484c4331919c538630a9261033128"
+            },
+            "50": {
+              "decisions": 87,
+              "state_sha256": "f552dbf7caefa2e8d201d0b75e883628da7bdcefe57f671cc74ac173f8271208"
+            },
+            "75": {
+              "decisions": 130,
+              "state_sha256": "e9223d3fa80111a685c71a955fe73aed1a3783ce8ef1b28cb5f8f706255d0d15"
+            }
+          },
+          "seed": 248260,
+          "sharing_decisions": 174,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 5,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 21,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 170,
+              "state_sha256": "d3bc854f5f575c8dce13932db184fb7c59415d782824d497a4fb04fd897e12c2"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "71ab247aa657ded6cf02498bf379bda76a968e2bebb9798ed0d33815dea6a355"
+            },
+            "50": {
+              "decisions": 85,
+              "state_sha256": "0db7588fe3fae2cd25374403f0fe0941c6b0c4765e29bf93dcc369773d4779d7"
+            },
+            "75": {
+              "decisions": 127,
+              "state_sha256": "d1d6fb47cf7990fbbd8b11db914660372a674d0f7d19bc3f7783b4782ce8bc97"
+            }
+          },
+          "seed": 243698,
+          "sharing_decisions": 170,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 21,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 175,
+              "state_sha256": "0ae04809ac008f10edb50beb1903d5f36bb4aed850cf044cf54969ef148ab5ee"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "88c47852e0af170d3bb8fb226e270b837f86d4707737a893923d5b743471c933"
+            },
+            "50": {
+              "decisions": 87,
+              "state_sha256": "cd004cf77d6bd7594d26369e075ff0571b72d10905fc66a08b59ec63254ca411"
+            },
+            "75": {
+              "decisions": 131,
+              "state_sha256": "b662806b6756134572bddded3fdabe76bb9acd5495ac02086022e5ea5fd35434"
+            }
+          },
+          "seed": 250684,
+          "sharing_decisions": 175,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 22,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 177,
+              "state_sha256": "05d4fea7273398ba2a1e2fe0cd5c4709d8642fea07a9cda84c441b83d945b810"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "877f9c6d3a8ca553832340b00766de2ec43df780127bf5544bde549af4d6c7e3"
+            },
+            "50": {
+              "decisions": 88,
+              "state_sha256": "275db5eeb6a1b40abfaff54150c2cf2f75643d369fa5fe228f87414e1ea7ab53"
+            },
+            "75": {
+              "decisions": 132,
+              "state_sha256": "7bd09c7ca5679137d26e2b5c0ed32f473316dbf171ef4e8153f637792193df29"
+            }
+          },
+          "seed": 248532,
+          "sharing_decisions": 177,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 23,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 174,
+              "state_sha256": "2b9f83f1310eb02a16e7378f8173253d6ee8878d23179d6140cd93490f14a78c"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "80c30d6be83d05b7d330ecc6e5f8da70208098a8e27e0050e5535310b32724f5"
+            },
+            "50": {
+              "decisions": 87,
+              "state_sha256": "012512b0342ac6829a1de5d97346dc5279f11b76844c7e9b88e34f36f5f0d5a7"
+            },
+            "75": {
+              "decisions": 130,
+              "state_sha256": "d43e1bfdb32bd9f683d9d13d0cafdcd977e817c6b44febfc82503bf817111019"
+            }
+          },
+          "seed": 250520,
+          "sharing_decisions": 174,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 469,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 24,
+            "total_fanout": 970,
+            "xor2_count": 469
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 173,
+              "state_sha256": "e399440aacc29084e2018f234e6661b26b9be1a367c142c214f2915e3b852126"
+            },
+            "25": {
+              "decisions": 43,
+              "state_sha256": "79ace6c3c7eae8ffa196fead4df9c9732fab8405d130b7440dc0573740b56f57"
+            },
+            "50": {
+              "decisions": 86,
+              "state_sha256": "5c6b0e4f4ad5ac685f1252490074d7245f105f450814c5f1161c34073f6788d7"
+            },
+            "75": {
+              "decisions": 129,
+              "state_sha256": "ac9a5963ed283c30d15e231060398bc6c503d89642089f4638947f4baebd05a7"
+            }
+          },
+          "seed": 245557,
+          "sharing_decisions": 173,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 470,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 16,
+            "total_fanout": 972,
+            "xor2_count": 470
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 177,
+              "state_sha256": "dae065870c0226ffd5ff40f7ce490dd513c1761b0540f2cf4a3f63b3ba4f6a4f"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "01527746b3cc8643ee1a30079f210009099ce8efe33d0ae5548913f838209532"
+            },
+            "50": {
+              "decisions": 88,
+              "state_sha256": "a975322d611fd594016791498b6bf5c50f1ea5276bb0f32bfb93484b583183a7"
+            },
+            "75": {
+              "decisions": 132,
+              "state_sha256": "8ad179bd0e0b1e462b1c5a0b5dca9d83e2e6f3c89b2c82fc69233c04674890db"
+            }
+          },
+          "seed": 242287,
+          "sharing_decisions": 177,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        }
+      ],
+      "median": [
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 33,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 167,
+              "state_sha256": "3b1d0e5329d90ea5936fb3226509e93b5cc5da56b1b047d96df3fdf272c86fd5"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "8f1ab770986cca20aa7ac97046782054473ef41ef65beac737779040f4f223d6"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "b5983aa2a3f0434ccc88b9edeab2e9507d7240efdcb467d600bd20d9f1fdaaa8"
+            },
+            "75": {
+              "decisions": 125,
+              "state_sha256": "f8f1136267768153f69a2fe1cfb8425987550732b8bd47d2d4ba28fbed8da0a9"
+            }
+          },
+          "seed": 240679,
+          "sharing_decisions": 167,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 7,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 33,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 164,
+              "state_sha256": "6e210c60a12097dc72ce166315c00edf9ead10bc56cf87cc232f5d73f9211f68"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "7e5ffce4c6197461d3599822e75e1b6ca0ff09ca2cf55c4c4dd347a3cfb3068e"
+            },
+            "50": {
+              "decisions": 82,
+              "state_sha256": "b59df8acc9f214f84f9036cc11b2897955b25c7d502e65aa51fa6bfc3dbda96a"
+            },
+            "75": {
+              "decisions": 123,
+              "state_sha256": "0d9e1e12d7328a4628e9b71efcf209ac8c943110053fe6f05798f0320bfc6598"
+            }
+          },
+          "seed": 240775,
+          "sharing_decisions": 164,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 32,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 167,
+              "state_sha256": "8bca495ee52bc3697735144fa9a1d20f24b90f020b0c5e6aa25e9eaa4009659d"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "e67ae63ad97de16f46dc82bcc869d3ef3260984b4e5580021db6392b7236f0b9"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "b464218dfc9b22f50b10ae99c097aa8b26e6220a7c2206974364885da94908c0"
+            },
+            "75": {
+              "decisions": 125,
+              "state_sha256": "ef9823a8c2e8e9da8e4deac88aeef1c2a93d71aa748d0cea87ab997fb16edd96"
+            }
+          },
+          "seed": 241834,
+          "sharing_decisions": 167,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 28,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 162,
+              "state_sha256": "05faed1887fafb4196c3c03afd88253e1e95c1e0f7b049d36613c0ed22ae1f98"
+            },
+            "25": {
+              "decisions": 40,
+              "state_sha256": "99c3fcf60f3ec2bf06bd7e4b8ba00d8e4a55a58daa4d904f175120911890fd9b"
+            },
+            "50": {
+              "decisions": 81,
+              "state_sha256": "d6b993f01a9c7678878f19b57ad8f844bac9c330649d84ab68d2c64b63aee6d9"
+            },
+            "75": {
+              "decisions": 121,
+              "state_sha256": "3eed599a9e11eb1d0b36bc190094df2842a798b96d188e36848bd2aae19ab2d2"
+            }
+          },
+          "seed": 241901,
+          "sharing_decisions": 162,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 7,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 28,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 167,
+              "state_sha256": "2c9f643a63a49c3aa77bd10ffd10cf7c71796965830a520dcf2097537f1abcdc"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "6eeeb3184fe3b2df7cca889dd82e6a02717fed863c1467025181c516ac94d49f"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "0040ce73aea280fdee4471ea76071e694ae6f5fa96f1946d6ac8074a435a15be"
+            },
+            "75": {
+              "decisions": 125,
+              "state_sha256": "cb52024bc5a58f7150c48120cd6d5ecb4ba0164021f879bd53369aeae9fe7053"
+            }
+          },
+          "seed": 242040,
+          "sharing_decisions": 167,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 23,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 166,
+              "state_sha256": "2d8d3e8c164af8e38f021484fc7a8c55cbc56eda03662159babc5b0c8aac0533"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "f84793940ebc4fbf448b27bc43df82ec2a4010f8de32e6a77893c59220cd9e23"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "84971c63d384bc0f9a61ecdc5e3f3901bb0a599b921b490699b05189bb79ff77"
+            },
+            "75": {
+              "decisions": 124,
+              "state_sha256": "70dabfe0d9be38fc4ac536aed3e2083acccc4cbf9f8fc109c7042e400c2402a9"
+            }
+          },
+          "seed": 243291,
+          "sharing_decisions": 166,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 35,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 167,
+              "state_sha256": "d43f74ce2e3db68180e9b66248a4c25ffb0b03cfc060a8a91b57f577ac2c8c13"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "56de70dea8630b7a8c9627e2b500c449cc42cf40966a5fb41de376ef53315f91"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "53b4810c906d3f03f956b267bc6a191400fb411540b194d2a6b0aa7df3b7f62a"
+            },
+            "75": {
+              "decisions": 125,
+              "state_sha256": "482a97bc62bcbae3e56e1ae8560d1050c49e8c6f682949d1b1b15ede32c08644"
+            }
+          },
+          "seed": 243297,
+          "sharing_decisions": 167,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 28,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 169,
+              "state_sha256": "6cdc29858056a9a223ba7246a9413fdf26cb6f51818bd3332b05789545583f8e"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "25b78ee6eedb49bb64a7f7844727d3eaedcd78f659b3da6d9723dca34e877512"
+            },
+            "50": {
+              "decisions": 84,
+              "state_sha256": "920475f805f79845cd7414c2ceafbb0f62a1e79473ca2121b24a2c8c603aaee3"
+            },
+            "75": {
+              "decisions": 126,
+              "state_sha256": "ac4131def5bc6c87d8a908e3547ca03bd08f26d432029ba0d5bf3a6bf0ab6ed5"
+            }
+          },
+          "seed": 243734,
+          "sharing_decisions": 169,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 24,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 167,
+              "state_sha256": "911cfaf7033a5dcc8b640671ea5dd3782b7377f7639faccd02c8ed41e057c506"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "2d7fbc93c6017e1166e99d1351fbdf9f546c3c39777340882d646eafb1108222"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "22ca100a885c63b364d9241180e66345477418ebc66a06eebda5dfdacf25f452"
+            },
+            "75": {
+              "decisions": 125,
+              "state_sha256": "f7d578e479c9a3f7d6483d390555134df444f42545230f23f7ac929c0d6e5c15"
+            }
+          },
+          "seed": 244355,
+          "sharing_decisions": 167,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 30,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 162,
+              "state_sha256": "fa25e2e8d9cc97955f3ed4815f342193242f9243f12b2562a29af8d673a4dc4d"
+            },
+            "25": {
+              "decisions": 40,
+              "state_sha256": "a0f77f628bf3fdc89a646bb01104c141d25339b2affd5315c8ffb6bc2fd24eae"
+            },
+            "50": {
+              "decisions": 81,
+              "state_sha256": "024a0b770c77331051996d64eebb315e35977d9a6e3c02ce666b80c393dda8ae"
+            },
+            "75": {
+              "decisions": 121,
+              "state_sha256": "0045d9c6634430b0db36fb0ae76dde5335b76a01f4fc201e519a560675d498dc"
+            }
+          },
+          "seed": 244400,
+          "sharing_decisions": 162,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 34,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 163,
+              "state_sha256": "9f0988589fc690adc37032f1cbf77a82f2ab7a6d635b9c8deb4eeaf070f9c781"
+            },
+            "25": {
+              "decisions": 40,
+              "state_sha256": "c766bf67ff23fdeb14f0e4cd32e48575bf28aa1db8488a627c52a38d6f57bc9b"
+            },
+            "50": {
+              "decisions": 81,
+              "state_sha256": "0f2ccc33d63259c94480ead9ca94a74fa27fb27287e4010a34889f291c9fe7c2"
+            },
+            "75": {
+              "decisions": 122,
+              "state_sha256": "37e7851201fae597dcd1b41cadc49b2125e4bdae2cdc016fc907fc68350613c9"
+            }
+          },
+          "seed": 244598,
+          "sharing_decisions": 163,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 7,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 31,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 167,
+              "state_sha256": "c5985e045c8935e9d28949d79d98ec3844024253e2f8a618909e1fbe22839ec8"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "fed90a31ac7238f67b2f0b243a63e680918fd2e8a57ec0da4cae4b785213e0b5"
+            },
+            "50": {
+              "decisions": 83,
+              "state_sha256": "07040d0aa911a54551dd1cc47aa77fb7cf4c89deaa0b2b4755b9dc6178590428"
+            },
+            "75": {
+              "decisions": 125,
+              "state_sha256": "4b481bc71b36f8449a2862e7cb28c16731893735f1201dc661297ce5d1d3dcc8"
+            }
+          },
+          "seed": 245713,
+          "sharing_decisions": 167,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 26,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 164,
+              "state_sha256": "b1efa3474be7d70da18d5668ebd9d0f20fd1880378d48a0fe61e2f2b2786b683"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "de8a41e5bf0522192ecea2c7ba71f6e86b5d4ab2f4b06cb221bfc1520cf917e0"
+            },
+            "50": {
+              "decisions": 82,
+              "state_sha256": "e47af159ce71cf6ce612f230ee65db69098bb1231b04e8e2be5edcd8c91c1f0b"
+            },
+            "75": {
+              "decisions": 123,
+              "state_sha256": "d85a74c993403ca93286619c8ea6cbadb19afd6474cbfdc2403954404c93f339"
+            }
+          },
+          "seed": 246808,
+          "sharing_decisions": 164,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 28,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 169,
+              "state_sha256": "dcf59c3e69b7229b3e59c0d6a7980b897b3976e7cc3bd6c60713d5da3273f2b5"
+            },
+            "25": {
+              "decisions": 42,
+              "state_sha256": "4f53a06b8b624be6a44e90975b3bb958c9fa6918051f06e3723de5cd31435517"
+            },
+            "50": {
+              "decisions": 84,
+              "state_sha256": "6ed2d8d1ec9a6a49534f4a90aea0d921c6086f5ddd53278a6c76f75632d086ed"
+            },
+            "75": {
+              "decisions": 126,
+              "state_sha256": "f35765c181c6737071a8a4462011f1b4f121a9044866241cbd6b9aa22bdd6023"
+            }
+          },
+          "seed": 247883,
+          "sharing_decisions": 169,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 7,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 24,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 165,
+              "state_sha256": "c3a73a14d99d004ee79791b29368581879d0682b19f88671477e42e16f5da04b"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "d9661834977da809c885064abe69205b8d6012d0dc4dd6d57bed36b7a0942bef"
+            },
+            "50": {
+              "decisions": 82,
+              "state_sha256": "127b080f210d08c9a26b6fe6eab6e59580fa289380359ca4fcc370c23e1250ea"
+            },
+            "75": {
+              "decisions": 123,
+              "state_sha256": "9f9656007b4fd2b2780c597a052be558c5d7f1091d65c88fdf67e6e18a584361"
+            }
+          },
+          "seed": 249382,
+          "sharing_decisions": 165,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 7,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 31,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 165,
+              "state_sha256": "bf7b743664ebfb0797aaee76cb075f712995c5a33198b277e24c95fac6b53aaf"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "8f36ed06221093b87d163514fb9e4a4acbd4c6c995f7c022567123460facd895"
+            },
+            "50": {
+              "decisions": 82,
+              "state_sha256": "93b577c4526e6dbbf6c206559b7f73dabc1ae2ed2b002cc6aec6e6d1a871bccd"
+            },
+            "75": {
+              "decisions": 123,
+              "state_sha256": "cc62141b65fdafef61130142862bd913842cced374825cbfd3960bc11ba4d50d"
+            }
+          },
+          "seed": 249835,
+          "sharing_decisions": 165,
+          "source_algorithm": "kraft-slack-tiebreak-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 31,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 165,
+              "state_sha256": "db301dc963f8faab600130d82d1142fb9def860d80ac8bbe937d0e0d1e96c988"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "6263c237376c0e4680b0308ba9cd6e0f8c6b307787a192c0d7788c9c52e0a42c"
+            },
+            "50": {
+              "decisions": 82,
+              "state_sha256": "11b5e29ee8fbd057ba83b7b7c6aa9a28229f770b810a57f6e56170bc7df25f98"
+            },
+            "75": {
+              "decisions": 123,
+              "state_sha256": "527741d6d2dc74a895d210808707af24f7355763d920b84b9e0a22df1cfc259e"
+            }
+          },
+          "seed": 320083,
+          "sharing_decisions": 165,
+          "source_algorithm": "kraft-phase-isolation-both-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 31,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 164,
+              "state_sha256": "07d7130c3708665a280e83d014e9f163b816329fe554872b514a62a1b2e47e6c"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "47d2af34d93baed82d0271d99a2938edcf47181192768a09fe11caace36a0e34"
+            },
+            "50": {
+              "decisions": 82,
+              "state_sha256": "43c03ca4c322f33ac978c343b2951b753f10c55aa0ef0828afaf25391ec80d59"
+            },
+            "75": {
+              "decisions": 123,
+              "state_sha256": "e823472c610e0044818c1d7aafab6cad6303609183cb53aad1873e72d624e4c1"
+            }
+          },
+          "seed": 320599,
+          "sharing_decisions": 164,
+          "source_algorithm": "kraft-phase-isolation-both-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 6,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 32,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 163,
+              "state_sha256": "fc228eefe4f5856cccffe82f6e7093d9302f8bb3605674e8988611ded73e9754"
+            },
+            "25": {
+              "decisions": 40,
+              "state_sha256": "f1ac10c8d252ad533ff79ebdc513d2ecfee9b8f0c1498c8bad3284092fa504dd"
+            },
+            "50": {
+              "decisions": 81,
+              "state_sha256": "b183ffb5055b3c6ad166a5ed6e33b0cac81c9003dad25243cd00bf77a2daebb7"
+            },
+            "75": {
+              "decisions": 122,
+              "state_sha256": "09e706c25b3ac7c8ea28973af5350bafc6bea1e182b1b2c19b214595aabb91b1"
+            }
+          },
+          "seed": 420865,
+          "sharing_decisions": 163,
+          "source_algorithm": "sharing-lookahead-control-depth6-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 485,
+            "maximum_depth": 6,
+            "maximum_fanout": 7,
+            "output_depths": [
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "total_excess_fanout_above_4": 27,
+            "total_fanout": 1002,
+            "xor2_count": 485
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 164,
+              "state_sha256": "f7bb46ad17c55bb5e33182b15e06f3cb41d94758dfd7587d0656e5b9872a91a0"
+            },
+            "25": {
+              "decisions": 41,
+              "state_sha256": "80c041bbb078a9ad7df312bf4287ec18f5af44eb2786f7dba953f6855006247f"
+            },
+            "50": {
+              "decisions": 82,
+              "state_sha256": "585c84175dcf830ae3e7abebbf94da9b459cc788c5bb402348fdc5387e1ef1ee"
+            },
+            "75": {
+              "decisions": 123,
+              "state_sha256": "0b330d6abeface920a19592c4ff41a49d718c4521bd001b6d9255864c49fe3ba"
+            }
+          },
+          "seed": 420947,
+          "sharing_decisions": 164,
+          "source_algorithm": "sharing-lookahead-control-depth6-v1"
+        }
+      ],
+      "pool_mean": 485.4683076923077,
+      "pool_median_count": 968,
+      "pool_median_low": 485,
+      "pool_sd": 5.288062800579998,
+      "pool_size": 13000
+    },
+    "7": {
+      "elite": [
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 438,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 908,
+            "xor2_count": 438
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 190,
+              "state_sha256": "5f8aae9e0a10c5494ed593b3a4606685252ddd00d802c697f4317d1c129aaa41"
+            },
+            "25": {
+              "decisions": 47,
+              "state_sha256": "5ef7e9653c2b51afc9745287dca59a9e68243929b27c7b528bdfaacc854ca394"
+            },
+            "50": {
+              "decisions": 95,
+              "state_sha256": "6e35e8dc48d67ee8f3632ea2ba6fdcfda9ad12374c244953554cbfcb8bc2a109"
+            },
+            "75": {
+              "decisions": 142,
+              "state_sha256": "683fc3ded0fbce04dc7ba96e4c035631af9e021c6448347d354cb97f61b60c15"
+            }
+          },
+          "seed": 400800,
+          "sharing_decisions": 190,
+          "source_algorithm": "sharing-lookahead-control-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 441,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 5,
+            "total_fanout": 914,
+            "xor2_count": 441
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 185,
+              "state_sha256": "c0a23a1c27347cc666f399a7d54cca797ca25d85988320ef4d3dde236dcf821d"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "1e111c24de1fab9e11bdccd4998ad8e643a51076af639efee28434b0d2462802"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "93e03da2af34bc78e34a053c27ce7f16b1c4a3bf9372d524145d3039beea1f39"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "77016992537d7265043057d990e541af07181e6ec7edded52785620c088fc697"
+            }
+          },
+          "seed": 40505,
+          "sharing_decisions": 185,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 3,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 195,
+              "state_sha256": "57e1fa6e07be4552be1c5db1139a328c0f71651b4bbc221ed89573f9082f3027"
+            },
+            "25": {
+              "decisions": 48,
+              "state_sha256": "67aca04067405ff7753f0fc95d6ea332389c66e31f4879e6bde7f1f1b8e546b6"
+            },
+            "50": {
+              "decisions": 97,
+              "state_sha256": "024723e66778e63f9adf8600d333ba37cb017a45093f98c9205ffb8d4c0edd0d"
+            },
+            "75": {
+              "decisions": 146,
+              "state_sha256": "d69d803c4e42c9568ecf39061db905d71d38408fe39174bb7bb0083131fa85e7"
+            }
+          },
+          "seed": 47901,
+          "sharing_decisions": 195,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 5,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 195,
+              "state_sha256": "5209b8aacac1893dfd2dda96f31115df7ad6e39055d54b60d458b1fbc86d337a"
+            },
+            "25": {
+              "decisions": 48,
+              "state_sha256": "03a662b3f4ee4bdbcba6f652462e74df0aea094d95144cf4350a6f36d82263b7"
+            },
+            "50": {
+              "decisions": 97,
+              "state_sha256": "bb894cfe08068c32eb4a332041710fc6b9270d4d2d7f7ef25a164c6c41c851e6"
+            },
+            "75": {
+              "decisions": 146,
+              "state_sha256": "357bc8055325c8b0dd69ff0e50c19de1148de91fa3e7dab0cf603c862d86e59c"
+            }
+          },
+          "seed": 45200,
+          "sharing_decisions": 195,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 184,
+              "state_sha256": "fa64871902352ea4b73d31c8139f68a2e4a1612d604815ee6cee82d4d9577995"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "61e0b716de8dca3dca138186ae8797b62799a1719be7e908ed540378bb46434b"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "a91eff7ede662eccf7252e759352661475d9ee266db0886ff5b96acf6cf77f51"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "88c52bcbe08118fdaa0003709c87c92d31a2d5f5d9b87a87d69c8b8eb201c9b5"
+            }
+          },
+          "seed": 40728,
+          "sharing_decisions": 184,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 192,
+              "state_sha256": "3561d5fdb5e138871baa3079204e07358e1e56a2c3d545eb6f251a40fd7e36cd"
+            },
+            "25": {
+              "decisions": 48,
+              "state_sha256": "c7136861ffaa21b2b35f1cccfa00f8f6bac7bcca6d94374009cf46456855805b"
+            },
+            "50": {
+              "decisions": 96,
+              "state_sha256": "3daa14945f0a4549a4864f6894117ede9b965cfaadf6083ff66b0bf07e03d00f"
+            },
+            "75": {
+              "decisions": 144,
+              "state_sha256": "802d5be9fbb095c7c7b8669550b2ea4e85ff6d1c6b6c9417ab26580720578722"
+            }
+          },
+          "seed": 47223,
+          "sharing_decisions": 192,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 192,
+              "state_sha256": "fd5496c45349d833f64620d00759ff7c243b04bba2f253818b09a993dac820b7"
+            },
+            "25": {
+              "decisions": 48,
+              "state_sha256": "47fd82556ebe66e3f20699fbfc53c4a0bb6ce3ddc0330bf22f83eea92e723d1f"
+            },
+            "50": {
+              "decisions": 96,
+              "state_sha256": "04c9323d6b30bc2d9a3db0ac2215100d06d9d8fb91cf3d97d5487f3e06742955"
+            },
+            "75": {
+              "decisions": 144,
+              "state_sha256": "64d402d0ff900b044d5f6c9ab2530b920026553d5226302d69fe2f6407f856d6"
+            }
+          },
+          "seed": 40556,
+          "sharing_decisions": 192,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 185,
+              "state_sha256": "f1a0959d47652dbb1b0d6fd370b1b4194b07e2e40617f7dc1456d26781668c90"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "84e31b7aeb55add5427633ba73f300baae4de25fc353521f7025d29b0a1796d8"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "b0971f413a52ea3d87d750a22dade61da9b5d29cb03a234e7687e6cb0793fa27"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "9e7662b99d47bb2d981c344983f173b7e3b31e63e7ef18c95b20c2b2193d8aef"
+            }
+          },
+          "seed": 48651,
+          "sharing_decisions": 185,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 8,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 185,
+              "state_sha256": "ef6b906ddbe76e340ca0bdd1edb983979b26b8499305c8926ff894bcf85f5e4c"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "f4a9ceff63fc332558947a39edd64feb295ce00184d54e12e109f50333859578"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "8b0cb611ab449d2cd8c04f95bcc123de0e80ba8d4ccb9352fce5a122194267f8"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "f8379540ca7231ee4839b89edae4b43f68c5d22b3741f178ecc1b7b37cef7e85"
+            }
+          },
+          "seed": 48922,
+          "sharing_decisions": 185,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 10,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 183,
+              "state_sha256": "b6828744b50a235ae3c39bc90c1c243db202461460f553e11a29e2b96179b7ac"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "42e231851654960a77562f3acfba07c969434e2c4bcee92e6e1a9a2f05ba5c32"
+            },
+            "50": {
+              "decisions": 91,
+              "state_sha256": "9d70b598ecbfd8d821f913a1683f6fb73b311ebf0355ed8f7578ffdc80bdfe28"
+            },
+            "75": {
+              "decisions": 137,
+              "state_sha256": "c4c4f746cb5a0c37f91ae5a480489fb2a278f7910569b8a573674cb59eb6f2f2"
+            }
+          },
+          "seed": 45360,
+          "sharing_decisions": 183,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 442,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 13,
+            "total_fanout": 916,
+            "xor2_count": 442
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 184,
+              "state_sha256": "96fca39063a47437ac4f69f681759d510825c64e9fa8e84644569177109cc63f"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "e306699fddb3f744482210b925f7dbf643cb1e91fb4183766f35bae4a33cf552"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "23c669547107e6aa56baa2d580f05d523bdc552d476f62421f60375d19a1bbdc"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "e10c363626550c2e64ac5eba0b7080fcf644d02ebba4b3c7ccb2f482429fe304"
+            }
+          },
+          "seed": 46093,
+          "sharing_decisions": 184,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 4,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 193,
+              "state_sha256": "cede5a1f5f9f32bc5d54a2ce772863b9522fb3c5a3dc2984697cf3db53fcb235"
+            },
+            "25": {
+              "decisions": 48,
+              "state_sha256": "178fac834152982b1068a0c986057bb6d9c704433e578b01a2205a8c0fe5cf29"
+            },
+            "50": {
+              "decisions": 96,
+              "state_sha256": "b70fea1141d17a8b86685ea6e465e1add65e38d12d72e5292068cb70717a6cc4"
+            },
+            "75": {
+              "decisions": 144,
+              "state_sha256": "ff63b4aced675ab602e60978597d586d036555f966f351665e9873651f4caaf9"
+            }
+          },
+          "seed": 44724,
+          "sharing_decisions": 193,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 4,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 196,
+              "state_sha256": "61f168a994e5adabfa6a556b86b2d80d71a1645f407bdd0adbdf9544639ce5fc"
+            },
+            "25": {
+              "decisions": 49,
+              "state_sha256": "83890790635559868eafe600ea5ad79146c9756c70ecc52a73c549cbef288513"
+            },
+            "50": {
+              "decisions": 98,
+              "state_sha256": "9640a3785876a5ec0b84a8578f3fff286d0cfef895d6556e20ff4679e72dfef3"
+            },
+            "75": {
+              "decisions": 147,
+              "state_sha256": "4467c484cfd99a43f263b1f4995a3c6994eb42fb08234baa66adb1be0614c31b"
+            }
+          },
+          "seed": 400165,
+          "sharing_decisions": 196,
+          "source_algorithm": "sharing-lookahead-control-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 5,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 187,
+              "state_sha256": "8e9fe191d876a49e6840bf08eaca71bb6d1374d8a78b9708f5b99f7688dd3c49"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "6bb84bde24aab17ceb985b2da5839e0f9738c130a59c0636410662fe93c523fb"
+            },
+            "50": {
+              "decisions": 93,
+              "state_sha256": "9454f9b86a09a7f3a9105ed53bdbcdd44f0a8acc9684bba5d977e1434be60fb2"
+            },
+            "75": {
+              "decisions": 140,
+              "state_sha256": "713f519ed5cce83768ed20c8dc596bb8224dcd679942d43e54df1178f2ac19db"
+            }
+          },
+          "seed": 42339,
+          "sharing_decisions": 187,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 5,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 187,
+              "state_sha256": "44c22374794c2f7ea40d85f8ca0627c18c79f1c1e67d0ad809e7c33e01d50f25"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "11a9c01f068052fe7d97e18cd9f0cf58f189f0450263072f5a6e575b7a53697c"
+            },
+            "50": {
+              "decisions": 93,
+              "state_sha256": "f97f969a2e4e1dfe516b79a30ce81d92a253101aa0d27c66dcaa8c5f813f3988"
+            },
+            "75": {
+              "decisions": 140,
+              "state_sha256": "f155a3e847ccb7894ec3fc5954b81028e11f7834b4238a6f6d386ca85469ebea"
+            }
+          },
+          "seed": 47821,
+          "sharing_decisions": 187,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 194,
+              "state_sha256": "4214eafbf59761277c6e9568069491f4dd0d6b08d16842f8176a7833b3a11e36"
+            },
+            "25": {
+              "decisions": 48,
+              "state_sha256": "e0123017ea1d37698029296c1b1b3fcee09472323adc0f14eb2e336432b293b7"
+            },
+            "50": {
+              "decisions": 97,
+              "state_sha256": "5118d348cfcf48a513d6ba05e96b726055b32f97da7d15aa109f5abbd107668f"
+            },
+            "75": {
+              "decisions": 145,
+              "state_sha256": "b7901a326de55d954034c0bedb50df424574f826b9794ecef3dea24021c31a60"
+            }
+          },
+          "seed": 44282,
+          "sharing_decisions": 194,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 187,
+              "state_sha256": "170743aed9641370446719d5eca355197ca0fc0c7d859bec85b536f602171e7b"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "59abfd5960fd879160c27a3b997712e1dd68d1e8c1d257ff63bcff7830a753cb"
+            },
+            "50": {
+              "decisions": 93,
+              "state_sha256": "2232698a549cfbdb71a09206ce9050c741a1e8882051f8d781a6dda32685b445"
+            },
+            "75": {
+              "decisions": 140,
+              "state_sha256": "1d80e8c028a392e369c6768c7d94a0a24f1e0a8135c3386b0ce7e60d6fff1451"
+            }
+          },
+          "seed": 49588,
+          "sharing_decisions": 187,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 186,
+              "state_sha256": "b2ce4fba94e63c6270fc4fb6eba9ef3847fda3b69b89776cd7740c0d97cec022"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "4939745d87a3b6b7b541637aa2914d253148011ac922e9207a2f6eb1bb126712"
+            },
+            "50": {
+              "decisions": 93,
+              "state_sha256": "06f5b1ff290b3b0d8f1f474fbc1a9b6680c2d5886f48d89ede83741e3a03f2ca"
+            },
+            "75": {
+              "decisions": 139,
+              "state_sha256": "6834e36ca5e8ed6bd30cf273a4bd10ec96f60bd3508474c1637c870f383079e0"
+            }
+          },
+          "seed": 41318,
+          "sharing_decisions": 186,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 189,
+              "state_sha256": "928d17e35a5ae763d1ca76f0b59668d66d11ec18a5d0e5b9dbdf17ce391637cf"
+            },
+            "25": {
+              "decisions": 47,
+              "state_sha256": "3613fb87627a7b1fc8c1ed66bf51b5b7b685e208bc7be3c90e2de0f44ee4d69c"
+            },
+            "50": {
+              "decisions": 94,
+              "state_sha256": "3ee0a615e5b40e5438c9d61e099a018259eb6fc370901a699105d8261b64c9f5"
+            },
+            "75": {
+              "decisions": 141,
+              "state_sha256": "ce70b4c49de3a41492879e0a3c73be082d42a450ca4acbf5f5d6fa1bfc1284a6"
+            }
+          },
+          "seed": 47326,
+          "sharing_decisions": 189,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 443,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 918,
+            "xor2_count": 443
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 191,
+              "state_sha256": "0e5c460357571807ba19552c22ba3cfe2d7f2fa5d6a30ef9ceb32e3b9ba171c6"
+            },
+            "25": {
+              "decisions": 47,
+              "state_sha256": "6eb21f3666879c3c2819bdedc87d243e4967cd4070d2431dfb7b99f363f193c7"
+            },
+            "50": {
+              "decisions": 95,
+              "state_sha256": "c3a9b5a1b0bb5c8312a1df33eb7254808d7e015afb137e487e1a1ace09c9e4e5"
+            },
+            "75": {
+              "decisions": 143,
+              "state_sha256": "e62ea2f7838ec06e217d7f04251f9d6070b150b89bc68b40e7add98d70b9ed6a"
+            }
+          },
+          "seed": 300060,
+          "sharing_decisions": 191,
+          "source_algorithm": "kraft-phase-isolation-baseline-depth7-v1"
+        }
+      ],
+      "median": [
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 5,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 181,
+              "state_sha256": "45b916aa49b4506269bd962c264ca7d2389fdcece05aee705220e16accca0f88"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "f102021e0baf088a9f3594c125b5a147cbef0b0e404cdbbaa2e40b30d939af9d"
+            },
+            "50": {
+              "decisions": 90,
+              "state_sha256": "2ca152d1efe115dfadd074dbe2c70a6b272828d9372e9059a0201271e4f269b1"
+            },
+            "75": {
+              "decisions": 135,
+              "state_sha256": "9674a800a06354069982cb4c587ac9c910899fb31e4facbf7dc7059574154486"
+            }
+          },
+          "seed": 40048,
+          "sharing_decisions": 181,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 13,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 184,
+              "state_sha256": "0709d1bc2639858c86e4548f296819e1513bd0b4f4d6ba9746ef60e29790eef7"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "87317bd33eceab55a21cc33107802bb40c789206da57872a91fd18a588f326ff"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "b45320a5f60dad2f861b970141310c3c327251f0170d59ce80d9c61870e54ffa"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "6fe6a4caba7d17e656819b6db9a2118dba7a7e2445b4a336a83c51b714f46fee"
+            }
+          },
+          "seed": 41451,
+          "sharing_decisions": 184,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 184,
+              "state_sha256": "bfbe0815d599334bd30c8fc394f0825fb2c857bdb0ec8502f1e00cdef51e441f"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "bc71202f2a874fd3b0b23698b8c3a87db262bfe762cdad598f70ff4ba85137b3"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "cdf877e0ad04c12940d8a349c8b39a21f2de8dab656e77d4f035c082f901504b"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "a6523fa7d2996f376e7045e958311496d23108ecb84a7ad361a5000f576a46d2"
+            }
+          },
+          "seed": 42615,
+          "sharing_decisions": 184,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 179,
+              "state_sha256": "9185c15afaa336ba58654b5d1a5278033b0e0d8030d6e6bd481b27e0da538277"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "3df100f6795a896a227d7bd9c4af4c5b5835044718a187c80aecaf8f860085f3"
+            },
+            "50": {
+              "decisions": 89,
+              "state_sha256": "2c734eda32ba465f92b22357aab304bcfec64dc9fa670fa6049964427babff74"
+            },
+            "75": {
+              "decisions": 134,
+              "state_sha256": "09d131b41d9c250a319cf97d12e2fe0e1706ac6dfe6bad8ea778996cbf99b2e0"
+            }
+          },
+          "seed": 42834,
+          "sharing_decisions": 179,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 10,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 176,
+              "state_sha256": "58cb9354bc5217084e877d704b8efef7c760955eb01e00746bcc80c6203bc02b"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "c54a42ccab1a2088c971ebb69a85120916d055c24af44bc42b03bc052457263e"
+            },
+            "50": {
+              "decisions": 88,
+              "state_sha256": "070eef139b50be826ffdbb363c43ac9c7fdeb4d2bfb67a3c2dd9b607d9e32905"
+            },
+            "75": {
+              "decisions": 132,
+              "state_sha256": "f5eef4ba2fa14f18b9a126c5fc970169a5ce9838d668b8015550565876171ea6"
+            }
+          },
+          "seed": 42864,
+          "sharing_decisions": 176,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 183,
+              "state_sha256": "898c35819c3e37178f6ff051000a8431dd2b364de9464224575c302e89de4942"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "cfbf41c3f1cc84596b0d6fa6beefd33e2bcddab9ccc1e72625c41970d066e932"
+            },
+            "50": {
+              "decisions": 91,
+              "state_sha256": "d686baac6648f0aef72ffceec78651d28733fa4effb8a85ddbaf660498a7ce70"
+            },
+            "75": {
+              "decisions": 137,
+              "state_sha256": "fbf4c9f217d3a2287abed2d746591318c8bbfdb951f06a9f309563dba1daf17a"
+            }
+          },
+          "seed": 43173,
+          "sharing_decisions": 183,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 182,
+              "state_sha256": "9d9cc64c3d4e89fd448cb0c7c3b0ad58b90dded029a047034728161aa13b2219"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "c61eb0454849820d156b4cf10d2943659ea8dc72f28fb1b6df678d64fecf8c29"
+            },
+            "50": {
+              "decisions": 91,
+              "state_sha256": "b0a75daaa113d84598c0f078dae8742817484a58008adc55161586408e9c01f3"
+            },
+            "75": {
+              "decisions": 136,
+              "state_sha256": "394adc0f512bdccf63248174f071586883d0b055d73e2f6ea274b59cd8285bfc"
+            }
+          },
+          "seed": 43779,
+          "sharing_decisions": 182,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 7,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 184,
+              "state_sha256": "cab0f7989797c1c23f408d3e5473bcf362d62d1603dc44e47f5669b8b0fabc7a"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "47f72117763db5f5feb10395a62c823922423fd82b18af773334d3be347e553e"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "cc489c6ca869181cd902164595b0ada75a7098173d76fefca3a65bd2e3c82e8f"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "c616a8e96ff2e8b745353f2d0584bc5303291b312619413a2e0f94fdada089de"
+            }
+          },
+          "seed": 44799,
+          "sharing_decisions": 184,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 185,
+              "state_sha256": "8266a4e5cdb1359d8f9855bc8aab4291d41d50e64dae40eeb498c6ecaa6041ce"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "864cca90bed9d1165efb32866237b5e82c3da078f6160a7b29d8c78bf830d987"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "d174700729534da6516b87c693da55daefa50a7c14b9c26a76568b6f24eef5ac"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "345c9e15763b94d2b9a299b9b05a573b9e7fc890e511569b2f870745e398673b"
+            }
+          },
+          "seed": 45025,
+          "sharing_decisions": 185,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 9,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 180,
+              "state_sha256": "f94c74d6bfc00f6c706598b2077f17e2e7f42bdefd121a86f2a8fbe8fbb5df65"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "cc7079605a5c5e96d3743c0d1cf3c897b468d51a5d89b153edf7524d8fb68e18"
+            },
+            "50": {
+              "decisions": 90,
+              "state_sha256": "d1c4e951e2edff867e50e3fd8d97018cefaab44e092b19ec464124e9505a33f5"
+            },
+            "75": {
+              "decisions": 135,
+              "state_sha256": "127494329ea1f9e78ef4109130d7b5b5c08c4960410a738e65d1d2ff0099885c"
+            }
+          },
+          "seed": 45512,
+          "sharing_decisions": 180,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 10,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 184,
+              "state_sha256": "0f1e6b43ce8a78a62b3ade74d77e539f471cf69cefcb3a353502741f3d07aeec"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "987d780be73cdb5da2c3fc14bc840fc4f38109eb9f81ace423eb195413b7eec4"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "e4a582a81a1efe6bc68c3efbe3105e7a4163862f080e43c378e9248d1df7c4d7"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "747396eb854b8a5b997f56b62a6ccf4ae38a4aa07d1e96cb5b14c03f42c6a01a"
+            }
+          },
+          "seed": 45724,
+          "sharing_decisions": 184,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 8,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 178,
+              "state_sha256": "ccc8bee29208f381e29fa9154b836e29d475d05e38ad95ace7dc55194ce24417"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "39ff0aac88435b036305aa80e4a7756814701d7005c5ef354258860ed494f049"
+            },
+            "50": {
+              "decisions": 89,
+              "state_sha256": "5150b4c50dd1c4b193ec249023a2ad3b124746c72bba4b8f14b2b136cb822644"
+            },
+            "75": {
+              "decisions": 133,
+              "state_sha256": "55906d6eb63b4881b0f4584d5c4d1d1bfa9484517d41a27e71dc206f63b150a5"
+            }
+          },
+          "seed": 45879,
+          "sharing_decisions": 178,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 9,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 179,
+              "state_sha256": "038cde22bfd067e48e40cb029a5f548d4a5d2d40264317229e0a4c4e4549c146"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "21d5c91ccaa644d358bd521c189eb802ec2ee79fffd4e1921b5aafbe7ba086c0"
+            },
+            "50": {
+              "decisions": 89,
+              "state_sha256": "19f02c5827821761183d2c6ade6acd9ae25a735a6fbfb6959354d9c17a129c46"
+            },
+            "75": {
+              "decisions": 134,
+              "state_sha256": "c9f0825146a9d66ab3f2a3e8d9d562a2e3ee331ffcd8858fa03cae1d45255669"
+            }
+          },
+          "seed": 47089,
+          "sharing_decisions": 179,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 9,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 180,
+              "state_sha256": "fadfc479791998006ffaafb37300b4e3c3a84e8bdd7ee893a543c2005f5a83db"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "0021826088cdc89e38985ceb78da7c234b84506f05869be75d7d3bf9c58f020e"
+            },
+            "50": {
+              "decisions": 90,
+              "state_sha256": "5d12dee028c671aef3bba8ddf6fb8e9410f6907d43ab5dfd34a5da96d92b075a"
+            },
+            "75": {
+              "decisions": 135,
+              "state_sha256": "0d8009160c0faf8e99a9f1f4696aee88c4303bbb1a361b8ffcd9b200408f615a"
+            }
+          },
+          "seed": 47683,
+          "sharing_decisions": 180,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 12,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 182,
+              "state_sha256": "b6677beb06253331799623e05195d3bd6663d005112dc00189e8f9678b494189"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "11be98858a3aac27fe98ed11120fa3df4556ee8c893175b59f8bb42aac7b2aae"
+            },
+            "50": {
+              "decisions": 91,
+              "state_sha256": "7077eb1e7a0fdb90446c9e6bd144e798180bb91432b9809afae04e87456dd280"
+            },
+            "75": {
+              "decisions": 136,
+              "state_sha256": "7b9909763be1704f0f976bc2dbdd7b9fcc9844f14086e743954b8cf8584a9588"
+            }
+          },
+          "seed": 48337,
+          "sharing_decisions": 182,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 8,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 184,
+              "state_sha256": "ac8dc509bf804fd2e794135af3b5b0abe0ccae0f3e7af45b5c15e55fa8cc011c"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "a44ca6bd990313478ce2d5ab206a755aab6eead22d1350b6b08745e6ae9e314f"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "1ff830b8ed44c173d53963bbae0b0f2e49b36e0f4f0d89751d54890674765d13"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "1a1535f826eeb605d7cb87481d24bd20c197e8af9e02a8bc41618890527e9eea"
+            }
+          },
+          "seed": 48524,
+          "sharing_decisions": 184,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 4,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 181,
+              "state_sha256": "2ee4b837bf2c6d6af4008477e27bc3f493608fbf73f7eab113ba624f1d8276d9"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "2190639a22c6067bd79d1c92b36c9016f14c76136244b426546d350b887a379c"
+            },
+            "50": {
+              "decisions": 90,
+              "state_sha256": "bad9030c24880cd7bed7639dd6a83fa7544324c6fe9faff8581411ca93b3b80a"
+            },
+            "75": {
+              "decisions": 135,
+              "state_sha256": "ef1436a8fbb17a6814ed4a01f048573effbd4631cdf1e6a668f45fc1a23b26a2"
+            }
+          },
+          "seed": 48584,
+          "sharing_decisions": 181,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 10,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 185,
+              "state_sha256": "673baa85606b944c2cb3e25862533bebe850db66ceac156ee61a745900f920bc"
+            },
+            "25": {
+              "decisions": 46,
+              "state_sha256": "4525cbc5d583c4989430fe9db929b9740fccff085b2f0ae33bbe5cd4f30b42d2"
+            },
+            "50": {
+              "decisions": 92,
+              "state_sha256": "8b531c0c5d5e54ecff2c064b899e4e83e1cc5c30088c6fcc9379e6844f0bbf06"
+            },
+            "75": {
+              "decisions": 138,
+              "state_sha256": "62f19933ce066bd6b7680f9c57eef756e15a9653ad9cdd058d353910038065df"
+            }
+          },
+          "seed": 48943,
+          "sharing_decisions": 185,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 5,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              6,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 6,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 179,
+              "state_sha256": "02e692d0e80f58e3d1c8ca940a3517dc744e97313fa677d931cd6a10d96a1e55"
+            },
+            "25": {
+              "decisions": 44,
+              "state_sha256": "bcf0c14e6efd26510df46dccc57ef2f96b86a48db5ab8aca9df973d455d5511a"
+            },
+            "50": {
+              "decisions": 89,
+              "state_sha256": "3f5189eb045df92dfba73047a47de3ee9ca979d1fb4a45441238f338596fcfa6"
+            },
+            "75": {
+              "decisions": 134,
+              "state_sha256": "dee29adf393936aab41f1c8f80905ff76aa3509d5df11c4334b77587123fa103"
+            }
+          },
+          "seed": 49191,
+          "sharing_decisions": 179,
+          "source_algorithm": "kraft-bounded-bp-cse-depth7-v1"
+        },
+        {
+          "final_metrics": {
+            "direct_output_alias_count": 32,
+            "intermediate_node_count": 456,
+            "maximum_depth": 7,
+            "maximum_fanout": 6,
+            "output_depths": [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "total_excess_fanout_above_4": 10,
+            "total_fanout": 944,
+            "xor2_count": 456
+          },
+          "prefixes": {
+            "100": {
+              "decisions": 181,
+              "state_sha256": "f0d7238539a70ded8cec28afa85692345c22a345bd882dcbebb42ab8034e746a"
+            },
+            "25": {
+              "decisions": 45,
+              "state_sha256": "c0e3bcc975b11f067e96d720f4cb9f3b52ace821e0be5a207b2b9fd30609d9d3"
+            },
+            "50": {
+              "decisions": 90,
+              "state_sha256": "e500fd1535c82038038cdcaaeb83d6daf457eb48d32027ce1b09b4d3d9125dc5"
+            },
+            "75": {
+              "decisions": 135,
+              "state_sha256": "187719d6d5a894a36045709ad599381fb93b74f75bb04c07964ef951890eb64f"
+            }
+          },
+          "seed": 300455,
+          "sharing_decisions": 181,
+          "source_algorithm": "kraft-phase-isolation-baseline-depth7-v1"
+        }
+      ],
+      "pool_mean": 456.05316666666664,
+      "pool_median_count": 1102,
+      "pool_median_low": 456,
+      "pool_sd": 4.266441551908164,
+      "pool_size": 12000
+    }
+  },
+  "selection": {
+    "elite_order": "xor2, excess fanout above 4, seed",
+    "fractions": [
+      25,
+      50,
+      75,
+      100
+    ],
+    "median_rule": "seed-sorted random.Random(SELECTION_SEED + cap).sample of pool_median_low trials",
+    "parent_count": 20,
+    "selection_seed": 921982,
+    "sources": {
+      "6": [
+        [
+          "kraft_slack_tiebreak.jsonl",
+          "kraft-slack-tiebreak-depth6-v1",
+          240000,
+          11000
+        ],
+        [
+          "kraft_phase_isolation.jsonl",
+          "kraft-phase-isolation-both-depth6-v1",
+          320000,
+          1000
+        ],
+        [
+          "sharing_lookahead.jsonl",
+          "sharing-lookahead-control-depth6-v1",
+          420000,
+          1000
+        ]
+      ],
+      "7": [
+        [
+          "kraft_bounded.jsonl",
+          "kraft-bounded-bp-cse-depth7-v1",
+          40000,
+          10000
+        ],
+        [
+          "kraft_phase_isolation.jsonl",
+          "kraft-phase-isolation-baseline-depth7-v1",
+          300000,
+          1000
+        ],
+        [
+          "sharing_lookahead.jsonl",
+          "sharing-lookahead-control-depth7-v1",
+          400000,
+          1000
+        ]
+      ]
+    }
+  }
+}
