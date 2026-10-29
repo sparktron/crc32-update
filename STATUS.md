@@ -829,3 +829,26 @@ and updated comparison evidence.
   validation passed on 159,904 records in 11 logs. The four replay commands
   in `report.md` reproduce the committed artifacts byte for byte. Full
   clean-clone rebuild was not repeated.
+
+### Iterated elite-restart experiment (preregistered 2026-10-29, not yet run)
+
+- Frozen protocol: `docs/experiments/iterated_elite_restart.md`;
+  implementation `optimizer/iterated_elite.py`. This follows the
+  elite-prefix record's frozen next decision. Per cap, there are 10 paired
+  replicates of 2,000 trials. Each pair shares 400 fresh generation-0
+  trials. The fresh arm adds 1,600 fresh seeds; the iterated arm adds four
+  generations of 20 parents x 20 children. The iterated arm thus pays for
+  its own elite pool, and no historical trial enters either arm. A child
+  replays its parent's seed chain through half of the parent's own redrawn
+  sharing decisions. Parents are re-selected each generation from all of
+  the replicate's trials (distinct circuits, at most 5 per generation-0
+  root).
+- H9b: iterated best-of-2,000 is at least 2.0 gates below fresh, paired
+  z <= -3. H9t: more distinct circuits at or below 442 (depth 7) or 469
+  (depth 6), paired z >= +3 and at least twice the fresh pooled count.
+  Existence targets <=436 and <=459 are reported separately.
+- Seeds 600000..635999 (depth 7) and 640000..675999 (depth 6): 72,000
+  trials, about 5 hours with 16 workers. The project owner starts it with
+  `python3 -B -m optimizer.iterated_elite --stage stage1 --workers 16 >> results/iterated_elite/stage1_progress.log 2>&1`
+  (resumable; `--cap 7` or `--cap 6` runs one cap). No experimental seed
+  has run; no result is claimed.
