@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import csv
 from pathlib import Path
 import re
 import tempfile
 import unittest
+from unittest import mock
 
 from verifier.build_results import (
     PHASE5_ALGORITHM,
@@ -18,7 +20,10 @@ from verifier.build_results import (
     dominates,
     nondominated,
     structural_fingerprint,
+    register_circuit,
+    _baseline_comparison,
 )
+from verifier.verify_network import parse_network_file, verify_exact_equivalence
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -83,6 +88,72 @@ class ClassObjectiveTests(unittest.TestCase):
 
 
 class FingerprintTests(unittest.TestCase):
+    def test_duplicate_n31_consumer_split_preserves_physical_identity_and_frontier(
+        self,
+    ):
+        source = Path("results/phase6/candidate_depth6_bounded.v").read_text()
+        assignment = re.search(r"^assign n31 = (.*);$", source, re.M).group(1)
+        consumers = [
+            line
+            for line in source.splitlines()
+            if line.startswith("assign ") and re.search(r"= .*\bn31\b", line)
+        ]
+        self.assertEqual(len(consumers), 6)
+        with tempfile.TemporaryDirectory() as directory:
+            points, identities = {}, {}
+            ids = []
+            for count in (1, 3):
+                split = source.replace("wire n31;", "wire n31;\nwire duplicate_gate;")
+                split = split.replace(
+                    f"assign n31 = {assignment};",
+                    f"assign n31 = {assignment};\nassign duplicate_gate = {assignment};",
+                )
+                for consumer in consumers[:count]:
+                    split = split.replace(
+                        consumer, re.sub(r"\bn31\b", "duplicate_gate", consumer)
+                    )
+                path = Path(directory) / f"split_{count}.v"
+                path.write_text(split)
+                normalized = parse_network_file(path).normalize()
+                self.assertEqual(verify_exact_equivalence(normalized), 97)
+                metrics = normalized.metrics().to_dict()
+                self.assertEqual(metrics["xor2_count"], 471)
+                self.assertEqual(
+                    metrics["total_excess_fanout_above_4"], 21 if count == 1 else 20
+                )
+                ids.append(
+                    register_circuit(
+                        points, identities, structural_fingerprint(path), metrics
+                    )
+                )
+                # Reverse the cosmetic wire-name ordering and XOR pin ordering.
+                renamed = re.sub(
+                    r"\bn(\d+)\b", lambda m: f"renamed_{9999 - int(m[1])}", split
+                )
+                renamed = renamed.replace(
+                    "module candidate_depth6_bounded", "module renamed"
+                )
+                renamed = re.sub(
+                    r"= ([\w\[\]]+) \^ ([\w\[\]]+);", r"= \2 ^ \1;", renamed
+                )
+                renamed_path = Path(directory) / f"renamed_{count}.v"
+                renamed_path.write_text(renamed)
+                self.assertEqual(
+                    structural_fingerprint(path), structural_fingerprint(renamed_path)
+                )
+            self.assertNotEqual(*ids)
+            self.assertEqual(nondominated(points), [ids[1]])
+
+    def test_one_identity_rejects_conflicting_metrics_and_short_hash_collision(self):
+        points, identities = {}, {}
+        register_circuit(points, identities, "a" * 64, _point(471, 6, 6, 21))
+        with self.assertRaisesRegex(ValueError, "conflicting measurements"):
+            register_circuit(points, identities, "a" * 64, _point(471, 6, 6, 20))
+        with self.assertRaisesRegex(ValueError, "short circuit ID collision"):
+            register_circuit(
+                points, identities, "a" * 12 + "b" * 52, _point(471, 6, 6, 21)
+            )
+
     def test_renaming_module_and_wires_keeps_the_fingerprint(self) -> None:
         source = (FIXTURES / "duplicate_instances.v").read_text()
         renamed = re.sub(r"\bn(\d+)\b", r"w\1", source).replace(
@@ -129,7 +200,9 @@ class Phase5RecordTests(unittest.TestCase):
         ]
 
     def test_unimproving_study_is_summarized(self) -> None:
-        summary = check_phase5(self.study, self.checkpoint, self.records, self.candidate)
+        summary = check_phase5(
+            self.study, self.checkpoint, self.records, self.candidate
+        )
         self.assertEqual(summary["solver_status_counts"], {"unsat": 1})
         self.assertEqual(summary["accepted_replacements"], 0)
 
@@ -144,6 +217,53 @@ class Phase5RecordTests(unittest.TestCase):
             check_phase5(
                 self.study, self.checkpoint, self.records, Path("results/other.v")
             )
+
+
+class BaselineProvenanceTests(unittest.TestCase):
+    def test_stale_published_baseline_metric_is_rejected_after_measurement(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "baseline_metrics.csv"
+            with Path("results/baseline_metrics.csv").open(newline="") as source:
+                reader = csv.DictReader(source)
+                rows = list(reader)
+                header = reader.fieldnames
+            rows[0]["xor2_count"] = "1"
+            with path.open("w", newline="") as output:
+                writer = csv.DictWriter(output, fieldnames=header)
+                writer.writeheader()
+                writer.writerows(rows)
+            (path.parent / "baselines").symlink_to(
+                Path("results/baselines").resolve(), target_is_directory=True
+            )
+            with self.assertRaisesRegex(ValueError, "stale baseline metrics"):
+                _baseline_comparison(path, {})
+
+    def test_runtime_columns_do_not_affect_provenance(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "baseline_metrics.csv"
+            with Path("results/baseline_metrics.csv").open(newline="") as source:
+                reader = csv.DictReader(source)
+                rows = list(reader)
+                header = reader.fieldnames
+            for row in rows:
+                for field in header:
+                    if field.endswith("runtime_seconds"):
+                        row[field] = "999999.9"
+            with path.open("w", newline="") as output:
+                writer = csv.DictWriter(output, fieldnames=header)
+                writer.writeheader()
+                writer.writerows(rows)
+
+            def measured(artifact, *args):
+                normalized = parse_network_file(
+                    Path("results/baselines") / artifact.name
+                ).normalize()
+                return {"metrics": normalized.metrics().to_dict()}
+
+            with mock.patch(
+                "verifier.build_results.verification_report", side_effect=measured
+            ), mock.patch("verifier.build_results.run_formal"):
+                self.assertEqual(len(_baseline_comparison(path, {})), 4)
 
 
 class BoundedBudgetTests(unittest.TestCase):
@@ -207,6 +327,42 @@ class BoundedBudgetTests(unittest.TestCase):
         self.assertEqual(provenance["seed"], 11)
         self.assertEqual(provenance["accepted_incumbents"], 2)
 
+    def test_retry_events_do_not_inflate_the_completed_seed_budget(self):
+        history = []
+        for record in self.records:
+            seed = record["seed"]
+            numbers = (1, 2) if seed == 10 else (1,)
+            for number in numbers:
+                trial_id = f"trial-{seed}-attempt-{number}"
+                start = {
+                    **record,
+                    "schema_version": 2,
+                    "attempt_number": number,
+                    "trial_id": trial_id,
+                    "attempt_id": trial_id + "-started",
+                    "status": "started",
+                    "accepted": False,
+                    "verification_passed": False,
+                }
+                history.append(start)
+                terminal = {
+                    **start,
+                    **record,
+                    "attempt_id": trial_id,
+                    "status": "succeeded",
+                }
+                if seed == 10 and number == 1:
+                    terminal.update(
+                        status="failed",
+                        accepted=False,
+                        verification_passed=False,
+                        final_metrics=None,
+                        error_reason="worker failed",
+                    )
+                history.append(terminal)
+        self.records = history
+        self.assertEqual(self._check()["logged_attempts"], 3)
+
     def test_incomplete_budget_is_rejected(self) -> None:
         self.checkpoint["status"] = "running"
         with self.assertRaisesRegex(ValueError, "not complete"):
@@ -218,7 +374,10 @@ class BoundedBudgetTests(unittest.TestCase):
             self._check()
 
     def test_better_unaccepted_trial_is_rejected(self) -> None:
-        self.records[2]["final_metrics"] = {**_point(440, 7, 5, 5), "output_depths": [7]}
+        self.records[2]["final_metrics"] = {
+            **_point(440, 7, 5, 5),
+            "output_depths": [7],
+        }
         with self.assertRaisesRegex(ValueError, "not the last accepted"):
             self._check()
 

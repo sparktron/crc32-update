@@ -193,15 +193,17 @@ def nondominated(points: dict[str, dict[str, object]]) -> list[str]:
 def structural_fingerprint(path: Path) -> str:
     """Hash the normalized XOR2 DAG independently of module and wire names.
 
-    Each node is labelled by the hash of its canonical input labels, so two
-    netlists that differ only in naming share a fingerprint while separately
-    instantiated duplicate gates remain distinct entries in the node multiset.
+    Unique recursive labels already identify every instance unambiguously. Keep
+    that historical encoding for those circuits. With duplicate labels, use an
+    exact canonical instance graph, including consumers and ordered outputs.
     """
     normalized = parse_network_file(path).normalize()
     labels = {signal: signal for signal in PRIMARY_INPUTS}
     node_labels = []
     for node in normalized.nodes:
-        inputs = sorted(labels[signal] for signal in normalized.canonical_inputs[node.output])
+        inputs = sorted(
+            labels[signal] for signal in normalized.canonical_inputs[node.output]
+        )
         label = hashlib.sha256(json.dumps(["xor2", inputs]).encode()).hexdigest()
         labels[node.output] = label
         node_labels.append(label)
@@ -209,7 +211,97 @@ def structural_fingerprint(path: Path) -> str:
         "nodes": sorted(node_labels),
         "outputs": [labels[source] for source in normalized.output_sources],
     }
+    if len(set(node_labels)) != len(node_labels):
+        document = _canonical_instance_graph(normalized, labels)
     return hashlib.sha256(json.dumps(document).encode()).hexdigest()
+
+
+def _canonical_instance_graph(normalized, labels):
+    """Canonical graph via equitable refinement and exact individualization.
+
+    Refinement alone is not an isomorphism test. Ambiguous cells are searched;
+    only vertices with literally identical neighbours can safely share a branch.
+    The final encoding contains actual instance indices, never just colours.
+    """
+    vertices = [node.output for node in normalized.nodes]
+    inputs = normalized.canonical_inputs
+    consumers = {v: [] for v in vertices}
+    outputs = {v: [] for v in vertices}
+    for v in vertices:
+        for parent in inputs[v]:
+            if parent in consumers:
+                consumers[parent].append(v)
+    for index, source in enumerate(normalized.output_sources):
+        if source in outputs:
+            outputs[source].append(index)
+    groups = {}
+    for v in vertices:
+        groups.setdefault(labels[v], []).append(v)
+
+    def canonical(partition):
+        while True:
+            colours = {v: index for index, cell in enumerate(partition) for v in cell}
+
+            def token(v):
+                return ("gate", colours[v]) if v in colours else ("input", v)
+
+            refined = []
+            for cell in partition:
+                buckets = {}
+                for v in cell:
+                    signature = (
+                        tuple(sorted(token(p) for p in inputs[v])),
+                        tuple(sorted(colours[c] for c in consumers[v])),
+                        tuple(outputs[v]),
+                    )
+                    buckets.setdefault(signature, []).append(v)
+                refined.extend(buckets[key] for key in sorted(buckets))
+            if len(refined) == len(partition):
+                break
+            partition = refined
+        ambiguous = next((i for i, cell in enumerate(partition) if len(cell) > 1), None)
+        if ambiguous is None:
+            order = [cell[0] for cell in partition]
+            return json.dumps(
+                {
+                    "nodes": [sorted(token(p) for p in inputs[v]) for v in order],
+                    "outputs": [token(v) for v in normalized.output_sources],
+                }
+            )
+        cell = partition[ambiguous]
+        candidates = []
+        twins = set()
+        for v in cell:
+            neighbours = (
+                tuple(sorted(inputs[v])),
+                tuple(sorted(consumers[v])),
+                tuple(outputs[v]),
+            )
+            if neighbours in twins:
+                continue
+            twins.add(neighbours)
+            candidates.append(
+                canonical(
+                    partition[:ambiguous]
+                    + [[v], [w for w in cell if w != v]]
+                    + partition[ambiguous + 1 :]
+                )
+            )
+        return min(candidates)
+
+    return {"instance_graph_v2": canonical([groups[key] for key in sorted(groups)])}
+
+
+def register_circuit(circuits, identities, fingerprint, metrics):
+    """Reject conflicting measurements and shortened-ID collisions."""
+    circuit_id = fingerprint[:12]
+    if circuit_id in identities and identities[circuit_id] != fingerprint:
+        raise ValueError("short circuit ID collision")
+    if circuit_id in circuits and circuits[circuit_id] != metrics:
+        raise ValueError("conflicting measurements for one physical circuit identity")
+    identities[circuit_id] = fingerprint
+    circuits[circuit_id] = metrics
+    return circuit_id
 
 
 def _log_records(search_log: Path) -> list[dict[str, object]]:
@@ -230,17 +322,17 @@ def _seed_range_records(
     seed_count = checkpoint.get("seed_count")
     if not isinstance(seed_start, int) or not isinstance(seed_count, int):
         raise ValueError(f"{algorithm} checkpoint seed range is malformed")
-    attempts = [
-        record
-        for record in records
-        if record.get("algorithm") == algorithm
-        and isinstance(record.get("seed"), int)
-        and seed_start <= record["seed"] < seed_start + seed_count
-    ]
+    from optimizer.search_lifecycle import budget_records
+
+    attempts, _, starts = budget_records(records, algorithm, seed_start, seed_count)
+    if starts:
+        raise ValueError(f"{algorithm} log contains unfinished attempts")
     if [record["seed"] for record in attempts] != list(
         range(seed_start, seed_start + seed_count)
     ):
-        raise ValueError(f"{algorithm} log does not hold its complete ordered seed range")
+        raise ValueError(
+            f"{algorithm} log does not hold its complete ordered seed range"
+        )
     ids = [record.get("attempt_id") for record in attempts]
     if len(set(ids)) != len(ids):
         raise ValueError(f"{algorithm} log contains duplicate attempt IDs")
@@ -292,7 +384,12 @@ def check_candidate_a(
         for path in checkpoints
         if _json(path).get("incumbent_seed") == winner["seed"]
     ]
-    if len(owning) != 1 or _json(owning[0]).get("incumbent_metrics") != measured:
+    incumbent_metrics = (
+        _json(owning[0]).get("incumbent_metrics") if len(owning) == 1 else None
+    )
+    if not isinstance(incumbent_metrics, dict) or _without_unreachable(
+        incumbent_metrics
+    ) != _without_unreachable(measured):
         raise ValueError("no completed checkpoint records the Candidate A incumbent")
     return {
         "algorithm": CANDIDATE_A_ALGORITHM,
@@ -317,7 +414,9 @@ def check_refinement(
         if record.get("algorithm") == refinement.starting_algorithm
     ]
     if len(starts) != 1:
-        raise ValueError(f"Candidate {submission.candidate_class} needs one starting point")
+        raise ValueError(
+            f"Candidate {submission.candidate_class} needs one starting point"
+        )
     start = starts[0]
     if not start.get("accepted") or not start.get("verification_passed"):
         raise ValueError("starting point was not verified and accepted")
@@ -393,17 +492,21 @@ def check_bounded_search(
         if int(metrics["maximum_depth"]) > budget.depth_cap:
             raise ValueError(f"{attempt.get('attempt_id')} exceeds the depth cap")
     winner = min(
-        attempts, key=lambda attempt: _bounded_order(attempt["final_metrics"], attempt["seed"])
+        attempts,
+        key=lambda attempt: _bounded_order(attempt["final_metrics"], attempt["seed"]),
     )
     accepted = [attempt for attempt in attempts if attempt.get("accepted")]
     if not accepted or accepted[-1] is not winner:
-        raise ValueError("the best logged bounded trial is not the last accepted incumbent")
+        raise ValueError(
+            "the best logged bounded trial is not the last accepted incumbent"
+        )
     if checkpoint.get("incumbent_seed") != winner["seed"]:
         raise ValueError("checkpoint incumbent seed is not the best logged trial")
     measured_metrics = _without_unreachable(measured)
-    if winner["final_metrics"] != measured_metrics or checkpoint.get(
-        "incumbent_metrics"
-    ) != measured_metrics:
+    if (
+        winner["final_metrics"] != measured_metrics
+        or checkpoint.get("incumbent_metrics") != measured_metrics
+    ):
         raise ValueError("bounded incumbent metrics do not match measurement")
     incumbent = budget.incumbent_dir / f"seed_{winner['seed']}.v"
     if Path(str(winner.get("artifact"))) != incumbent:
@@ -438,9 +541,13 @@ def check_class_objectives(metrics_by_class: dict[str, dict[str, object]]) -> No
     A minimizes XOR2 count; B minimizes XOR2 count within the depth-8 bound;
     C minimizes depth first, then XOR2 count. Ties are allowed.
     """
-    missing = [label for label in REQUIRED_CANDIDATE_CLASSES if label not in metrics_by_class]
+    missing = [
+        label for label in REQUIRED_CANDIDATE_CLASSES if label not in metrics_by_class
+    ]
     if missing:
-        raise ValueError(f"required candidate classes are missing: {', '.join(missing)}")
+        raise ValueError(
+            f"required candidate classes are missing: {', '.join(missing)}"
+        )
     points = list(metrics_by_class.values())
 
     def best(eligible, key, label: str, objective: str) -> None:
@@ -448,7 +555,9 @@ def check_class_objectives(metrics_by_class: dict[str, dict[str, object]]) -> No
         if not eligible(metrics_by_class[label]):
             raise ValueError(f"Candidate {label} does not satisfy its class constraint")
         if any(key(metrics) < key(metrics_by_class[label]) for metrics in candidates):
-            raise ValueError(f"Candidate {label} does not {objective} among submissions")
+            raise ValueError(
+                f"Candidate {label} does not {objective} among submissions"
+            )
 
     best(lambda m: True, lambda m: m["xor2_count"], "A", "minimize XOR2 count")
     best(
@@ -483,17 +592,23 @@ def check_phase5(
         raise ValueError("Phase 5 v2 study roots or outcomes are malformed")
     if [outcome.get("root") for outcome in outcomes] != roots:
         raise ValueError("Phase 5 v2 outcomes do not cover the configured roots")
-    if checkpoint.get("completed_roots") != roots or checkpoint.get("outcomes") != outcomes:
+    if (
+        checkpoint.get("completed_roots") != roots
+        or checkpoint.get("outcomes") != outcomes
+    ):
         raise ValueError("Phase 5 v2 checkpoint disagrees with the study output")
     for outcome in outcomes:
-        if outcome.get("witness") is not None or outcome.get(
-            "replacement_gate_count"
-        ) is not None:
+        if (
+            outcome.get("witness") is not None
+            or outcome.get("replacement_gate_count") is not None
+        ):
             raise ValueError(
                 f"Phase 5 cone {outcome.get('root')} has a replacement witness; "
                 "integrate and re-verify it before regenerating the frontier"
             )
-    logged = [record for record in records if record.get("algorithm") == PHASE5_ALGORITHM]
+    logged = [
+        record for record in records if record.get("algorithm") == PHASE5_ALGORITHM
+    ]
     if [record.get("study_outcome") for record in logged] != outcomes:
         raise ValueError("Phase 5 v2 log records disagree with the study output")
     exploratory = [
@@ -527,8 +642,26 @@ def _baseline_comparison(
 ) -> list[dict[str, object]]:
     with path.open(newline="") as source:
         rows = list(csv.DictReader(source))
+    from verifier.verify_baselines import BASELINES
+
+    filenames = dict(BASELINES)
+    if sorted(row["baseline"] for row in rows) != sorted(filenames):
+        raise ValueError(
+            "baseline metrics must contain each committed baseline exactly once"
+        )
     comparison = []
     for row in rows:
+        # This is the committed artifact underlying the published table. A fresh
+        # ABC synthesis belongs to a separate observation when tool versions differ.
+        artifact = path.parent / "baselines" / filenames[row["baseline"]]
+        report = verification_report(
+            artifact, DEFAULT_RANDOM_TESTS, DEFAULT_RANDOM_SEED
+        )
+        run_formal(artifact)
+        for key, value in _without_unreachable(report["metrics"]).items():
+            recorded = json.loads(row[key]) if key == "output_depths" else int(row[key])
+            if recorded != value:
+                raise ValueError(f"stale baseline metrics: {row['baseline']} {key}")
         metrics = {key: int(row[key]) for key in OBJECTIVES}
         comparison.append(
             {
@@ -552,6 +685,7 @@ def build_results(
     records = _log_records(search_log)
     submitted = []
     circuits: dict[str, dict[str, object]] = {}
+    identities: dict[str, str] = {}
     for submission in SUBMISSIONS:
         report = verification_report(submission.artifact, random_tests, random_seed)
         run_formal(submission.artifact)
@@ -572,9 +706,8 @@ def build_results(
             provenance = check_refinement(submission, measured, records)
             seed = provenance["source_seed"]
         fingerprint = structural_fingerprint(submission.artifact)
-        circuit_id = fingerprint[:12]
         metrics = _without_unreachable(measured)
-        circuits.setdefault(circuit_id, metrics)
+        circuit_id = register_circuit(circuits, identities, fingerprint, metrics)
         submitted.append(
             {
                 "candidate_class": submission.candidate_class,
@@ -632,7 +765,8 @@ def build_results(
         "submitted_candidates": submitted,
         "phase5_exact_study": phase5,
         "baseline_comparison": _baseline_comparison(
-            BASELINE_METRICS, {circuit_id: circuits[circuit_id] for circuit_id in frontier_ids}
+            BASELINE_METRICS,
+            {circuit_id: circuits[circuit_id] for circuit_id in frontier_ids},
         ),
         "specification_checks": {
             "required_candidate_classes": list(REQUIRED_CANDIDATE_CLASSES),
@@ -722,7 +856,9 @@ def main() -> int:
             if not path.exists() or path.read_text() != text
         ]
         if stale:
-            parser.exit(1, f"Result files do not match regeneration: {', '.join(stale)}\n")
+            parser.exit(
+                1, f"Result files do not match regeneration: {', '.join(stale)}\n"
+            )
     else:
         for path, text in ((args.frontier, frontier_text), (args.metrics, metrics)):
             path.parent.mkdir(parents=True, exist_ok=True)

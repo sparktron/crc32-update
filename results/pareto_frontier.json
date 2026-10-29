@@ -411,7 +411,7 @@
     {
       "artifact": "results/phase4/candidate_c_refined.v",
       "candidate_class": "C0",
-      "circuit_id": "0c80bfcc8e2b",
+      "circuit_id": "103832014152",
       "metrics": {
         "direct_output_alias_count": 32,
         "intermediate_node_count": 1390,
@@ -470,7 +470,7 @@
         "starting_point_attempt_id": "candidate-c-phase4-balanced-starting-point-v1"
       },
       "seed": null,
-      "structural_sha256": "0c80bfcc8e2be8a92e72e23c6481ae71277be12629f646704ab7d67099de78ae",
+      "structural_sha256": "103832014152b7ec17a983c5a4364c936c4ad5c838d9daf9d8c70e1c0f038a03",
       "verification": {
         "exact_vectors": 97,
         "formal_equivalence": "passed",

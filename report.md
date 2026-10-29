@@ -139,7 +139,7 @@ The following values are transcribed directly from `results/metrics.csv`.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | true |
 | B | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | true |
-| C0 | 0c80bfcc8e2b |  | 1390 | 6 | 20 | 2812 | 1038 | false |
+| C0 | 103832014152 |  | 1390 | 6 | 20 | 2812 | 1038 | false |
 | B7 | b65a4c2b615e | 40505 | 441 | 7 | 5 | 914 | 5 | true |
 | C | b8edf279b361 | 56140 | 470 | 6 | 6 | 972 | 20 | true |
 
