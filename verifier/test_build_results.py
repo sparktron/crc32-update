@@ -86,6 +86,18 @@ class ClassObjectiveTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing: C"):
             check_class_objectives(self.metrics)
 
+    def test_fanout_class_wins_within_its_fanout_bound(self) -> None:
+        self.metrics["F4"] = _point(445, 7, 4, 0)
+        check_class_objectives(self.metrics)
+        self.metrics["F0"] = _point(444, 8, 4, 0)
+        with self.assertRaisesRegex(ValueError, "Candidate F4 does not minimize"):
+            check_class_objectives(self.metrics)
+
+    def test_fanout_class_must_meet_its_fanout_bound(self) -> None:
+        self.metrics["F4"] = _point(445, 7, 5, 2)
+        with self.assertRaisesRegex(ValueError, "class constraint"):
+            check_class_objectives(self.metrics)
+
 
 class FingerprintTests(unittest.TestCase):
     def test_duplicate_n31_consumer_split_preserves_physical_identity_and_frontier(
@@ -431,13 +443,14 @@ class SelectedTrialTests(unittest.TestCase):
             "artifact": str(self.root / f"seed_{seed}.v") if accepted else None,
         }
 
-    def _check(self, selected_seed, measured, source="module selected;\n"):
+    def _check(self, selected_seed, measured, source="module selected;\n", fanout_bound=None):
         budget = BoundedBudget(
             6,
             self.root / "checkpoint.json",
             self.root,
             logged_algorithm="test-algorithm-depth6-v1",
             selected_seed=selected_seed,
+            fanout_bound=fanout_bound,
         )
         budget.checkpoint.write_text(json.dumps(self.checkpoint))
         artifact = self.root / "candidate.v"
@@ -479,6 +492,29 @@ class SelectedTrialTests(unittest.TestCase):
     def test_artifact_must_replay_from_the_selected_seed(self) -> None:
         with self.assertRaisesRegex(ValueError, "does not replay"):
             self._check(12, self.selected_metrics, source="module other;\n")
+
+    def test_fanout_bound_takes_the_minimum_among_trials_within_it(self) -> None:
+        # Seed 13 has more XOR2 than the budget minimum, but no other trial
+        # has every fanout at most four.
+        bounded = {**_point(470, 6, 4, 0), "output_depths": [6]}
+        self.records[3]["final_metrics"] = bounded
+        provenance = self._check(13, bounded, fanout_bound=4)
+        self.assertEqual(provenance["seed"], 13)
+        self.assertEqual(
+            provenance["selection"],
+            "selected nondominated minimum-XOR2 trial with maximum fanout at most 4",
+        )
+
+    def test_fanout_bound_rejects_a_trial_above_it(self) -> None:
+        with self.assertRaisesRegex(ValueError, "exceeds maximum fanout 4"):
+            self._check(12, self.selected_metrics, fanout_bound=4)
+
+    def test_fanout_bound_rejects_a_trial_above_its_minimum(self) -> None:
+        self.records[2]["final_metrics"] = {**_point(468, 6, 4, 0), "output_depths": [6]}
+        bounded = {**_point(470, 6, 4, 0), "output_depths": [6]}
+        self.records[3]["final_metrics"] = bounded
+        with self.assertRaisesRegex(ValueError, "minimum XOR2 count"):
+            self._check(13, bounded, fanout_bound=4)
 
 
 if __name__ == "__main__":

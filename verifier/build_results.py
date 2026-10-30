@@ -41,6 +41,10 @@ OBJECTIVES = (
 MINIMUM_DISTINCT_PARETO_CANDIDATES = 3
 REQUIRED_CANDIDATE_CLASSES = ("A", "B", "C")
 CANDIDATE_B_DEPTH_BOUND = 8
+# F4 is an optional class: fewest XOR2 with every fanout at most four, which
+# is zero excess fanout. It mirrors Candidate B with a fanout bound in place of
+# the depth bound.
+CANDIDATE_F4_FANOUT_BOUND = 4
 CANDIDATE_A_ALGORITHM = "gf2-bp-cse-depth-stochastic-v1"
 CANDIDATE_A_CHECKPOINTS = (
     Path("results/checkpoints/candidate_a_checkpoint.json"),
@@ -103,7 +107,9 @@ class BoundedBudget:
     and last accepted incumbent. With ``selected_seed``, it is that logged
     trial instead, which may differ from the incumbent when the incumbent wins
     only on a later objective. The trial must reach the budget's minimum XOR2
-    count and be nondominated within the budget.
+    count and be nondominated within the budget. With ``fanout_bound`` as
+    well, the trial must have no fanout above that bound and reach the minimum
+    XOR2 count among the budget's trials that meet it.
     """
 
     depth_cap: int
@@ -117,6 +123,7 @@ class BoundedBudget:
         (),
     )
     selected_seed: int | None = None
+    fanout_bound: int | None = None
 
     @property
     def algorithm(self) -> str:
@@ -141,10 +148,41 @@ class Submission:
     bounded: BoundedBudget | None = None
 
 
+def _elite_prefix_budget(
+    fraction: int,
+    depth_cap: int,
+    selected_seed: int | None = None,
+    fanout_bound: int | None = None,
+) -> BoundedBudget:
+    """An elite-arm stage-1 budget of the elite-prefix restart experiment."""
+    name = f"elite_f{fraction}_depth{depth_cap}"
+    checkpoints = Path("results/checkpoints/elite_prefix")
+    return BoundedBudget(
+        depth_cap,
+        checkpoints / f"stage1_{name}_search.json",
+        checkpoints / f"stage1_{name}_incumbents",
+        logged_algorithm=f"elite-prefix-elite-f{fraction}-depth{depth_cap}-v1",
+        rendered_module=f"candidate_{name}",
+        trial=(
+            "optimizer.elite_prefix",
+            "replay_trial",
+            (("group", "elite"), ("fraction", fraction)),
+        ),
+        selected_seed=selected_seed,
+        fanout_bound=fanout_bound,
+    )
+
+
+ELITE_PREFIX_437 = Path("results/elite_prefix/stage1_elite_f75_depth7.v")
+
 SUBMISSIONS = (
-    Submission("A", Path("results/phase4/candidate_a_extended.v")),
+    # A0 and B0 are the Phase 4 Candidate A and B circuit (439 XOR2, depth 8).
+    # Like C0, they are kept for provenance: the Candidate A search and the
+    # Phase 5 exact study are checked against them. The 437 below dominates
+    # them and now satisfies the Candidate A and B objectives.
+    Submission("A0", Path("results/phase4/candidate_a_extended.v")),
     Submission(
-        "B",
+        "B0",
         Path("results/phase4/candidate_b_refined.v"),
         Refinement(
             "B",
@@ -166,44 +204,47 @@ SUBMISSIONS = (
             Path("results/checkpoints/candidate_c_refinement.json"),
         ),
     ),
-    # B7 is a bounded-depth (Candidate B family) circuit at depth 7. Adopted
-    # 2026-10-27, replacing the 441-gate Kraft-bounded incumbent
-    # (results/phase6/candidate_depth7_bounded.v). It is the incumbent of the
-    # ablation `rewrite` arm's 1,000-seed budget
-    # (docs/experiments/ablation_toward_dclo.md). That arm's distribution
-    # matches the baseline's, so this circuit is a verified tail draw, not
-    # evidence of a better method.
-    Submission(
-        "B7",
-        Path("results/ablation/rewrite_depth7.v"),
-        bounded=BoundedBudget(
-            7,
-            Path("results/checkpoints/ablation/rewrite_depth7_search.json"),
-            Path("results/checkpoints/ablation/rewrite_depth7_incumbents"),
-            logged_algorithm="ablation-rewrite-depth7-v1",
-            rendered_module="candidate_depth7_ablation_rewrite",
-            trial=("optimizer.ablation", "search_seed_ablated", (("arm", "rewrite"),)),
-        ),
-    ),
+    # The remaining circuits come from the elite-prefix restart experiment
+    # (docs/experiments/elite_prefix_restart_results.md) and were adopted
+    # 2026-10-29. Its parents were selected on outcome from earlier budgets, so
+    # these are verified tail draws, not evidence of a better method at
+    # matched compute.
+    #
+    # A, B and B7 are one circuit: seed 502,021, the incumbent of the f = 75
+    # depth-7 budget, with 437 XOR2 at depth 7. It is the fewest XOR2 of any
+    # logged trial although a depth-7 search found it. It dominates the
+    # previous A and B (A0, B0) and the previous B7, the 440-gate ablation
+    # incumbent (results/ablation/rewrite_depth7.v).
+    Submission("A", ELITE_PREFIX_437, bounded=_elite_prefix_budget(75, 7)),
+    Submission("B", ELITE_PREFIX_437, bounded=_elite_prefix_budget(75, 7)),
+    Submission("B7", ELITE_PREFIX_437, bounded=_elite_prefix_budget(75, 7)),
     # C minimizes depth, then XOR2 count. Depth 6 is the lowest any XOR2
-    # network for the widest output row can reach. Adopted 2026-10-27,
-    # replacing the 470-gate Kraft-bounded incumbent
-    # (results/phase6/candidate_depth6_bounded.v). It is seed 286,375 of the
-    # Kraft-adaptive stage-2 rerun (docs/experiments/kraft_adaptive_tiebreak.md).
-    # It ties that budget's minimum of 465 XOR2 and has lower excess fanout
-    # than the budget incumbent, seed 288,438, which wins only on maximum
-    # fanout. It dominates the previous C.
+    # network for the widest output row can reach. Seed 522,004, the incumbent
+    # of the f = 75 depth-6 budget, has 460 XOR2. It dominates the previous C,
+    # the 465-gate Kraft-adaptive seed 286,375
+    # (results/kraft_adaptive/notable/seed_286375_depth6.v).
     Submission(
         "C",
-        Path("results/kraft_adaptive/notable/seed_286375_depth6.v"),
-        bounded=BoundedBudget(
-            6,
-            Path("results/checkpoints/kraft_adaptive/stage2_rerun_depth6_search.json"),
-            Path("results/checkpoints/kraft_adaptive/stage2_rerun_depth6_incumbents"),
-            logged_algorithm="kraft-adaptive-tiebreak-half-depth6-v2",
-            rendered_module="candidate_depth6_kraft_adaptive",
-            trial=("optimizer.kraft_adaptive", "search_seed_adaptive", ()),
-            selected_seed=286375,
+        Path("results/elite_prefix/stage1_elite_f75_depth6.v"),
+        bounded=_elite_prefix_budget(75, 6),
+    ),
+    # C2 is a second depth-6 Pareto point: seed 521,005, the incumbent of the
+    # f = 50 depth-6 budget. It has one more XOR2 than C and two fewer units
+    # of excess fanout.
+    Submission(
+        "C2",
+        Path("results/elite_prefix/stage1_elite_f50_depth6.v"),
+        bounded=_elite_prefix_budget(50, 6),
+    ),
+    # F4 has every fanout at most four, so no excess fanout. Seed 500,413 of
+    # the f = 25 depth-7 budget has 445 XOR2 at depth 7, the fewest of the
+    # four logged trials that meet the bound. Its budget's incumbent has 440
+    # XOR2 and fanout 5, so F4 is selected under the fanout bound.
+    Submission(
+        "F4",
+        Path("results/elite_prefix/notable/seed_500413_depth7.v"),
+        bounded=_elite_prefix_budget(
+            25, 7, selected_seed=500413, fanout_bound=CANDIDATE_F4_FANOUT_BOUND
         ),
     ),
 )
@@ -578,9 +619,19 @@ def check_bounded_search(
             )
         chosen = selected[0]
         selection = "selected nondominated minimum-XOR2 trial"
-        minimum = min(
-            int(attempt["final_metrics"]["xor2_count"]) for attempt in attempts
-        )
+        eligible = attempts
+        if budget.fanout_bound is not None:
+            selection += f" with maximum fanout at most {budget.fanout_bound}"
+            eligible = [
+                attempt
+                for attempt in attempts
+                if int(attempt["final_metrics"]["maximum_fanout"]) <= budget.fanout_bound
+            ]
+            if chosen not in eligible:
+                raise ValueError(
+                    f"selected trial exceeds maximum fanout {budget.fanout_bound}"
+                )
+        minimum = min(int(attempt["final_metrics"]["xor2_count"]) for attempt in eligible)
         if int(chosen["final_metrics"]["xor2_count"]) != minimum:
             raise ValueError(
                 "selected trial does not reach the budget's minimum XOR2 count"
@@ -621,7 +672,8 @@ def check_class_objectives(metrics_by_class: dict[str, dict[str, object]]) -> No
     """Require each SPEC.md Section 4 class to win its objective among submissions.
 
     A minimizes XOR2 count; B minimizes XOR2 count within the depth-8 bound;
-    C minimizes depth first, then XOR2 count. Ties are allowed.
+    C minimizes depth first, then XOR2 count. The optional F4 minimizes XOR2
+    count with every fanout at most four. Ties are allowed.
     """
     missing = [
         label for label in REQUIRED_CANDIDATE_CLASSES if label not in metrics_by_class
@@ -654,6 +706,13 @@ def check_class_objectives(metrics_by_class: dict[str, dict[str, object]]) -> No
         "C",
         "minimize depth, then XOR2 count,",
     )
+    if "F4" in metrics_by_class:
+        best(
+            lambda m: m["maximum_fanout"] <= CANDIDATE_F4_FANOUT_BOUND,
+            lambda m: m["xor2_count"],
+            "F4",
+            f"minimize XOR2 count at maximum fanout {CANDIDATE_F4_FANOUT_BOUND} or less",
+        )
 
 
 def check_phase5(
@@ -821,7 +880,7 @@ def build_results(
         _json(PHASE5_STUDY),
         _json(PHASE5_CHECKPOINT),
         records,
-        Path(by_class["B"]["artifact"]),
+        Path(by_class["B0"]["artifact"]),
     )
 
     frontier_ids = nondominated(circuits)

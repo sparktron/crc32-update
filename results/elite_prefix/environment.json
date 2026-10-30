@@ -1,0 +1,9 @@
+{
+  "python": "3.10.12",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "logical_cpus": 20,
+  "tools": {
+    "yosys": "Yosys 0.9 (git sha1 1979e0b)",
+    "z3": "Z3 version 4.8.12 - 64 bit"
+  }
+}

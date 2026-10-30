@@ -69,6 +69,8 @@ checkpoint_seed() {
   python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["incumbent_seed"])' "$1"
 }
 
+# Discovery rather than a fixed module list, so the test modules each
+# experiment adds cannot be left out.
 step "Unit and rejection tests"
 python3 -B -m unittest discover
 
@@ -139,7 +141,7 @@ same results/phase4/candidate_c_refined.v "${output}/phase4/candidate_c_min_dept
 
 # These are the original Kraft-bounded B7 and C, superseded on 2026-10-27.
 # They are replayed for provenance. build_results --check below replays the
-# current B7 and C from their recorded seeds.
+# current bounded-budget circuits (A/B/B7, C, C2 and F4) from their seeds.
 step "Superseded Kraft-bounded B7 and C replays"
 for cap in 7 6; do
   best="$(checkpoint_seed "results/checkpoints/depth${cap}_bounded_search.json")"
