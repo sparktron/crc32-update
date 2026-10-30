@@ -2,9 +2,16 @@
 
 Preregistered 2026-10-29, before any experimental seed outcome. Base commit:
 `1918092abb9510bad00676274387b3a93ca1981a` (elite-prefix frontier adopted).
-Branch: `claude/iterated-elite-restart`, stacked on PR #14. The
-implementation and this protocol must be committed before collecting
-results; the run manifest records that commit. Results and interpretation
+Branch: `claude/iterated-elite-restart`. The implementation and this
+protocol must be committed before collecting results; the run manifest
+records that commit.
+
+Pre-run note (2026-10-30, before any experimental seed ran): PR #14 has
+merged, and this branch now also contains master's PR #15 (search-lifecycle
+and architecture fixes) through merge `0d95016`. The design, seeds, arms and
+decision rules below are unchanged. The run uses the code at the commit the
+manifest records, not at `1918092`; the full suite (164 tests) passed on
+`0d95016`. Results and interpretation
 belong in `iterated_elite_restart_results.md`; this protocol remains
 immutable. Previous experiment: `elite_prefix_restart_results.md`, whose
 frozen next-decision rule (H8 passed at both caps) requires this protocol.
