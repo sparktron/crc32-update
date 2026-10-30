@@ -201,7 +201,7 @@ and B0.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A0 | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | false |
 | B0 | 1472a09886a8 | 16564 | 439 | 8 | 5 | 910 | 5 | false |
-| C0 | 0c80bfcc8e2b |  | 1390 | 6 | 20 | 2812 | 1038 | false |
+| C0 | 103832014152 |  | 1390 | 6 | 20 | 2812 | 1038 | false |
 | A | aa77c6d02bb6 | 502021 | 437 | 7 | 5 | 906 | 2 | true |
 | B | aa77c6d02bb6 | 502021 | 437 | 7 | 5 | 906 | 2 | true |
 | B7 | aa77c6d02bb6 | 502021 | 437 | 7 | 5 | 906 | 2 | true |
@@ -396,21 +396,21 @@ results without overwriting them. To intentionally regenerate result files:
 python3 -B -m verifier.build_results --random-tests 100000 --seed 0xC32A5EED
 ```
 
-For full clean-checkout reproduction, run this manually (the recorded run
-took 73 seconds and can exceed an agent command limit):
+For full clean-checkout reproduction, run this manually (the 2026-10-29 run
+took 5 minutes 43 seconds and can exceed an agent command limit):
 
 ```bash
 scripts/clean_rebuild.sh
 ```
 
-It clones HEAD, runs unit/rejection tests, regenerates the fixture and
-baselines, replays submitted circuits, checks final results and the three-point
-minimum, and requires an unchanged checkout. A Yosys/ABC baseline difference
-on another toolchain is reported separately. It does not repeat the hours-long
-search budgets or SMT study; those are validated from complete records.
-The prior fresh-clone run passed 58 tests and byte-for-byte local baseline
-and artifact comparisons. That evidence predates this documentation-only
-closeout; it is not a claim of a fresh full rebuild of the report revision.
+It clones HEAD, runs every unit/rejection test module, regenerates the fixture
+and baselines, replays submitted circuits, checks final results and the
+three-point minimum, and requires an unchanged checkout. A Yosys/ABC baseline
+difference on another toolchain is reported separately. It does not repeat the
+hours-long search budgets or SMT study; those are validated from complete
+records. The 2026-10-29 fresh-clone run of `796631c` passed 117 tests,
+byte-for-byte local baseline and artifact comparisons, and the four-circuit
+frontier check. It predates the documentation-only commit that records it.
 
 For focused replay without adding optimization attempts:
 

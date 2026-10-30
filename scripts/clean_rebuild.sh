@@ -69,15 +69,10 @@ checkpoint_seed() {
   python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["incumbent_seed"])' "$1"
 }
 
+# Discovery rather than a fixed module list, so the test modules each
+# experiment adds cannot be left out.
 step "Unit and rejection tests"
-python3 -m unittest \
-  verifier.test_verifier \
-  verifier.test_verify_candidate \
-  verifier.test_build_results \
-  generator.test_baseline_generator \
-  optimizer.test_optimize \
-  optimizer.test_phase5_exact \
-  optimizer.test_depth_bounded
+python3 -B -m unittest discover
 
 step "Phase 1 matrix, structural fixture, and formal check"
 python3 -m generator.build_matrix \
@@ -107,6 +102,14 @@ python3 -m verifier.verify_baselines \
   --generation-timings "${output}/baseline_timings.json" \
   --metrics-output "${output}/baseline_metrics.csv" \
   --random-tests "${random_tests}" --seed "${seed}"
+
+# Verify the committed artifacts used by the published comparison, including
+# the historical ABC netlist. The fresh ABC result above is a toolchain-specific
+# observation and never substitutes for that artifact or its measurements.
+step "Published baseline measurement provenance"
+python3 -B -c 'from pathlib import Path; from verifier.build_results import _baseline_comparison; _baseline_comparison(Path("results/baseline_metrics.csv"), {})'
+python3 -B -c 'import json; from optimizer.search_lifecycle import tool_versions; print(json.dumps(tool_versions(), indent=2, sort_keys=True))' > "${output}/tool_versions.json"
+cat "${output}/tool_versions.json"
 
 step "Phase 3 Candidate A replay and record check"
 python3 -m optimizer.optimize \

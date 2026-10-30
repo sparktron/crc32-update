@@ -6,8 +6,82 @@ Current phase: Phase 6 — Final verification, comparison, and reporting complet
 
 Current gate: G6 passed locally on 2026-10-24. The final report is in
 `report.md`; all submitted artifacts, final metrics, provenance records, and
-the four-circuit frontier agree. The recorded fresh-clone rebuild passed;
-it was not repeated for this documentation-only closeout.
+the four-circuit frontier agree. The historical fresh-clone rebuild evidence
+below is retained. The architecture-fix validation is recorded separately in
+`docs/validation/2026-10-27-architecture-fixes.md`; a fresh-clone CI run for
+these fixes has not been performed.
+
+## PR #15 Conflict Resolution — 2026-10-29
+
+Merged master `903210d` into `codex/architecture-fixes`, retaining the elite-prefix
+four-circuit frontier, F4 fanout-bounded selection, complete unittest discovery,
+and the architecture fixes. The 437/460/461/445-gate circuits and all historical
+netlists, logs and checkpoints are unchanged from master. C0 keeps the corrected
+physical-instance identity `103832014152` in the metrics, frontier and report.
+
+Validation on the combined tree:
+
+- `python3 -B -m unittest verifier.test_build_results`: 32 tests passed.
+- `python3 -B -m unittest verifier.test_search_logs verifier.test_frozen_checkout`:
+  8 tests passed.
+- `python3 -B -m verifier.build_results --check --require-spec-minimum`: passed;
+  nine submitted classes and four committed baselines independently checked and
+  formally proved, four distinct Pareto circuits confirmed, metrics and frontier
+  byte-identical to regeneration.
+- All 52 Python files parsed successfully; `bash -n scripts/clean_rebuild.sh`
+  and `git diff --check` passed.
+
+The full unittest suite and clean-clone gate were not rerun here because of the
+repository's long-command restriction. CI runs the complete gate after push.
+To rerun the same gate manually, use
+`scripts/clean_rebuild.sh origin/codex/architecture-fixes 2>&1 | tee /tmp/pr15-clean-rebuild.log`.
+That log records progress; rerunning the command repeats the verification without
+extending any historical search budget. Next: review PR #15 and its CI result.
+
+## Architecture PR Integration — 2026-10-29
+
+The architecture patch `b87659c` was reconciled with master `4221a33` before
+opening its PR. The combined tree passed 136 discovered tests in 237.961
+seconds and the full publication check. The then-current 440-gate B7 and 465-gate C,
+per-experiment logs, fresh-gate fallback and selected-trial provenance were
+preserved. Only C0 identity metadata differs from master's publication data.
+See `docs/validation/2026-10-29-architecture-pr.md` for that integration
+evidence and limits. The earlier 109-test result below describes the pre-integration tree.
+
+## Architecture Review Follow-up — 2026-10-27
+
+The F1–F6 fixes are isolated on `codex/architecture-fixes`, starting at
+`890d136`. Physical identities now retain duplicate-gate connectivity; resume
+validates before mutation; CI discovers every test; published baseline metrics
+are measured from their actual netlists; failures/retries are journaled; and
+process scheduling is bounded. The lifecycle also preserves damaged-tail
+evidence, detects interrupted starts, and binds new budgets to source,
+configuration, matrix, strategy inputs, and tool versions.
+Final local validation passed 109 discovered tests in 143.936 seconds and
+`python3 -B -m verifier.build_results --check --require-spec-minimum`; all five
+submissions and four committed baselines were proved and three frontier
+circuits confirmed. Historical replay and fresh baseline regeneration were
+byte-identical on this host.
+
+The corrected identity changes only C0's derived hash from `0c80bfcc8e2b` to
+`103832014152`. No circuit, metric value, frontier membership, seed, checkpoint,
+or historical attempt record was changed. All three frontier IDs are stable.
+
+The original checkout's active search log, ablation checkpoints and running
+experiments were left alone. Completed legacy checkpoints and complete
+log-only bounded/DCLO budgets can restore outputs. Unfinished legacy budgets
+without a manifest cannot be extended under this implementation; an already
+loaded historical process may continue in its original checkout. Running
+workers may finish their bounded cohort after cancellation, and a stuck worker
+can still delay shutdown. Tool versions are recorded; cross-version portability
+and physical hardware performance are not established.
+
+Continuation: review the PR from this isolated branch. CI runs
+`scripts/clean_rebuild.sh --in-place`; the complete clean-clone gate was not
+run locally. Do not restart an
+old unfinished budget using the changed implementation or rewrite its history.
+See `docs/search_lifecycle.md` for the full policy and the review follow-up for
+the demonstrated regression cases.
 
 ## Current Submitted Results
 
@@ -362,7 +436,7 @@ nondominated circuits, meeting the `SPEC.md` Section 4 minimum of three;
 
 Submitted but dominated, kept for provenance: A0 and B0 (`1472a09886a8`, the
 Phase 4 Candidate A and B circuit, 439 XOR2 at depth 8), which A dominates;
-and C0 (`0c80bfcc8e2b`, 1,390 XOR2, depth 6, maximum fanout 20, excess
+and C0 (`103832014152`, 1,390 XOR2, depth 6, maximum fanout 20, excess
 1,038), the Phase 4 minimum-depth starting point, which C dominates.
 
 - **The frontier was replaced on 2026-10-29** by circuits from the
@@ -827,8 +901,14 @@ and updated comparison evidence.
   submitted classes, and every local baseline dominated
   (`results/elite_prefix/frontier_integration_check.log`). The CI search-log
   validation passed on 159,904 records in 11 logs. The four replay commands
-  in `report.md` reproduce the committed artifacts byte for byte. Full
-  clean-clone rebuild was not repeated.
+  in `report.md` reproduce the committed artifacts byte for byte.
+- Clean rebuild: `scripts/clean_rebuild.sh` passed from a fresh clone of
+  `1918092` in 1 m 56 s, but its test step named seven fixed modules (68
+  tests), so the nine test modules added by later experiments, including
+  `optimizer.test_elite_prefix`, never ran there or in CI. The step now runs
+  `python3 -m unittest discover`. The fresh-clone rebuild of `796631c` passed
+  all 117 tests, every byte-for-byte replay and the four-circuit frontier
+  check in 5 m 43 s.
 
 ### Iterated elite-restart experiment (preregistered 2026-10-29, not yet run)
 

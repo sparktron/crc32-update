@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from concurrent.futures import ProcessPoolExecutor
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import json
 import fcntl
@@ -21,9 +20,15 @@ from typing import Iterable, Sequence
 
 from generator.build_matrix import (
     INPUT_COUNT,
-    OUTPUT_COUNT,
     basis_signal_names,
     build_transformation_matrix,
+)
+from optimizer.search_lifecycle import (
+    append_log,
+    budget_records,
+    inspect_log,
+    run_budget,
+    write_checkpoint,
 )
 from verifier.run_formal import run as run_formal
 from verifier.search_logs import log_file_for
@@ -92,7 +97,9 @@ def _toggle(expression: set[int], signal: int) -> None:
         expression.add(signal)
 
 
-def _replace_pair(expression: set[int], pair: tuple[int, int], replacement: int) -> None:
+def _replace_pair(
+    expression: set[int], pair: tuple[int, int], replacement: int
+) -> None:
     expression.remove(pair[0])
     expression.remove(pair[1])
     _toggle(expression, replacement)
@@ -308,11 +315,11 @@ def independently_check(candidate: Candidate) -> Metrics:
     return normalized.metrics()
 
 
-def _worker(seed: int) -> tuple[int, dict[str, object], float]:
+def _worker(seed: int) -> tuple[int, dict[str, object], str, float]:
     started = time.perf_counter()
     candidate = search_seed(seed)
     metrics = independently_check(candidate)
-    return seed, metrics.to_dict(), time.perf_counter() - started
+    return seed, metrics.to_dict(), candidate.render(), time.perf_counter() - started
 
 
 def _timestamp() -> str:
@@ -320,10 +327,7 @@ def _timestamp() -> str:
 
 
 def _write_json(path: Path, document: object) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
-    temporary.replace(path)
+    write_checkpoint(path, document)
 
 
 def _metrics_for_log(metrics: dict[str, object]) -> dict[str, object]:
@@ -333,10 +337,7 @@ def _metrics_for_log(metrics: dict[str, object]) -> dict[str, object]:
 
 
 def _append_log(path: Path, records: Sequence[dict[str, object]]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a") as output:
-        for record in records:
-            output.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
+    append_log(path, records)
 
 
 @contextmanager
@@ -358,7 +359,9 @@ def _exclusive_search_lock(checkpoint_path: Path) -> Iterable[None]:
             fcntl.flock(lock_file, fcntl.LOCK_UN)
 
 
-def _full_verify(candidate: Candidate, random_tests: int, random_seed: int) -> dict[str, object]:
+def _full_verify(
+    candidate: Candidate, random_tests: int, random_seed: int
+) -> dict[str, object]:
     with tempfile.TemporaryDirectory(prefix="candidate-a-incumbent-") as directory:
         path = Path(directory) / "candidate_a_min_area.v"
         path.write_text(candidate.render())
@@ -382,34 +385,9 @@ def _checkpoint_search_log_path(
 def _candidate_a_attempts(
     log_path: Path, seed_start: int, seed_count: int
 ) -> list[dict[str, object]]:
-    if not log_path.exists():
-        return []
-    attempts: list[dict[str, object]] = []
-    for line_number, raw_line in enumerate(log_path.read_text().splitlines(), 1):
-        try:
-            record = json.loads(raw_line)
-        except json.JSONDecodeError as error:
-            raise ValueError(
-                f"malformed search log record at line {line_number}: {error}"
-            ) from error
-        if not isinstance(record, dict):
-            raise ValueError(f"search log line {line_number} is not an object")
-        seed = record.get("seed")
-        if (
-            record.get("algorithm") == ALGORITHM
-            and isinstance(seed, int)
-            and seed_start <= seed < seed_start + seed_count
-        ):
-            attempts.append(record)
-    expected_seeds = list(range(seed_start, seed_start + len(attempts)))
-    if [attempt.get("seed") for attempt in attempts] != expected_seeds:
-        raise ValueError("Candidate A search log is not a contiguous seed prefix")
-    expected_ids = [
-        f"candidate-a-{ALGORITHM}-seed-{seed}" for seed in expected_seeds
+    return budget_records(inspect_log(log_path)[0], ALGORITHM, seed_start, seed_count)[
+        0
     ]
-    if [attempt.get("attempt_id") for attempt in attempts] != expected_ids:
-        raise ValueError("Candidate A search log has invalid or duplicate attempt IDs")
-    return attempts
 
 
 def _reconcile_checkpoint(
@@ -448,7 +426,9 @@ def _restore_search_log(
         return
     if requested_path.exists():
         if requested_path.read_bytes() != recorded_path.read_bytes():
-            raise ValueError("requested search log conflicts with checkpoint search log")
+            raise ValueError(
+                "requested search log conflicts with checkpoint search log"
+            )
         return
     requested_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(recorded_path, requested_path)
@@ -492,9 +472,7 @@ def _write_result_artifacts(
         "intermediate_node_count,direct_output_alias_count,exact_vectors_checked,"
         "random_vectors_checked,random_seed,formal_equivalence,verification_status\n"
     )
-    output_depths = json.dumps(
-        best_metrics["output_depths"], separators=(",", ":")
-    )
+    output_depths = json.dumps(best_metrics["output_depths"], separators=(",", ":"))
     row = (
         f"A,{artifact_path},{best.seed},{best_metrics['xor2_count']},"
         f"{best_metrics['maximum_depth']},\"{output_depths}\","
@@ -520,182 +498,110 @@ def run_search(
     random_tests: int,
     random_seed: int,
 ) -> Candidate:
-    if seed_count <= 0:
-        raise ValueError("seed count must be positive")
-    started = time.perf_counter()
-    baseline = parse_network(
-        Path("results/baselines/greedy_cse.v").read_text()
-    ).normalize().metrics().to_dict()
-    best: Candidate | None = None
-    best_metrics: dict[str, object] | None = None
-    completed_before = 0
-    if checkpoint_path.exists():
-        loaded = json.loads(checkpoint_path.read_text())
-        expected = (ALGORITHM, seed_start, seed_count, random_tests, random_seed)
-        actual = (
-            loaded.get("algorithm"),
-            loaded.get("seed_start"),
-            loaded.get("seed_count"),
-            loaded.get("random_tests"),
-            loaded.get("random_seed"),
-        )
-        if actual != expected:
-            raise ValueError(
-                "checkpoint configuration does not match requested search"
-            )
-        recorded_log_path = _checkpoint_search_log_path(loaded, checkpoint_path)
-        if (
-            loaded.get("status") != "completed"
-            and recorded_log_path.resolve() != log_path.resolve()
-        ):
-            raise ValueError("running checkpoint must resume with its recorded log")
-        completed_before, incumbent_seed, logged_metrics = _reconcile_checkpoint(
-            loaded, recorded_log_path, seed_start, seed_count
-        )
-        if not 0 <= completed_before <= seed_count:
-            raise ValueError("checkpoint completed-seed count is outside the budget")
-        if incumbent_seed is not None:
-            best = search_seed(int(incumbent_seed))
-            best_metrics = independently_check(best).to_dict()
-            if _metrics_for_log(best_metrics) != logged_metrics:
-                raise RuntimeError("replayed search-log incumbent metrics do not match")
-        if (
-            completed_before != loaded.get("completed_seeds")
-            or loaded.get("incumbent_seed") != incumbent_seed
-            or loaded.get("incumbent_metrics") != best_metrics
-        ):
-            loaded.update(
-                {
-                    "completed_seeds": completed_before,
-                    "incumbent_seed": None if best is None else best.seed,
-                    "incumbent_metrics": best_metrics,
-                }
-            )
-            _write_json(checkpoint_path, loaded)
-        if loaded.get("status") == "completed":
-            if best is None or best_metrics is None:
-                raise RuntimeError("completed checkpoint has no incumbent")
-            _restore_search_log(loaded, checkpoint_path, log_path)
-            _write_result_artifacts(
-                best,
-                best_metrics,
-                artifact_path,
-                frontier_path,
-                metrics_path,
-                random_tests,
-                random_seed,
-            )
-            return best
-    elif _candidate_a_attempts(log_path, seed_start, seed_count):
-        raise ValueError("search log has Candidate A attempts without a checkpoint")
-
-    checkpoint = {
+    if random_tests < DEFAULT_RANDOM_TESTS:
+        raise ValueError(f"random_tests must be at least {DEFAULT_RANDOM_TESTS}")
+    configuration = {
         "algorithm": ALGORITHM,
         "seed_start": seed_start,
         "seed_count": seed_count,
         "random_tests": random_tests,
         "random_seed": random_seed,
-        "search_log_path": os.path.relpath(
-            log_path.resolve(), checkpoint_path.parent.resolve()
-        ),
-        "completed_seeds": completed_before,
-        "incumbent_seed": None if best is None else best.seed,
-        "incumbent_metrics": best_metrics,
-        "status": "running",
     }
-    _write_json(checkpoint_path, checkpoint)
+    incumbent_dir = checkpoint_path.parent / "candidate_a_incumbents"
 
-    seeds = range(seed_start + completed_before, seed_start + seed_count)
-    executor = ProcessPoolExecutor(max_workers=workers) if workers > 1 else None
-    results = executor.map(_worker, seeds, chunksize=1) if executor else map(_worker, seeds)
-    buffered_records: list[dict[str, object]] = []
-    try:
-        for completed_now, (seed, metrics, trial_runtime) in enumerate(
-            results, 1
-        ):
-            completed = completed_before + completed_now
-            improves = best_metrics is None or (
-                metrics["xor2_count"], metrics["maximum_depth"], seed
-            ) < (
-                best_metrics["xor2_count"], best_metrics["maximum_depth"], best.seed
+    def restore(record):
+        path = incumbent_dir / f"seed_{record['seed']}.v"
+        if not path.is_file():
+            path = Path(record["artifact"])
+        source = path.read_text()
+        normalized = parse_network(source).normalize()
+        verify_exact_equivalence(normalized)
+        return _metrics_for_log(normalized.metrics().to_dict()), source
+
+    def accept(seed, metrics, source):
+        candidate = search_seed(seed)
+        if candidate.render() != source:
+            raise RuntimeError("seed replay source differs from the worker artifact")
+        if _metrics_for_log(independently_check(candidate).to_dict()) != metrics:
+            raise RuntimeError("seed replay changed before incumbent verification")
+        report = _full_verify(candidate, random_tests, random_seed)
+        if _metrics_for_log(report["metrics"]) != metrics:
+            raise RuntimeError(
+                "independent incumbent metrics changed during verification"
             )
-            accepted = False
-            verification_passed = True
-            rejection_reason: str | None = "dominated by verified incumbent"
-            artifact: str | None = None
-            if improves:
-                candidate = search_seed(seed)
-                if independently_check(candidate).to_dict() != metrics:
-                    raise RuntimeError("seed replay changed before incumbent verification")
-                report = _full_verify(candidate, random_tests, random_seed)
-                verified_metrics = report["metrics"]
-                if verified_metrics != metrics:
-                    raise RuntimeError("independent incumbent metrics changed during verification")
-                best = candidate
-                best_metrics = metrics
-                accepted = True
-                rejection_reason = None
-                incumbent_path = (
-                    checkpoint_path.parent
-                    / "candidate_a_incumbents"
-                    / f"seed_{seed}.v"
-                )
-                incumbent_path.parent.mkdir(parents=True, exist_ok=True)
-                incumbent_path.write_text(candidate.render())
-                artifact = str(incumbent_path)
-                artifact_path.parent.mkdir(parents=True, exist_ok=True)
-                artifact_path.write_text(candidate.render())
-            buffered_records.append(
-                {
-                    "timestamp_utc": _timestamp(),
-                    "attempt_id": f"candidate-a-{ALGORITHM}-seed-{seed}",
-                    "algorithm": ALGORITHM,
-                    "parameters": {
-                        "candidate_class": "A",
-                        "depth_cap": None,
-                        "seed_budget": seed_count,
-                        "seed_start": seed_start,
-                    },
-                    "seed": seed,
-                    "runtime_seconds": round(trial_runtime, 6),
-                    "starting_metrics": _metrics_for_log(baseline),
-                    "final_metrics": _metrics_for_log(metrics),
-                    "verification_passed": verification_passed,
-                    "accepted": accepted,
-                    "rejection_reason": rejection_reason,
-                    "artifact": artifact,
-                }
-            )
-            if completed % 25 == 0 or completed == seed_count:
-                _append_log(log_path, buffered_records)
-                buffered_records.clear()
-                checkpoint.update(
-                    {
-                        "completed_seeds": completed,
-                        "incumbent_seed": None if best is None else best.seed,
-                        "incumbent_metrics": best_metrics,
-                        "elapsed_seconds": round(time.perf_counter() - started, 6),
-                    }
-                )
-                _write_json(checkpoint_path, checkpoint)
-    finally:
-        if executor:
-            executor.shutdown()
-    if best is None or best_metrics is None:
+        path = incumbent_dir / f"seed_{seed}.v"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source)
+        return path
+
+    best_seed, metrics, source = run_budget(
+        configuration=configuration,
+        workers=workers,
+        checkpoint_path=checkpoint_path,
+        log_path=log_path,
+        worker=_lifecycle_worker,
+        score=lambda metrics, seed: (
+            metrics["xor2_count"],
+            metrics["maximum_depth"],
+            seed,
+        ),
+        eligible=lambda metrics: True,
+        restore=restore,
+        accept=accept,
+        append=_append_log,
+        save=_write_json,
+    )
+    if best_seed is None or metrics is None:
         raise RuntimeError("search completed without a verified incumbent")
-
+    best = _saved_candidate(best_seed, source)
+    full_metrics = {**metrics, "unreachable_nodes": []}
     _write_result_artifacts(
         best,
-        best_metrics,
+        full_metrics,
         artifact_path,
         frontier_path,
         metrics_path,
         random_tests,
         random_seed,
     )
-    checkpoint["status"] = "completed"
-    _write_json(checkpoint_path, checkpoint)
     return best
+
+
+@dataclass(frozen=True)
+class _SavedCandidate(Candidate):
+    source: str
+
+    def render(self, module_name: str = "candidate_a_min_area") -> str:
+        import re
+
+        return re.sub(r"module \w+\(", f"module {module_name}(", self.source, count=1)
+
+
+def _saved_candidate(seed, source):
+    normalized = parse_network(source).normalize()
+    names = list(basis_signal_names()) + [node.output for node in normalized.nodes]
+    indices = {name: index for index, name in enumerate(names)}
+    vectors = [1 << index for index in range(INPUT_COUNT)]
+    depths = [0] * INPUT_COUNT
+    operations = []
+    for node in normalized.nodes:
+        a, b = (indices[name] for name in normalized.canonical_inputs[node.output])
+        operations.append(Operation(indices[node.output], a, b))
+        vectors.append(vectors[a] ^ vectors[b])
+        depths.append(1 + max(depths[a], depths[b]))
+    return _SavedCandidate(
+        seed,
+        tuple(operations),
+        tuple(indices[name] for name in normalized.output_sources),
+        tuple(vectors),
+        tuple(depths),
+        source,
+    )
+
+
+def _lifecycle_worker(seed):
+    seed, metrics, source, runtime = _worker(seed)
+    return seed, _metrics_for_log(metrics), source, runtime
 
 
 def main() -> int:
@@ -717,21 +623,22 @@ def main() -> int:
         "--workers", type=int, default=min(8, max(1, os.cpu_count() or 1))
     )
     parser.add_argument(
-        "--checkpoint", type=Path,
+        "--checkpoint",
+        type=Path,
         default=Path("results/checkpoints/candidate_a_checkpoint.json"),
     )
     parser.add_argument(
         "--artifact", type=Path, default=Path("results/candidate_a_min_area.v")
     )
     parser.add_argument(
-        "--frontier", type=Path, default=Path("results/phase3/candidate_a_frontier.json")
+        "--frontier",
+        type=Path,
+        default=Path("results/phase3/candidate_a_frontier.json"),
     )
     parser.add_argument(
         "--metrics", type=Path, default=Path("results/phase3/candidate_a_metrics.csv")
     )
-    parser.add_argument(
-        "--search-log", type=Path, default=log_file_for(ALGORITHM)
-    )
+    parser.add_argument("--search-log", type=Path, default=log_file_for(ALGORITHM))
     parser.add_argument("--random-tests", type=int, default=DEFAULT_RANDOM_TESTS)
     parser.add_argument(
         "--random-seed", type=lambda value: int(value, 0), default=DEFAULT_RANDOM_SEED
