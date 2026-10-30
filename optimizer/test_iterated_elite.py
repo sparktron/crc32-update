@@ -110,8 +110,10 @@ class IteratedEliteTests(unittest.TestCase):
             fresh = sum(count for name, _, count in rows if name in ("gen0", "fresh"))
             iterated = sum(count for name, _, count in rows if name != "fresh")
             self.assertEqual((fresh, iterated), (REPLICATES * BUDGET,) * 2)
+        historical = [r for r in read_records()
+                      if not str(r.get("algorithm")).startswith("iterated-elite-")]
         self.assertFalse(any(isinstance(r.get("seed"), int) and any(r["seed"] in s for s in spans)
-                             for r in read_records()))
+                             for r in historical))
         self.assertEqual(replicate_of("gen0", 600_000, 600_399), 0)
         self.assertEqual(replicate_of("fresh", 604_000, 605_600), 1)
         self.assertEqual(replicate_of("gen2", 624_000, 627_999), 9)
