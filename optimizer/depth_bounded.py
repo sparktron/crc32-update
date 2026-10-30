@@ -14,14 +14,14 @@ within the cap, and every completed trial meets the bound by construction.
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ProcessPoolExecutor
 from collections import Counter
-from itertools import combinations, repeat
+from itertools import combinations
 import json
 from pathlib import Path
 import random
 import time
 from typing import Callable, Sequence
+from functools import partial
 
 from generator.build_matrix import INPUT_COUNT, build_transformation_matrix
 from optimizer.optimize import (
@@ -32,13 +32,21 @@ from optimizer.optimize import (
     _replace_pair,
     independently_check,
 )
-from optimizer.refine_candidates import _append_log, _metrics, _timestamp, _write_checkpoint
+from optimizer.refine_candidates import _append_log, _metrics, _write_checkpoint
+from optimizer.search_lifecycle import (
+    budget_records,
+    callable_identity,
+    inspect_log,
+    run_budget,
+)
 from verifier.run_formal import run as run_formal
 from verifier.search_logs import log_file_for
 from verifier.verify_network import (
     DEFAULT_RANDOM_SEED,
     DEFAULT_RANDOM_TESTS,
     verification_report,
+    parse_network_file,
+    verify_exact_equivalence,
 )
 
 ALGORITHM_PREFIX = "kraft-bounded-bp-cse"
@@ -81,9 +89,12 @@ class _BoundedBuilder:
         self.generator = random.Random(seed)
         self.vectors = [1 << index for index in range(INPUT_COUNT)]
         self.depths = [0] * INPUT_COUNT
-        self.vector_to_signal = {vector: index for index, vector in enumerate(self.vectors)}
+        self.vector_to_signal = {
+            vector: index for index, vector in enumerate(self.vectors)
+        }
         self.expressions = [
-            {index for index in range(INPUT_COUNT) if row & (1 << index)} for row in rows
+            {index for index in range(INPUT_COUNT) if row & (1 << index)}
+            for row in rows
         ]
         self.operations: list[Operation] = []
         for index, expression in enumerate(self.expressions):
@@ -101,7 +112,10 @@ class _BoundedBuilder:
     def _fits(self, expression: set[int], pair: tuple[int, int]) -> bool:
         replacement, depth = self._target(pair)
         kraft = _kraft(expression, self.depths)
-        return _kraft_after(expression, kraft, pair, replacement, depth, self.depths) <= self.limit
+        return (
+            _kraft_after(expression, kraft, pair, replacement, depth, self.depths)
+            <= self.limit
+        )
 
     def _feasible_frequencies(self, new_only: bool) -> Counter[tuple[int, int]]:
         frequencies: Counter[tuple[int, int]] = Counter()
@@ -112,7 +126,9 @@ class _BoundedBuilder:
                 if new_only and replacement is not None:
                     continue
                 if (
-                    _kraft_after(expression, kraft, pair, replacement, depth, self.depths)
+                    _kraft_after(
+                        expression, kraft, pair, replacement, depth, self.depths
+                    )
                     <= self.limit
                 ):
                     frequencies[pair] += 1
@@ -150,7 +166,9 @@ class _BoundedBuilder:
         options = []
         for pair in combinations(sorted(expression), 2):
             depth = 1 + max(self.depths[pair[0]], self.depths[pair[1]])
-            increase = (1 << depth) - (1 << self.depths[pair[0]]) - (1 << self.depths[pair[1]])
+            increase = (
+                (1 << depth) - (1 << self.depths[pair[0]]) - (1 << self.depths[pair[1]])
+            )
             if kraft + increase <= self.limit:
                 options.append((depth, pair))
         if not options:
@@ -169,7 +187,9 @@ class _BoundedBuilder:
         targets = [
             expression
             for expression in self.expressions
-            if pair[0] in expression and pair[1] in expression and self._fits(expression, pair)
+            if pair[0] in expression
+            and pair[1] in expression
+            and self._fits(expression, pair)
         ]
         if not targets:
             raise RuntimeError("depth-bounded move has no feasible expression")
@@ -190,7 +210,9 @@ class _BoundedBuilder:
                         continue
                     depth = self.depths[replacement]
                     if (
-                        _kraft_after(expression, kraft, pair, replacement, depth, self.depths)
+                        _kraft_after(
+                            expression, kraft, pair, replacement, depth, self.depths
+                        )
                         > self.limit
                     ):
                         continue
@@ -210,7 +232,9 @@ class _BoundedBuilder:
         maximum_frequency = max(frequencies[pair] for pair in candidates)
         slack = 1 if self.generator.randrange(4) == 0 and maximum_frequency > 2 else 0
         pool = [
-            pair for pair in candidates if frequencies[pair] >= maximum_frequency - slack
+            pair
+            for pair in candidates
+            if frequencies[pair] >= maximum_frequency - slack
         ]
         pool.sort(
             key=lambda pair: (
@@ -322,26 +346,10 @@ def _score(metrics: dict[str, object], seed: int) -> tuple[int, ...]:
 def logged_attempts(
     log_path: Path, algorithm: str, seed_start: int, seed_count: int
 ) -> list[dict[str, object]]:
-    """Return this budget's records, which must form a contiguous seed prefix."""
-    if not log_path.exists():
-        return []
-    attempts = []
-    for line_number, line in enumerate(log_path.read_text().splitlines(), 1):
-        record = json.loads(line)
-        if not isinstance(record, dict):
-            raise ValueError(f"{log_path}:{line_number}: record is not an object")
-        seed = record.get("seed")
-        if (
-            record.get("algorithm") == algorithm
-            and isinstance(seed, int)
-            and seed_start <= seed < seed_start + seed_count
-        ):
-            attempts.append(record)
-    if [record.get("seed") for record in attempts] != list(
-        range(seed_start, seed_start + len(attempts))
-    ):
-        raise ValueError("depth-bounded search log is not a contiguous unique seed prefix")
-    return attempts
+    """Return successful terminals, validating retries and the contiguous prefix."""
+    return budget_records(inspect_log(log_path)[0], algorithm, seed_start, seed_count)[
+        0
+    ]
 
 
 def run_bounded_search(
@@ -367,8 +375,6 @@ def run_bounded_search(
     ``algorithm`` name and render under their own ``module_name``.
     """
 
-    if seed_count <= 0 or workers <= 0:
-        raise ValueError("seed_count and workers must be positive")
     if random_tests < DEFAULT_RANDOM_TESTS:
         raise ValueError(f"random_tests must be at least {DEFAULT_RANDOM_TESTS}")
     algorithm = algorithm or algorithm_name(depth_cap)
@@ -381,104 +387,48 @@ def run_bounded_search(
         "random_tests": random_tests,
         "random_seed": random_seed,
     }
-    if checkpoint_path.exists():
-        checkpoint = json.loads(checkpoint_path.read_text())
-        if {key: checkpoint.get(key) for key in configuration} != configuration:
-            raise ValueError("checkpoint configuration does not match requested search")
-    attempts = logged_attempts(log_path, algorithm, seed_start, seed_count)
-    completed = len(attempts)
 
-    # The log is authoritative: an accepted record may have been appended just
-    # before an interruption prevented the matching checkpoint update.
-    best_seed: int | None = None
-    best_metrics: dict[str, object] | None = None
-    accepted = [record for record in attempts if record.get("accepted")]
-    if accepted:
-        best_seed = int(accepted[-1]["seed"])
-        replay = trial(best_seed, depth_cap)
-        best_metrics = independently_check(replay).to_dict()
-        best_metrics.pop("unreachable_nodes")
-        if best_metrics != accepted[-1].get("final_metrics"):
-            raise ValueError("replayed incumbent does not match its logged metrics")
-        incumbent = incumbent_dir / f"seed_{best_seed}.v"
-        if not incumbent.exists() or incumbent.read_text() != replay.render(module_name):
-            raise ValueError(f"incumbent artifact {incumbent} is missing or differs")
+    def restore(record):
+        path = incumbent_dir / f"seed_{record['seed']}.v"
+        normalized = parse_network_file(path).normalize()
+        verify_exact_equivalence(normalized)
+        metrics = normalized.metrics().to_dict()
+        metrics.pop("unreachable_nodes")
+        return metrics, path.read_text()
 
-    checkpoint = {
-        **configuration,
-        "completed_seeds": completed,
-        "incumbent_seed": best_seed,
-        "incumbent_metrics": best_metrics,
-        "search_log_path": str(log_path),
-        "status": "running",
-    }
-    _write_checkpoint(checkpoint_path, checkpoint)
-    incumbent_dir.mkdir(parents=True, exist_ok=True)
+    def accept(seed, metrics, source):
+        path = incumbent_dir / f"seed_{seed}.v"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source)
+        report = verification_report(path, random_tests, random_seed)
+        run_formal(path)
+        if _metrics(report) != metrics:
+            raise RuntimeError("full verification metrics disagree with worker")
+        return path
 
-    seeds = range(seed_start + completed, seed_start + seed_count)
-    executor = ProcessPoolExecutor(max_workers=workers) if workers > 1 else None
-    results = (
-        executor.map(
-            _worker, seeds, repeat(depth_cap), repeat(module_name), repeat(trial), chunksize=1
-        )
-        if executor
-        else (_worker(seed, depth_cap, module_name, trial) for seed in seeds)
+    best_seed, best_metrics, source = run_budget(
+        configuration=configuration,
+        workers=workers,
+        checkpoint_path=checkpoint_path,
+        log_path=log_path,
+        worker=partial(
+            _worker, depth_cap=depth_cap, module_name=module_name, trial=trial
+        ),
+        score=_score,
+        eligible=lambda metrics: int(metrics["maximum_depth"]) <= depth_cap,
+        restore=restore,
+        accept=accept,
+        append=_append_log,
+        save=_write_checkpoint,
+        identity_inputs={
+            "module_name": module_name,
+            "trial": callable_identity(trial),
+        },
     )
-    try:
-        for offset, (seed, metrics, source, runtime) in enumerate(results, 1):
-            eligible = int(metrics["maximum_depth"]) <= depth_cap
-            improves = eligible and (
-                best_metrics is None
-                or _score(metrics, seed) < _score(best_metrics, best_seed or 0)
-            )
-            artifact = None
-            if improves:
-                artifact = incumbent_dir / f"seed_{seed}.v"
-                artifact.write_text(source)
-                report = verification_report(artifact, random_tests, random_seed)
-                run_formal(artifact)
-                if _metrics(report) != metrics:
-                    raise RuntimeError("full verification metrics disagree with worker")
-                best_metrics = metrics
-                best_seed = seed
-            record = {
-                "timestamp_utc": _timestamp(),
-                "attempt_id": f"{algorithm}-seed-{seed}",
-                "algorithm": algorithm,
-                "parameters": {
-                    "depth_cap": depth_cap,
-                    "seed_start": seed_start,
-                    "seed_budget": seed_count,
-                },
-                "seed": seed,
-                "runtime_seconds": round(runtime, 6),
-                "starting_metrics": None,
-                "final_metrics": metrics,
-                "verification_passed": True,
-                "accepted": improves,
-                "rejection_reason": None
-                if improves
-                else ("exceeds depth bound" if not eligible else "does not improve incumbent"),
-                "artifact": str(artifact) if artifact else None,
-            }
-            _append_log(log_path, [record])
-            checkpoint.update(
-                {
-                    "completed_seeds": completed + offset,
-                    "incumbent_seed": best_seed,
-                    "incumbent_metrics": best_metrics,
-                }
-            )
-            _write_checkpoint(checkpoint_path, checkpoint)
-    finally:
-        if executor:
-            executor.shutdown()
     if best_seed is None:
         raise RuntimeError("no trial produced a depth-bounded network")
     artifact_path.parent.mkdir(parents=True, exist_ok=True)
-    artifact_path.write_text((incumbent_dir / f"seed_{best_seed}.v").read_text())
-    checkpoint["status"] = "completed"
-    _write_checkpoint(checkpoint_path, checkpoint)
+    artifact_path.write_text(source)
     return best_seed, best_metrics
 
 
@@ -533,7 +483,9 @@ def main() -> int:
     args.checkpoint = args.checkpoint or Path(
         f"results/checkpoints/depth{cap}_bounded_search.json"
     )
-    args.artifact = args.artifact or Path(f"results/phase6/candidate_depth{cap}_bounded.v")
+    args.artifact = args.artifact or Path(
+        f"results/phase6/candidate_depth{cap}_bounded.v"
+    )
     args.incumbent_dir = args.incumbent_dir or Path(
         f"results/checkpoints/depth{cap}_bounded_incumbents"
     )

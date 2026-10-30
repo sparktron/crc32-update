@@ -19,9 +19,8 @@ Experiment control documents:
   gates.
 - [`STATUS.md`](STATUS.md) records completed work, current best results, and
   unresolved issues.
-- [`results/search_logs/`](results/search_logs) contains one
-  machine-readable record for every optimization attempt, in one append-only
-  JSONL file per experiment. `verifier/search_logs.py` maps each algorithm to
+- [`results/search_logs/`](results/search_logs) retains historical single-row attempts and new started/terminal
+  events, in one append-only JSONL file per experiment. `verifier/search_logs.py` maps each algorithm to
   its file.
   - Until 2026-10-27 these records were a single file,
     `results/search_log.jsonl`. `python3 -m scripts.split_search_log` split it
@@ -35,6 +34,9 @@ Phase 1 fixture, runs the unit and rejection suite, checks 97 exact plus 100,000
 seeded random vectors, runs formal equivalence, and regenerates then validates
 the deterministic Phase 2 baselines. The generation timings and measurement
 results in that CI check always refer to the same generated artifacts.
+The result builder also independently measures and proves the committed
+baseline artifacts used in the published table. A newly synthesized ABC
+baseline is reported separately when tool versions produce different output.
 
 Phase 1 reference, matrix, parser, metric, equivalence, rejection, and formal
 tests run in the same CI gate. CI also replays Candidate A from its recorded
@@ -48,6 +50,30 @@ another node has the same inputs. Metric normalization preserves those instances
 so fanout-aware duplication can trade additional gates for reduced fanout.
 Common-subexpression merging is measured as an explicit optimization that emits
 a different circuit, not as an automatic verifier rewrite.
+Circuit identity preserves gate instances and their consumer connectivity,
+ordered output bits, cosmetic-name independence, and XOR input commutativity.
+Conflicting measurements for one identity are rejected.
+
+## Search Persistence and Recovery
+
+Candidate A, bounded search (including DCLO and ablation), and B/C refinement
+share a durable journal and bounded scheduler. Only successful terminal records
+advance the ordered seed budget. Failed/cancelled attempts retain their reason
+and available metrics; retries receive new IDs. At most one trial per worker is
+dispatched, and parent verification completes before replacement work is queued.
+
+Resume validates the recorded log and immutable experiment manifest before any
+persistent modification. Completed budgets restore saved outputs without seed
+execution. Completed-log relocation copies a validated recorded log; running
+budgets must use their original log. Recovery preserves a damaged copy before
+discarding an incomplete final JSONL record; interior corruption is rejected.
+
+New manifests bind source, configuration, frozen matrix, trial inputs, and
+Python/Yosys/ABC/Z3 versions. Historical completed checkpoints remain readable;
+an unfinished legacy budget without a manifest cannot be extended by this
+implementation. Continue an already running historical process in its original
+checkout, or start a separately named and disjoint new budget. See
+[`docs/search_lifecycle.md`](docs/search_lifecycle.md) for the precise policies.
 
 ## Phase 1 Commands
 
@@ -145,8 +171,8 @@ stochastic optimization or creates an optimization candidate.
 Run the recorded 10,000-seed, unrestricted-depth Candidate A search. The search
 uses GF(2) signal vectors, common-subexpression extraction, Boyar–Peralta-style
 distance reduction, depth-aware rewrites, and seeded stochastic tie-breaking.
-It appends one JSONL record per seed and atomically updates a resumable
-checkpoint every 25 seeds:
+It syncs started and terminal JSONL events and atomically updates a resumable
+checkpoint after each successful seed:
 
 ```bash
 python3 -m optimizer.optimize \
